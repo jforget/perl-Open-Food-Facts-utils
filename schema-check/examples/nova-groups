@@ -1,0 +1,45 @@
+{
+	"_id" : "00187251",
+	"code" : "00187251",
+	"nova_groups_markers" : {
+		"3" : [
+			[
+				"ingredients",
+				"en:salt"
+			],
+			{
+				"deliberate_error_in_nova_groups_3": 1
+			},
+			[
+				"ingredients",
+				"en:sugar"
+			]
+		],
+		"4" : [
+			[
+				"additives",
+				"en:e322"
+			],
+			[
+				"additives",
+				"en:e471"
+			],
+			[
+				"ingredients",
+				"en:emulsifier"
+			],
+			[
+				"ingredients",
+				"en:flavouring"
+			],
+			[
+				"ingredients",
+				"en:invert-sugar"
+			],
+			{
+				"deliberate_error_in_nova_groups_4": 1
+			}
+		]
+	},
+	"ingredients_with_specified_percent_n" : 0
+}

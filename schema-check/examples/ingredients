@@ -1,0 +1,204 @@
+{
+	"_id" : "00187251",
+	"code" : "00187251",
+	"ingredients" : [
+		{
+			"ingredients" : [
+				{
+					"vegetarian" : "yes",
+					"vegan" : "yes",
+					"percent_max" : 100,
+					"id" : "en:wheat-flour",
+					"percent_estimate" : 27.564102564102566,
+					"ciqual_proxy_food_code" : "9410",
+					"text" : "wheat flour",
+					"percent_min" : 1.2820512820512822
+				},
+				{
+					"percent_min" : 0,
+					"text" : "niacin",
+					"percent_estimate" : 13.14102564102564,
+					"id" : "en:e375",
+					"percent_max" : 50,
+					"vegan" : "maybe",
+					"vegetarian" : "maybe"
+				},
+				{
+					"percent_max" : 33.333333333333336,
+					"percent_estimate" : 6.570512820512821,
+					"id" : "en:reduced-iron",
+					"text" : "reduced iron",
+					"percent_min" : 0
+				},
+				{
+					"percent_max" : 25,
+					"percent_min" : 0,
+					"text" : "thiamine mononitrate",
+					"percent_estimate" : 3.2852564102564124,
+					"id" : "en:thiamin-mononitrate"
+				},
+				{
+					"percent_max" : 20,
+					"vegetarian" : "yes",
+					"vegan" : "maybe",
+					"text" : "riboflavin",
+					"percent_min" : 0,
+					"percent_estimate" : 1.642628205128208,
+					"id" : "en:e101"
+				},
+				{
+					"percent_max" : 16.666666666666668,
+					"id" : "en:folic-acid",
+					"percent_estimate" : 1.6426282051282115,
+					"text" : "folic acid",
+					"percent_min" : 0
+				}
+			],
+			"percent_max" : 100,
+			"vegan" : "yes",
+			"vegetarian" : "yes",
+			"processing" : "en:unbleached,en:enriched",
+			"percent_estimate" : 53.84615384615385,
+			"id" : "en:flour",
+			"percent_min" : 7.6923076923076925,
+			"text" : "flour",
+			"ciqual_proxy_food_code" : "9410"
+		},
+		{
+			"vegan" : "yes",
+			"vegetarian" : "yes",
+			"percent_max" : 33.333333333333,
+			"ciqual_proxy_food_code" : "31016",
+			"percent_min" : 0,
+			"text" : "sugar",
+			"id" : "en:sugar",
+			"percent_estimate" : 16.6666666666665
+		},
+		{
+			"ingredients" : [
+				{
+					"text" : "processed with alkali",
+					"percent_min" : 0,
+					"percent_estimate" : 14.743589743589823,
+					"id" : "en:processed-with-alkali",
+					"percent_max" : 33.333333333333,
+					"deliberate_error_in_top_ingredient" : 33.333333333333
+				}
+			],
+			"percent_max" : 33.333333333333,
+			"vegetarian" : "yes",
+			"processing" : "en:defatted",
+			"vegan" : "yes",
+			"id" : "en:cocoa-powder",
+			"percent_estimate" : 14.743589743589823,
+			"ciqual_food_code" : "18100",
+			"text" : "cocoa powder",
+			"percent_min" : 0
+		},
+		{
+			"id" : "en:invert-sugar-syrup",
+			"percent_estimate" : 7.371794871794911,
+			"percent_min" : 0,
+			"text" : "invert syrup",
+			"vegan" : "yes",
+			"vegetarian" : "yes",
+			"deliberate_error_in_bottom_ingredient" : 25,
+			"percent_max" : 25
+		},
+		{
+			"from_palm_oil" : "yes",
+			"percent_max" : 20,
+			"vegan" : "yes",
+			"vegetarian" : "yes",
+			"ciqual_food_code" : "16129",
+			"id" : "en:palm-oil",
+			"percent_estimate" : 3.685897435897459,
+			"percent_min" : 0,
+			"text" : "palm oil"
+		},
+		{
+			"percent_max" : 16.666666666666668,
+			"vegetarian" : "yes",
+			"vegan" : "yes",
+			"id" : "en:whole-wheat-flour",
+			"percent_estimate" : 1.8429487179487296,
+			"text" : "whole wheat flour",
+			"percent_min" : 0,
+			"ciqual_proxy_food_code" : "9410"
+		},
+		{
+			"text" : "natural flavour",
+			"percent_min" : 0,
+			"id" : "en:natural-flavouring",
+			"percent_estimate" : 0.9214743589743648,
+			"percent_max" : "5",
+			"vegetarian" : "maybe",
+			"vegan" : "maybe"
+		},
+		{
+			"percent_estimate" : 0.4607371794871824,
+			"id" : "en:e500ii",
+			"percent_min" : 0,
+			"text" : "sodium bicarbonate",
+			"vegan" : "yes",
+			"vegetarian" : "yes",
+			"percent_max" : "5"
+		},
+		{
+			"percent_min" : 0,
+			"text" : "salt",
+			"ciqual_food_code" : "11058",
+			"percent_estimate" : 0.2303685897435912,
+			"id" : "en:salt",
+			"vegan" : "yes",
+			"vegetarian" : "yes",
+			"percent_max" : 0.70833333333333
+		},
+		{
+			"percent_max" : 0.70833333333333,
+			"id" : "en:vegetable-mono-and-diglycerides",
+			"percent_estimate" : 0.1151842948717956,
+			"text" : "vegetable mono- and diglycerides",
+			"percent_min" : 0
+		},
+		{
+			"text" : "soy lecithin",
+			"percent_min" : 0,
+			"percent_estimate" : 0.0575921474358978,
+			"id" : "en:soya-lecithin",
+			"ciqual_food_code" : "42200",
+			"percent_max" : 0.70833333333333,
+			"vegetarian" : "yes",
+			"vegan" : "yes",
+			"ingredients" : [
+				{
+					"percent_min" : 0,
+					"text" : "an emulsifier",
+					"id" : "en:emulsifier",
+					"percent_estimate" : 0.0575921474358978,
+					"percent_max" : 0.70833333333333
+				}
+			]
+		},
+		{
+			"vegetarian" : "yes",
+			"vegan" : "yes",
+			"percent_max" : 0.70833333333333,
+			"ciqual_proxy_food_code" : "9410",
+			"text" : "contain wheat",
+			"percent_min" : 0,
+			"id" : "en:wheat",
+			"percent_estimate" : 0.0287960737179489
+		},
+		{
+			"vegan" : "yes",
+			"vegetarian" : "yes",
+			"percent_max" : 0.70833333333333,
+			"percent_min" : 0,
+			"text" : "soy",
+			"id" : "en:soya",
+			"percent_estimate" : 0.028796073717956006
+		}
+	],
+	"ingredients_with_specified_percent_n" : 0
+}
