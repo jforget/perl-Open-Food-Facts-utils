@@ -39,6 +39,194 @@ n'exclus pas  de stocker des documents  dans une base de  données soit
 directement dans la base MongoDB `off`, soit en recopiant la base dans
 une base SQL.
 
+Mode d'emploi
+=============
+
+Installation
+------------
+
+Il y a besoin de Perl 5.38, ainsi que des modules `YAML`, `YAML::Node`
+et `JSON::PP`. J'ai eu l'intention  de prendre `YAML::Any`, mais comme
+l'explique la documentation, ce module est destiné à être remplacé par
+`YAML` qui, à terme, fonctionnera comme un module `xxx::Any`.
+
+Votre machine doit contenir une copie locale du dépôt
+[`openfoodfacts-server`](https://github.com/openfoodfacts/openfoodfacts-server)
+ou d'un clone ce de dépôt.
+
+Dans le programme `schéma-check.pl`,  il faut changer l'initialisation
+de la  variable `$dir_sch`  pour y  mettre le  répertoire de  la copie
+locale du dépôt OFF-S contenant  les fichiers YAML décrivant le schéma
+des données.
+
+Utilisation
+-----------
+
+Si la  version de Perl  utilisée par  votre système est  trop ancienne
+(avant 5.38),  il faut sélectionner  une version récente,  par exemple
+avec `perlbrew`.
+
+Pour analyser les documents JSON contenus dans le fichier `exemple.txt`,
+taper :
+
+```
+perl schema-check.pl exemple.txt
+```
+
+Supposons que le fichier `exemple.txt` contienne :
+
+```
+ligne bidon
+{ "_id": "abcdef", "erreur_volontaire": 1 }
+nouvelle ligne bidon
+{
+  "code": "ghijkl",
+  "nutriments" : {
+    "nouvelle_erreur_volontaire": 2
+  }
+}
+dernière ligne bidon
+```
+
+Le résultat de la vérification est :
+
+```
+(coupé)
+--------------------------------------------------
+exemple.txt abcdef
+--------------------------------------------------
+invalid property erreur_volontaire (top)
+--------------------------------------------------
+exemple.txt ghijkl
+--------------------------------------------------
+invalid property nouvelle_erreur_volontaire (top nutriments)
+
+```
+
+Voici ce qui s'est passé. Le programme commence par charger en mémoire
+le schéma de données. Il affiche le résultat sur de noombreuses lignes
+que j'ai remplacées  ci-dessus par `(coupé)`. Je ne  m'étends pas plus
+sur  cette première  étape.  Ensuite, le  programme  ouvre le  fichier
+`exemple.txt` et en extrait les  documents JSON, ou plus exactement ce
+qui pourrait ressembler à un document JSON. Cela peut être  :
+
+* un document mono-ligne,  commençant par une accolade  ouvrante et se
+terminant par une accolade fermante, comme
+
+```
+{ "_id": "abcdef", "erreur_volontaire": 1 }
+```
+
+* un document formatté sur plusieurs lignes, la première étant réduite
+à une accolade ouvrante et la dernière à une accolade fermante, comme
+
+```
+{
+  "code": "ghijkl",
+  "nutriments" : {
+    "nouvelle_erreur_volontaire": 2
+  }
+}
+```
+
+Tout le reste  est ignoré. Remarquons que le  programme ne reconnaîtra
+pas  les documents  JSON qui  sont  formattés autrement  que les  deux
+possibilités ci-dessus. Par exemple, il ne reconnaîtra pas :
+
+```
+{ "code": "ghijkl",
+  "nutriments" : {
+    "nouvelle_erreur_volontaire": 2
+  }
+}
+```
+
+et il extraira un document tronqué avec :
+
+```
+{ "code": "ghijkl", "nutriments" : { "nouvelle_erreur_volontaire": 2 }
+}
+```
+
+car il partira du principe  que l'accolade terminant la première ligne
+est  l'accolade  fermant le  document  JSON,  alors qu'elle  ferme  un
+sous-document.
+
+Pour chaque document, on a :
+
+1. une ligne de séparation,
+2. une ligne d'entête, avec le nom de fichier et le code du produit,
+3. une deuxième ligne de séparation,
+4. les erreurs rencontrées.
+
+Le code du produit est extrait soit de la propriété `code`, soit de la
+propriété  `_id`. Si  un  document contient  les  deux propriétés,  en
+général elles ont la même valeur. Ce n'est pas vérifié.
+
+Dans une ligne  d'erreur, on a bien entendu le  libellé de l'erreur et
+la  valeur erronée  en  cause.  On a  également  entre parenthèses  la
+localisation  de l'erreur,  en  fonction de  la  hiérarchie des  clés.
+Ainsi, pour l'erreur du document `abcdef`, la localisation est `(top)`
+pour indiquer que  l'erreur se situe à la racine  du document. Pour le
+document  `ghijkl`,  la  localisation  est  `(top  nutriments)`,  pour
+indiquer que l'erreur se trouve dans le sous-document `nutriments`.
+
+Si vous ne voulez pas avoir  la description du schéma de données (dans
+les 2000 lignes), précisez-le sur la ligne de commade :
+
+```
+perl schema-check.pl --no-schema-listing exemple.txt
+```
+
+Utilisation d'un autre schéma
+-----------------------------
+
+Lorsque vous utilisez le schéma de  données provenant du dépôt OFF, il
+se peut que vous obteniez une erreur YAML du genre :
+
+```
+YAML Error: Expected separator '---'
+   Code: YAML_PARSE_ERR_NO_SEPARATOR
+   Line: 24
+   Document: 2
+ at /home/jf/perl5/lib/perl5/YAML/Loader.pm line 88.
+```
+
+Dans ce  cas, il  faut corriger  l'erreur de  syntaxe YAML  dans votre
+copie locale,  la valider, créer  une _pull request_, la  soumettre et
+attendre qu'elle soit prise en compte par l'équipe OFF.
+
+Ou  alors,  vous  pouvez  copier  les  fichiers  YAML  vers  un  autre
+répertoire, les corriger, puis utiliser  ces nouveaux fichiers pour le
+schéma  de données.  C'est ce  que j'ai  fait avec  le sous-répertoire
+`schemas` du présent dépôt. Pour  lancer la vérification des documents
+JSON, la ligne de commande devient alors :
+
+```
+perl schema-check.pl --schema=schemas/product.yaml exemple.txt
+```
+
+ou bien
+
+```
+perl schema-check.pl --no-schema-listing --schema=schemas/product.yaml exemple.txt
+```
+
+Ne pas oublier  de vérifier de temps  à autre si le  schéma de données
+provenant du dépôt OFF a évolué.
+
+Une autre  utilisation de cette option  consiste à créer un  schéma de
+données délibérément réduit, pour tester un cas particulier sans avoir
+à  se coltiner  le schéma  complet.  C'est ce  que j'ai  fait dans  le
+sous-répertoire `reduced-schema` de ce dépôt. La ligne de commande
+est :
+
+```
+perl schema-check.pl --schema=reduced-schema/product_meta.yaml reduced-schema/off1
+```
+
+
+
 Description du schéma
 =====================
 
@@ -258,12 +446,6 @@ Exemple extrait de `product_nutrition.yaml`
         type: number
 ```
 
-Actuellement, toutes  les clés génériques  sont des clés  se terminant
-par un code langue. Il est permis d'envisager d'autres usages des clés
-génériques,  mais  pour l'instant  ce  n'est  pas le  cas.  Remarquons
-également que  ces clés  génériques ne sont  pas utilisées  partout où
-elles pourraient l'être. Jetez un coup d'œil au
-
 Champs implicites
 -----------------
 
@@ -304,7 +486,7 @@ provoquera pas d'erreur.
 
 Le livre de  Kristina Chodorow ne mentionne pas  la clé `"_keywords"`.
 Néanmoins, à  cause du  caractère souligné  initial, je  suppose qu'il
-s'agit  également d'une  clé implicite,  même si  son ajout  n'est pas
+pourrait s'agir également d'une clé implicite, même si son ajout n'est pas
 systématique. Cependant, comme ce n'est pas une certitude, je continue
 à déclencher un message d'erreur sur cette clé.
 
@@ -385,12 +567,12 @@ description: |
   Fields related to Eco-Score for a product.
 
   See also: `ecoscore_score`, `ecoscore_grade` and `ecoscore_tags`.
-  
+
 properties:
   ecoscore_data:
     type: object
     description: |
-      An object about a lot of details about data needed for Eco-Score computation 
+      An object about a lot of details about data needed for Eco-Score computation
       and complementary data of interest.
     properties:
       status:
@@ -866,8 +1048,8 @@ suivant
           sizes:
             type: object
             description: |
-              The available image sizes for the product (both reduced and full). 
-              The reduced images are the ones with numbers as the key( 100, 200 etc) 
+              The available image sizes for the product (both reduced and full).
+              The reduced images are the ones with numbers as the key( 100, 200 etc)
               while the full images have `full` as the key.
             patternProperties:
               (?<image_size>100|400):
@@ -975,7 +1157,7 @@ tableau, ou un `null`.
 ```
 
 Dans  le   fichier  `ingredient.yaml`,   j'ai  trouvé   cette  syntaxe
-également, où le  champ `type` est alimenté par une  liste. 
+également, où le  champ `type` est alimenté par une  liste.
 
 ```
         percent_estimate:
@@ -1013,10 +1195,10 @@ elements[*] . type` (donc un `type` métier) n'a pas de champ technique
                     The type of the included element object.
                     The type also indicates which field contains the included element object.
                     e.g. if the type is "text", the included element object will be in the "text_element" field.
-                    
+
                     Note that in the future, new type of element may be added,
                     so your code should ignore unrecognized types, and unknown properties.
-                    
+
                     TODO: add Map type
                   element_type: string
                   enum:
@@ -1279,7 +1461,7 @@ Outre les  fichiers YAML du  schéma, le  programme reçoit des  noms de
 fichiers. On  considère que ces  fichiers contiennent du  texte varié,
 avec par moment  des documents JSON. On cherche des  documents JSON de
 deux variétés.  Tout d'abord, des  documents mono-lignes. Et  ce n'est
-pas  grave si  l'on obtient  une  ligne de  plus de  30 000 caratères.
+pas  grave si  l'on obtient  une  ligne de  plus de 30 000 caractères.
 Ensuite,  des  documents  bien  mis en  forme,  avec  une  indentation
 cohérente. Ces documents sont sur  plusieurs lignes, la première étant
 constituée d'une accolade ouvrante en  début de ligne et rien d'autre,
@@ -1520,7 +1702,7 @@ répertoire. En effet,
 * `panels.yaml` inclut `./panel.yaml`
 
 mais  ce  dernier fichier  doit  se  trouver dans  le  sous-répértoire
-`knowledge_panels`  du  répertoire   `$dir_sch`,  pas  dans  `dir_sch`
+`knowledge_panels`  du  répertoire   `$dir_sch`,  pas  dans `$dir_sch`
 directement.
 
 Un dernier point  concernant `find_ref_rec` est la mise  en cache puis

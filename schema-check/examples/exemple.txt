@@ -1,0 +1,10 @@
+ligne bidon
+{ "_id": "abcdef", "erreur_volontaire": 1 }
+nouvelle ligne bidon
+{
+  "code": "ghijkl",
+  "nutriments" : {
+    "nouvelle_erreur_volontaire": 2
+  }
+}
+dernière ligne bidon

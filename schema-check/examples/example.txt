@@ -1,0 +1,10 @@
+dummy line
+{ "_id": "abcdef", "deliberate_error": 1 }
+another dummy line
+{
+  "code": "ghijkl",
+  "nutriments" : {
+    "another_deliberate_error": 2
+  }
+}
+a last dummy line
