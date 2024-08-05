@@ -5,5 +5,5 @@
 # Basic test, with the usual values for the parameters
 #
 
-perl schema-check.pl --no-schema-listing --schema=schemas/product.yaml examples/*
+perl schema-check.pl --schema=schemas/product.yaml examples/*
 

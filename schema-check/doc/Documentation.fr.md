@@ -28,7 +28,6 @@ utilitaire  est  de  vérifier  si   les  documents  de  la  collection
 répertorier les différences, essentiellement les  clés qui ne sont pas
 déclarées dans le schéma.
 
-
 Les  documents à  contrôler  sont  au format  JSON.  Ils peuvent  être
 extraits  par  une  requête  sous  le  client  `mongosh`  ou  `mongo`,
 récupérés en masse avec `mongoexport`, ou autre méthode. On peut ainsi
@@ -91,7 +90,6 @@ dernière ligne bidon
 Le résultat de la vérification est :
 
 ```
-(coupé)
 --------------------------------------------------
 exemple.txt abcdef
 --------------------------------------------------
@@ -104,9 +102,7 @@ invalid property nouvelle_erreur_volontaire (top nutriments)
 ```
 
 Voici ce qui s'est passé. Le programme commence par charger en mémoire
-le schéma de données. Il affiche le résultat sur de noombreuses lignes
-que j'ai remplacées  ci-dessus par `(coupé)`. Je ne  m'étends pas plus
-sur  cette première  étape.  Ensuite, le  programme  ouvre le  fichier
+le schéma de données. Puis le  programme  ouvre le  fichier
 `exemple.txt` et en extrait les  documents JSON, ou plus exactement ce
 qui pourrait ressembler à un document JSON. Cela peut être  :
 
@@ -152,7 +148,7 @@ car il partira du principe  que l'accolade terminant la première ligne
 est  l'accolade  fermant le  document  JSON,  alors qu'elle  ferme  un
 sous-document.
 
-Pour chaque document, on a :
+Pour chaque document, la sortie standard contient :
 
 1. une ligne de séparation,
 2. une ligne d'entête, avec le nom de fichier et le code du produit,
@@ -171,11 +167,11 @@ pour indiquer que  l'erreur se situe à la racine  du document. Pour le
 document  `ghijkl`,  la  localisation  est  `(top  nutriments)`,  pour
 indiquer que l'erreur se trouve dans le sous-document `nutriments`.
 
-Si vous ne voulez pas avoir  la description du schéma de données (dans
+Si vous voulez avoir  la description du schéma de données (dans
 les 2000 lignes), précisez-le sur la ligne de commade :
 
 ```
-perl schema-check.pl --no-schema-listing exemple.txt
+perl schema-check.pl --schema-listing exemple.txt
 ```
 
 Utilisation d'un autre schéma
@@ -209,7 +205,7 @@ perl schema-check.pl --schema=schemas/product.yaml exemple.txt
 ou bien
 
 ```
-perl schema-check.pl --no-schema-listing --schema=schemas/product.yaml exemple.txt
+perl schema-check.pl --schema-listing --schema=schemas/product.yaml exemple.txt
 ```
 
 Ne pas oublier  de vérifier de temps  à autre si le  schéma de données
