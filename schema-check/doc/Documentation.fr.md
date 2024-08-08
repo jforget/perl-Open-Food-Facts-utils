@@ -240,14 +240,6 @@ vous avez  une base de  tests et vous  pouvez extraire des  données de
 cette  base  pour les  soumettre  à  `schema-check.pl`. Voici  comment
 faire.
 
-### Avant le 21 juin 2024
-
-Avant le  21 juin 2024,  il existait  un service Docker  pour MongoDB.
-Voici la  méthode utilisée à  l'époque, qui  a entre autres  permis de
-créer le  fichier de test  `examples/multiligne`. Comme j'ai  pris des
-notes plutôt lacunaires et comme ne  ne suis pas un expert sur Docker,
-il peut y avoir des erreurs.
-
 Pour initialiser la base de données de tests, lancer l'une de ces deux
 commandes (je n'ai  pas cherché quelles étaient  les différences entre
 les deux) :
@@ -259,6 +251,14 @@ les deux) :
 
 Ensuite, vous  pouvez utiliser le  site web  de tests pour  ajouter de
 nouveaux produits, si vous le souhaitez.
+
+### Avant le 21 juin 2024
+
+Avant le  21 juin 2024,  il existait  un service Docker  pour MongoDB.
+Voici la  méthode utilisée à  l'époque, qui  a entre autres  permis de
+créer le  fichier de test  `examples/multiligne`. Comme j'ai  pris des
+notes plutôt lacunaires et comme ne  ne suis pas un expert sur Docker,
+il peut y avoir des erreurs.
 
 Pour extraire quelques  documents de la base de données,  je passe par
 une fenêtre  shell dans Emacs.
@@ -362,8 +362,16 @@ Depuis le  21 juin  2024, le  service Docker  pour MongoDB  n'est plus
 accessible.  Également, j'ai  mis  à  jour mon  poste  de travail,  en
 désactivant l'instance  locale de MongoDB. Du  coup, il n'y a  plus de
 conflit de  port TCP entre  l'instance locale et l'instance  Docker de
-MongoDB.  Pour  l'extraction  de   quelques  documents,  la  procédure
-devient :
+MongoDB.
+
+Pour extraire la  totalité du contenu de la  collection `products`, il
+suffit maintenant d'une seule ligne de commande :
+
+```
+      mongoexport -doff -cproducts --type=json -o/tmp/products.json
+```
+
+Pour l'extraction de quelques documents, la procédure devient :
 
 1. ouverture d'une fenêtre shell dans Emacs
 
@@ -411,11 +419,35 @@ principe. Remarquons qu'il ne contient pas de `NumberLong(123456789)`.
 Sans doute  est-ce parce que  le client MongoDB utilisé  est `mongosh`
 dans la nouvelle version et `mongo` dans l'ancienne.
 
-Pour extraire la totalité du contenu de la collection `products`, il suffit
-maintenant d'une seule ligne de commande :
+En  revanche,  les  clés  des   paires  clé-valeur  ont  rarement  des
+délimiteurs (doubles  quotes) et les  valeurs de ces paires  sont très
+souvent délimitées par  des simples quotes au lieu  de doubles quotes.
+Par exemple :
 
 ```
-      mongoexport -doff -cproducts --type=json -o/tmp/products.json
+    _id: '0052833225082',
+```
+
+au lieu de
+
+```
+    "_id": "0052833225082",
+```
+
+_A  priori_,  on  peut  s'en  sortir avec  les  bons  paramètres  pour
+l'analyseur  JSON fourni  par `JSON::PP`.  Sauf que  certaines valeurs
+contiennent des doubles quotes et `JSON::PP` n'aime pas. Par exemple :
+
+```
+    ingredients_text_with_allergens: 'Cheddar cheese (<span class="allergen">milk</span>), potato starch.',
+```
+
+La solution consiste à supprimer ces doubles quotes, même si ce n'est
+plus du HTML bien formatté. Voir le résultat dans
+`examples/multiline-2`.
+
+```
+    ingredients_text_with_allergens: 'Cheddar cheese (<span class=allergen>milk</span>), potato starch.',
 ```
 
 Description du schéma
@@ -1660,7 +1692,7 @@ la dernière étant constituée d'une accolade fermante en début de ligne
 et rien d'autre.
 
 L'extraction  se fait  avec un  automate à  états finis.  Cet automate
-comporte uniquement deux états, `A`  et `B`. L'état initial est l'état
+comporte uniquement trois états, `A`, `B` et `C`. L'état initial est l'état
 `A`. L'automate ne traite pas le fichier caractère par caractère, mais
 ligne par ligne (pas d'utilisation de `chop` ni de `chomp`).
 
@@ -1670,8 +1702,8 @@ programme appelle la  fonction de vérification du  document avec cette
 ligne.
 
 Dans l'état  `A`, si  l'on tombe  sur une  ligne constituée  d'un seul
-caractère  accolade  fermante (plus  le  LF  ou le  CRLF),  l'automate
-initialise une chaîne  de caractères avec cette  accolade fermante (et
+caractère  accolade  ouvrante (plus  le  LF  ou le  CRLF),  l'automate
+initialise une chaîne  de caractères avec cette  accolade ouvrante (et
 la fin de ligne) et passe à l'état `B`.
 
 Dans l'état `B`, le programme alimente la chaîne de caractères avec la
@@ -1679,6 +1711,22 @@ ligne lue  dans le fichier.  Si cette  ligne est constituée  d'un seul
 caractère accolade fermante  (encore une fois avec un LF  ou un CRLF),
 l'automate  appelle  la fonction  de  vérification  du document,  puis
 transitionne vers l'état `A`.
+
+Dans l'état  `A`, si  l'on tombe  sur une  ligne constituée  d'un seul
+caractère crochet  ouvrant (+ LF  ou CRLF), l'automate  initialise une
+chaîne de caractères  avec ce crochet ouvrant (et la  fin de ligne) et
+passe à l'état `C`.
+
+Dans l'état `C`, le programme alimente la chaîne de caractères avec la
+ligne lue  dans le fichier.  Si cette  ligne est constituée  d'un seul
+caractère crochet  fermant (encore une  fois avec  un LF ou  un CRLF),
+l'automate analyse le JSON contenu dans la chaîne (un tableau, puisque
+cela commence par  un crochet et que cela se  termine par un crochet),
+découpe ce  tableau en documents  élémentaires appelle la  fonction de
+vérification pour chaque document  élémentaire, puis transitionne vers
+l'état `A`.
+
+Il n'y a pas de transition possible entre l'état `B` et l'état `C`.
 
 L'état final  autorisé devrait être  l'état `A`, mais le  programme ne
 contrôle pas que le fichier se  termine bien. Il se contente de fermer

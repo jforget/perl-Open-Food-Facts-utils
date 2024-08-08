@@ -40,6 +40,7 @@ else {
   die "Please give the pathname for at least one JSON data file";
 }
 
+my $json_parser = JSON::PP->new->allow_singlequote(1)->allow_barekey(1);
 my %dyn_schema = ();
 my $dyn_sch    = 'dyna';
 my $schema = YAML::Load(slurp($schema_file));
@@ -98,14 +99,25 @@ for my $fname (@data_files) {
         $doc   = $line;
         $state = 'B';
       }
+      elsif ($line =~ /\A \[ \Z/x) {
+        $doc   = $line;
+        $state = 'C';
+      }
       elsif ($line =~ /\A \{ .* \} \Z/x) {
         check_json($line, $fname);
       }
     }
-    else {
+    elsif ($state eq 'B') {
       $doc .= $line;
       if ($line =~ /\A \} \Z/x) {
         check_json($doc, $fname);
+        $state = 'A';
+      }
+    }
+    else {
+      $doc .= $line;
+      if ($line =~ /\A \] \Z/x) {
+        check_json_array($doc, $fname);
         $state = 'A';
       }
     }
@@ -206,10 +218,28 @@ sub tweak_hash($schema) {
   return $ynode;
 }
 
+sub check_json_array($json, $fname) {
+  my $data = '';
+  eval { $data = $json_parser->decode($json); };
+  if ($@) {
+    say '?' x 50;
+    say "Invalid JSON";
+    say $@;
+    say '?' x 50;
+    return;
+  }
+  for my $datum (@$data) {
+    say '-' x 50;
+    say join ' ', $fname, $datum->{code} // $datum->{_id} // '???';
+    say '-' x 50;
+    check_hash($datum, 'top', $schema);
+  }
+}
+
 sub check_json($json, $fname) {
   #my $data = JSON::PP::decode_json($json);
   my $data = '';
-  eval { $data = JSON::PP::decode_json($json); };
+  eval { $data = $json_parser->decode($json); };
   if ($@) {
     say '?' x 50;
     say "Invalid JSON";

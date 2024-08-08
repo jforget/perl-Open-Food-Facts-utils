@@ -1,8 +1,8 @@
 jf@LDLC:~/Documents/perl$ mongosh
-Current Mongosh Log ID:	66b48527940efb150c838725
-Connecting to:		mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.2.15
-Using MongoDB:		4.4.29
-Using Mongosh:		2.2.15
+Current Mongosh Log ID: 66b48527940efb150c838725
+Connecting to:          mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.2.15
+Using MongoDB:          4.4.29
+Using Mongosh:          2.2.15
 
 For mongosh info see: https://docs.mongodb.com/mongodb-shell/
 
@@ -4402,7 +4402,7 @@ db.products.find({"food_groups":"en:cheese"})
     generic_name_en: '',
     nutriscore_score: 17,
     pnns_groups_2_tags: [ 'cheese', 'known' ],
-    ingredients_text_with_allergens: 'Cheddar cheese (<span class="allergen">milk</span>), potato starch.',
+    ingredients_text_with_allergens: 'Cheddar cheese (<span class=allergen>milk</span>), potato starch.',
     packaging: '',
     obsolete: '',
     countries: 'United Kingdom',
@@ -5053,7 +5053,7 @@ db.products.find({"food_groups":"en:cheese"})
     traces_from_user: '(en) ',
     ciqual_food_name_tags: [ 'cheese-average' ],
     quantity: '250 g',
-    ingredients_text_with_allergens_en: 'Cheddar cheese (<span class="allergen">milk</span>), potato starch.',
+    ingredients_text_with_allergens_en: 'Cheddar cheese (<span class=allergen>milk</span>), potato starch.',
     interface_version_created: '20150316.jqm2',
     nutriscore_2021_tags: [ 'd' ],
     emb_codes: '',
@@ -5948,7 +5948,7 @@ db.products.findOne({"_id":"00187251"})
   nutriscore_2023_tags: [ 'd' ],
   manufacturing_places_debug_tags: [],
   allergens_from_user: '(en) en:gluten',
-  ingredients_text_with_allergens_en: 'unbleached enriched flour ( <span class="allergen">wheat  flour</span>, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, <span class="allergen">soy lecithin</span> (an emulsifier), contain  wheat , <span class="allergen">soy</span>, may contain traces of <span class="allergen">peanuts</span> and <span class="allergen">tree nuts</span>,',
+  ingredients_text_with_allergens_en: 'unbleached enriched flour ( <span class=allergen>wheat  flour</span>, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, <span class=allergen>soy lecithin</span> (an emulsifier), contain  wheat , <span class=allergen>soy</span>, may contain traces of <span class=allergen>peanuts</span> and <span class=allergen>tree nuts</span>,',
   interface_version_created: '20120622',
   nutriscore_2021_tags: [ 'd' ],
   quantity: '16 oz',
@@ -6137,7 +6137,7 @@ db.products.findOne({"_id":"00187251"})
   },
   purchase_places_debug_tags: [],
   vitamins_prev_tags: [ 'en:riboflavin', 'en:folic-acid' ],
-  ingredients_text_with_allergens: 'unbleached enriched flour ( <span class="allergen">wheat  flour</span>, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, <span class="allergen">soy lecithin</span> (an emulsifier), contain  wheat , <span class="allergen">soy</span>, may contain traces of <span class="allergen">peanuts</span> and <span class="allergen">tree nuts</span>,',
+  ingredients_text_with_allergens: 'unbleached enriched flour ( <span class=allergen>wheat  flour</span>, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, <span class=allergen>soy lecithin</span> (an emulsifier), contain  wheat , <span class=allergen>soy</span>, may contain traces of <span class=allergen>peanuts</span> and <span class=allergen>tree nuts</span>,',
   nutriscore_score: 14,
   pnns_groups_2_tags: [ 'biscuits-and-cakes', 'known' ],
   countries: 'United Kingdom',
