@@ -221,7 +221,202 @@ est :
 perl schema-check.pl --schema=reduced-schema/product_meta.yaml reduced-schema/off1
 ```
 
+Où trouver des données de test ?
+--------------------------------
 
+Vous pouvez toujours  les taper directement en JSON sous  Vi, Emacs ou
+tout autre éditeur de source à votre convenance.
+
+Vous  pouvez  charger une  archive  représentant  la base  de  données
+complète. Voir les explications
+[sur le site web d'OFF](https://world.openfoodfacts.org/data).
+et notamment le paragraphe « JSONL data export ». Le fichier au format
+JSONL peut  être traité  directement par  `schema-check.pl`. Attention
+toutefois, il contient plus de 3 millions de lignes pour une taille de
+53 Go (été 2024).
+
+Puisque vous  avez une  copie locale du  dépôt `openfoodfacts-server`,
+vous avez  une base de  tests et vous  pouvez extraire des  données de
+cette  base  pour les  soumettre  à  `schema-check.pl`. Voici  comment
+faire.
+
+### Avant le 21 juin 2024
+
+Avant le  21 juin 2024,  il existait  un service Docker  pour MongoDB.
+Voici la  méthode utilisée à  l'époque, qui  a entre autres  permis de
+créer le  fichier de test  `examples/multiligne`. Comme j'ai  pris des
+notes plutôt lacunaires et comme ne  ne suis pas un expert sur Docker,
+il peut y avoir des erreurs.
+
+Pour initialiser la base de données de tests, lancer l'une de ces deux
+commandes (je n'ai  pas cherché quelles étaient  les différences entre
+les deux) :
+
+```
+  make dev
+  make import_sample_data
+```
+
+Ensuite, vous  pouvez utiliser le  site web  de tests pour  ajouter de
+nouveaux produits, si vous le souhaitez.
+
+Pour extraire quelques  documents de la base de données,  je passe par
+une fenêtre  shell dans Emacs.
+
+1. ouverture d'une fenêtre shell
+
+```
+        M-x shell
+```
+
+2. ouverture d'une session sur le conteneur de la base de données (l'étape
+qui ne fonctionne plus depuis le 21 juin)
+
+```
+        docker compose exec mongodb mongo
+```
+
+3. extraction de  quelques documents de la  collection `products`, par
+exemple le produit `00187251` et les fromages
+
+```
+        use off
+        db.products.findOne( { '_id': '00187251' } );
+        db.products.find( { 'food_groups' : 'en:cheese' } )
+```
+
+4. fin de la session sur le conteneur
+
+```
+        exit
+```
+
+5. sauvegarde du  contenu de la fenêtre shell dans  un fichier appelé,
+par exemple, `resultat`
+
+```
+        C-x C-w resultat
+```
+
+6. fin de la session shell dans la fenêtre Emacs
+
+```
+        exit
+        C-x C-k
+```
+
+Le  fichier de  tests  `examples/multiligne` a  été  constitué sur  ce
+principe.
+
+Si vous voulez extraire la totalité de la collection `products`, voici
+comment procéder.  Contrairement à la  procédure précédente, il  n'y a
+pas d'avantage  à utiliser une  fenêtre shell dans Emacs,  vous pouvez
+utiliser une fenêtre xterm.
+
+1. extraction dans le répertoire `/tmp` du conteneur
+
+```
+      docker compose exec mongodb bash
+      cd tmp
+      mongoexport -doff -cproducts --type=json -o/tmp/products.json
+      exit
+```
+
+2. liste des processus Docker, pour récupérer l'ID du conteneur. Voici la commande et sa sortie standard
+
+```
+      $ docker ps
+      CONTAINER ID   IMAGE                                   COMMAND                  CREATED         STATUS         PORTS                        NAMES
+      12345678       openfoodfacts-server/frontend:dev       "/docker-entrypoint.…"   5 minutes ago   Up 5 minutes   127.0.0.1:80->80/tcp         po_off-frontend-1
+      89abcdef       openfoodfacts-server/backend:dev        "/docker-entrypoint.…"   5 minutes ago   Up 5 minutes   80/tcp                       po_off-backend-1
+      87654321       openfoodfacts-server/dynamicfront:dev   "docker-entrypoint.s…"   5 minutes ago   Up 5 minutes                                po_off-dynamicfront-1
+      fedcba98       openfoodfacts-server/backend:dev        "/docker-entrypoint.…"   5 minutes ago   Up 5 minutes   80/tcp                       po_off-minion-1
+      babeb1b0       openfoodfacts-server/backend:dev        "/docker-entrypoint.…"   5 minutes ago   Up 5 minutes   80/tcp                       po_off-incron-1
+      cacec1c0       postgres:12-alpine                      "docker-entrypoint.s…"   5 minutes ago   Up 5 minutes   5432/tcp                     po_off-postgres-1
+      daded1d0       memcached:1.6-alpine                    "docker-entrypoint.s…"   6 minutes ago   Up 6 minutes   11211/tcp                    po_off-memcached-1
+      cafebabe       redis:7.2-alpine                        "docker-entrypoint.s…"   2 days ago      Up 5 minutes   127.0.0.1:6379->6379/tcp     off_shared-redis-1
+      deadbeef       mongo:4.4                               "docker-entrypoint.s…"   2 days ago      Up 5 minutes   127.0.0.1:27017->27017/tcp   off_shared-mongodb-1
+```
+
+3. transfert du fichier
+
+```
+      docker cp deadbeef:/tmp/products.json /home/jf/tmp
+```
+
+_Attention_. Avec l'une de ces deux procédures, ou peut-être les deux,
+certains nombres sont extraits dans le fichier JSON sous la forme :
+
+```
+NumberLong(123456789)
+```
+
+Je ne  suis pas sûr du  mot-clé `NumberLong`, voyez vous-même  dans le
+fichier lorsque vous l'aurez obtenu.  Cette syntaxe est refusée par le
+module  d'analyse JSON  du programme  `schema-check.pl`, il  faut donc
+convertir ces nombres en enlevant le type et les parenthèses.
+
+### Après le 21 juin 2024
+
+Depuis le  21 juin  2024, le  service Docker  pour MongoDB  n'est plus
+accessible.  Également, j'ai  mis  à  jour mon  poste  de travail,  en
+désactivant l'instance  locale de MongoDB. Du  coup, il n'y a  plus de
+conflit de  port TCP entre  l'instance locale et l'instance  Docker de
+MongoDB.  Pour  l'extraction  de   quelques  documents,  la  procédure
+devient :
+
+1. ouverture d'une fenêtre shell dans Emacs
+
+```
+        M-x shell
+```
+
+2. ouverture d'une session sur la base de données
+
+```
+        mongosh
+```
+
+3. extraction de  quelques documents de la  collection `products`, par
+exemple le produit `00187251` et les fromages
+
+```
+        use off
+        db.products.findOne( { '_id': '00187251' } );
+        db.products.find( { 'food_groups' : 'en:cheese' } )
+```
+
+4. fin de la session sur la base de données
+
+```
+        exit
+```
+
+5. sauvegarde du  contenu de la fenêtre shell dans  un fichier appelé,
+par exemple, `resultat`
+
+```
+        C-x C-w resultat
+```
+
+6. fin de la session shell dans la fenêtre Emacs
+
+```
+        exit
+        C-x C-k
+```
+
+Le  fichier de  tests `examples/multiline-1`  a été  constitué sur  ce
+principe. Remarquons qu'il ne contient pas de `NumberLong(123456789)`.
+Sans doute  est-ce parce que  le client MongoDB utilisé  est `mongosh`
+dans la nouvelle version et `mongo` dans l'ancienne.
+
+Pour extraire la totalité du contenu de la collection `products`, il suffit
+maintenant d'une seule ligne de commande :
+
+```
+      mongoexport -doff -cproducts --type=json -o/tmp/products.json
+```
 
 Description du schéma
 =====================
@@ -316,11 +511,11 @@ Cela correspond à ce document :
 
 ```
 {
-	"code" : "00187251",
-	"product_name_en" : "choclatey cats",
-	"nova_group" : 4,
-	"product_name" : "choclatey cats",
-	"product_quantity" : 453.59237
+        "code" : "00187251",
+        "product_name_en" : "choclatey cats",
+        "nova_group" : 4,
+        "product_name" : "choclatey cats",
+        "product_quantity" : 453.59237
 }
 ```
 
@@ -367,10 +562,10 @@ Cela correspond au document ci-dessous (extrait du document `00187251`) :
 
 ```
 {
-	"ingredients_text_en" : "unbleached enriched flour ( wheat  flour, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, soy lecithin (an emulsifier), contain  wheat , soy, may contain traces of peanuts and tree nuts,",
-	"ingredients_text_with_allergens_en" : "unbleached enriched flour ( <span class=\"allergen\">wheat  flour</span>, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, <span class=\"allergen\">soy lecithin</span> (an emulsifier), contain  wheat , <span class=\"allergen\">soy</span>, may contain traces of <span class=\"allergen\">peanuts</span> and <span class=\"allergen\">tree nuts</span>,",
-	"ingredients_text_with_allergens" : "unbleached enriched flour ( <span class=\"allergen\">wheat  flour</span>, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, <span class=\"allergen\">soy lecithin</span> (an emulsifier), contain  wheat , <span class=\"allergen\">soy</span>, may contain traces of <span class=\"allergen\">peanuts</span> and <span class=\"allergen\">tree nuts</span>,",
-	"ingredients_text" : "unbleached enriched flour ( wheat  flour, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, soy lecithin (an emulsifier), contain  wheat , soy, may contain traces of peanuts and tree nuts,"
+        "ingredients_text_en" : "unbleached enriched flour ( wheat  flour, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, soy lecithin (an emulsifier), contain  wheat , soy, may contain traces of peanuts and tree nuts,",
+        "ingredients_text_with_allergens_en" : "unbleached enriched flour ( <span class=\"allergen\">wheat  flour</span>, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, <span class=\"allergen\">soy lecithin</span> (an emulsifier), contain  wheat , <span class=\"allergen\">soy</span>, may contain traces of <span class=\"allergen\">peanuts</span> and <span class=\"allergen\">tree nuts</span>,",
+        "ingredients_text_with_allergens" : "unbleached enriched flour ( <span class=\"allergen\">wheat  flour</span>, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, <span class=\"allergen\">soy lecithin</span> (an emulsifier), contain  wheat , <span class=\"allergen\">soy</span>, may contain traces of <span class=\"allergen\">peanuts</span> and <span class=\"allergen\">tree nuts</span>,",
+        "ingredients_text" : "unbleached enriched flour ( wheat  flour, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, soy lecithin (an emulsifier), contain  wheat , soy, may contain traces of peanuts and tree nuts,"
 }
 
 ```
@@ -451,18 +646,18 @@ En réalité, ce document contient plutôt :
 
 ```
 {
-	"_id" : "00187251",
-	"code" : "00187251",
-	"product_name_en" : "choclatey cats",
-	"nova_group" : 4,
-	"product_name" : "choclatey cats",
-	"product_quantity" : 453.59237,
-	"_keywords" : [
-		"cat",
-		"trader",
-		"joe",
-		"choclatey"
-	]
+        "_id" : "00187251",
+        "code" : "00187251",
+        "product_name_en" : "choclatey cats",
+        "nova_group" : 4,
+        "product_name" : "choclatey cats",
+        "product_quantity" : 453.59237,
+        "_keywords" : [
+                "cat",
+                "trader",
+                "joe",
+                "choclatey"
+        ]
 }
 ```
 
@@ -801,12 +996,12 @@ Exemple, encore une fois tiré du produit `00187251`
 
 ```
 {
-	"_id" : "00187251",
-	"ingredients_analysis_tags" : [
-		"en:palm-oil",
-		"en:vegan-status-unknown",
-		"en:vegetarian-status-unknown"
-	]
+        "_id" : "00187251",
+        "ingredients_analysis_tags" : [
+                "en:palm-oil",
+                "en:vegan-status-unknown",
+                "en:vegetarian-status-unknown"
+        ]
 }
 ```
 
@@ -1099,9 +1294,9 @@ ressemblent,  avec un  code  langue, suivi  d'un  deux-points et  d'un
 libellé.
 
 ```
-		"en:palm-oil"
-		"en:vegan-status-unknown"
-		"en:vegetarian-status-unknown"
+                "en:palm-oil"
+                "en:vegan-status-unknown"
+                "en:vegetarian-status-unknown"
 ```
 
 Rien dans les fichiers YAML ne permet de formaliser cette structure et
