@@ -30,13 +30,7 @@ déclarées dans le schéma.
 
 Les  documents à  contrôler  sont  au format  JSON.  Ils peuvent  être
 extraits  par  une  requête  sous  le  client  `mongosh`  ou  `mongo`,
-récupérés en masse avec `mongoexport`, ou autre méthode. On peut ainsi
-utiliser  soit un  fichier qui  contient  un seul  document JSON,  peu
-importe la  façon dont il est  formatté, soit un fichier  qui contient
-plusieurs documents JSON,  chacun étant écrit sur une  seule ligne. Je
-n'exclus pas  de stocker des documents  dans une base de  données soit
-directement dans la base MongoDB `off`, soit en recopiant la base dans
-une base SQL.
+récupérés en masse avec `mongoexport`, ou autre méthode.
 
 Mode d'emploi
 =============
@@ -44,9 +38,13 @@ Mode d'emploi
 Installation
 ------------
 
-Il y a besoin de Perl 5.38, ainsi que des modules `YAML`, `YAML::Node`
-et `JSON::PP`. J'ai eu l'intention  de prendre `YAML::Any`, mais comme
-l'explique la documentation, ce module est destiné à être remplacé par
+Il y a besoin de Perl 5.38, ainsi que des modules
+[`YAML`](https://metacpan.org/dist/YAML/view/lib/YAML.pod),
+[`YAML::Node`](https://metacpan.org/dist/YAML/view/lib/YAML/Node.pod)
+et [`JSON::PP`](https://metacpan.org/pod/JSON::PP).
+J'ai eu l'intention  de prendre `YAML::Any`, mais comme l'explique la
+[documentation](https://metacpan.org/dist/YAML/view/lib/YAML/Any.pod),
+ce module est destiné à être remplacé par
 `YAML` qui, à terme, fonctionnera comme un module `xxx::Any`.
 
 Votre machine doit contenir une copie locale du dépôt
@@ -55,15 +53,16 @@ ou d'un clone ce de dépôt.
 
 Dans le programme `schéma-check.pl`,  il faut changer l'initialisation
 de la  variable `$dir_sch`  pour y  mettre le  répertoire de  la copie
-locale du dépôt OFF-S contenant  les fichiers YAML décrivant le schéma
-des données.
+locale  du dépôt  `openfoodfacts-server` contenant  les fichiers  YAML
+décrivant le schéma des données.
 
 Utilisation
 -----------
 
 Si la  version de Perl  utilisée par  votre système est  trop ancienne
 (avant 5.38),  il faut sélectionner  une version récente,  par exemple
-avec `perlbrew`.
+avec
+[`perlbrew`](https://metacpan.org/dist/App-perlbrew/view/script/perlbrew).
 
 Pour analyser les documents JSON contenus dans le fichier `exemple.txt`,
 taper :
@@ -106,49 +105,66 @@ le schéma de données. Puis le  programme  ouvre le  fichier
 `exemple.txt` et en extrait les  documents JSON, ou plus exactement ce
 qui pourrait ressembler à un document JSON. Cela peut être  :
 
-* un document mono-ligne,  commençant par une accolade  ouvrante et se
+* un  objet mono-ligne,  commençant par  une accolade  ouvrante et  se
 terminant par une accolade fermante, comme
 
 ```
-{ "_id": "abcdef", "erreur_volontaire": 1 }
+        { "_id": "abcdef", "erreur_volontaire": 1 }
 ```
 
-* un document formatté sur plusieurs lignes, la première étant réduite
+* un objet formatté sur plusieurs lignes, la première étant réduite
 à une accolade ouvrante et la dernière à une accolade fermante, comme
 
 ```
-{
-  "code": "ghijkl",
-  "nutriments" : {
-    "nouvelle_erreur_volontaire": 2
-  }
-}
+        {
+          "code": "ghijkl",
+          "nutriments" : {
+            "nouvelle_erreur_volontaire": 2
+          }
+        }
+```
+
+* un  tableau d'objets,  formatté  sur plusieurs  lignes, la  première
+ligne étant  un crochet ouvrant  (et rien d'autre), la  dernière ligne
+étant un crochet  fermant (et rien d'autre). Le  formattage des objets
+JSON à l'intérieur de ce tableau n'a pas d'importance.
+
+```
+        [
+          {
+            "code": "ghijkl",
+            "nutriments" : {
+              "nouvelle_erreur_volontaire": 2
+            }
+          },
+          { "_id": "abcdef", "erreur_volontaire": 1 }
+        ]
 ```
 
 Tout le reste  est ignoré. Remarquons que le  programme ne reconnaîtra
-pas  les documents  JSON qui  sont  formattés autrement  que les  deux
+pas  les documents  JSON qui  sont  formattés autrement  que les trois
 possibilités ci-dessus. Par exemple, il ne reconnaîtra pas :
 
 ```
-{ "code": "ghijkl",
-  "nutriments" : {
-    "nouvelle_erreur_volontaire": 2
-  }
-}
+        { "code": "ghijkl",
+          "nutriments" : {
+            "nouvelle_erreur_volontaire": 2
+          }
+        }
 ```
 
 et il extraira un document tronqué avec :
 
 ```
-{ "code": "ghijkl", "nutriments" : { "nouvelle_erreur_volontaire": 2 }
-}
+        { "code": "ghijkl", "nutriments" : { "nouvelle_erreur_volontaire": 2 }
+        }
 ```
 
 car il partira du principe  que l'accolade terminant la première ligne
 est  l'accolade  fermant le  document  JSON,  alors qu'elle  ferme  un
 sous-document.
 
-Pour chaque document, la sortie standard contient :
+Pour chaque objet JSON, la sortie standard contient :
 
 1. une ligne de séparation,
 2. une ligne d'entête, avec le nom de fichier et le code du produit,
@@ -156,16 +172,16 @@ Pour chaque document, la sortie standard contient :
 4. les erreurs rencontrées.
 
 Le code du produit est extrait soit de la propriété `code`, soit de la
-propriété  `_id`. Si  un  document contient  les  deux propriétés,  en
+propriété  `_id`. Si  un  objet contient  les  deux propriétés,  en
 général elles ont la même valeur. Ce n'est pas vérifié.
 
 Dans une ligne  d'erreur, on a bien entendu le  libellé de l'erreur et
 la  valeur erronée  en  cause.  On a  également  entre parenthèses  la
 localisation  de l'erreur,  en  fonction de  la  hiérarchie des  clés.
-Ainsi, pour l'erreur du document `abcdef`, la localisation est `(top)`
-pour indiquer que  l'erreur se situe à la racine  du document. Pour le
-document  `ghijkl`,  la  localisation  est  `(top  nutriments)`,  pour
-indiquer que l'erreur se trouve dans le sous-document `nutriments`.
+Ainsi, pour l'erreur de l'objet  `abcdef`, la localisation est `(top)`
+pour indiquer  que l'erreur  se situe  à la  racine du  document. Pour
+l'objet  `ghijkl`,  la  localisation   est  `(top  nutriments)`,  pour
+indiquer que l'erreur se trouve dans le sous-objet `nutriments`.
 
 Si vous voulez avoir  la description du schéma de données (dans
 les 2000 lignes), précisez-le sur la ligne de commade :
@@ -177,7 +193,7 @@ perl schema-check.pl --schema-listing exemple.txt
 Utilisation d'un autre schéma
 -----------------------------
 
-Lorsque vous utilisez le schéma de  données provenant du dépôt OFF, il
+Lorsque vous utilisez le schéma de  données provenant du dépôt `openfoodfacts-server`, il
 se peut que vous obteniez une erreur YAML du genre :
 
 ```
@@ -209,7 +225,7 @@ perl schema-check.pl --schema-listing --schema=schemas/product.yaml exemple.txt
 ```
 
 Ne pas oublier  de vérifier de temps  à autre si le  schéma de données
-provenant du dépôt OFF a évolué.
+provenant du dépôt `openfoodfacts-server` a évolué.
 
 Une autre  utilisation de cette option  consiste à créer un  schéma de
 données délibérément réduit, pour tester un cas particulier sans avoir
@@ -229,7 +245,7 @@ tout autre éditeur de source à votre convenance.
 
 Vous  pouvez  charger une  archive  représentant  la base  de  données
 complète. Voir les explications
-[sur le site web d'OFF](https://world.openfoodfacts.org/data).
+[sur le site web d'OFF](https://world.openfoodfacts.org/data)
 et notamment le paragraphe « JSONL data export ». Le fichier au format
 JSONL peut  être traité  directement par  `schema-check.pl`. Attention
 toutefois, il contient plus de 3 millions de lignes pour une taille de
@@ -257,7 +273,7 @@ nouveaux produits, si vous le souhaitez.
 Avant le  21 juin 2024,  il existait  un service Docker  pour MongoDB.
 Voici la  méthode utilisée à  l'époque, qui  a entre autres  permis de
 créer le  fichier de test  `examples/multiligne`. Comme j'ai  pris des
-notes plutôt lacunaires et comme ne  ne suis pas un expert sur Docker,
+notes plutôt lacunaires et comme je  ne suis pas un expert sur Docker,
 il peut y avoir des erreurs.
 
 Pour extraire quelques  documents de la base de données,  je passe par
@@ -419,9 +435,13 @@ principe. Remarquons qu'il ne contient pas de `NumberLong(123456789)`.
 Sans doute  est-ce parce que  le client MongoDB utilisé  est `mongosh`
 dans la nouvelle version et `mongo` dans l'ancienne.
 
-En  revanche,  les  clés  des   paires  clé-valeur  ont  rarement  des
+En  revanche, ainsi que c'est précisé dans
+[la documentation de mongosh](https://www.mongodb.com/docs/mongodb-shell/reference/compatibility/#object-quoting-behavior),
+les clés  des   paires  clé-valeur  ont  rarement  des
 délimiteurs (doubles  quotes) et les  valeurs de ces paires  sont très
 souvent délimitées par  des simples quotes au lieu  de doubles quotes.
+C'est un pas dans la direction de
+[JSON5](https://json5.org/).
 Par exemple :
 
 ```
@@ -434,12 +454,15 @@ au lieu de
     "_id": "0052833225082",
 ```
 
-_A  priori_,  on  peut  s'en  sortir avec  les  bons  paramètres  pour
+La  solution  proposée  par  la  documentation  de  MongoDB,  apliquer
+`EJSON.stringify()` à toutes les requêtes, est peu ergonomique. À la place,
+_a  priori_,  on  peut  s'en  sortir avec  les  bons  paramètres  pour
 l'analyseur  JSON fourni  par `JSON::PP`.  Sauf que  certaines valeurs
 contiennent des doubles quotes et `JSON::PP` n'aime pas. Par exemple :
 
 ```
     ingredients_text_with_allergens: 'Cheddar cheese (<span class="allergen">milk</span>), potato starch.',
+                                                                  ..........
 ```
 
 La solution consiste à supprimer ces doubles quotes, même si ce n'est
@@ -448,7 +471,11 @@ plus du HTML bien formatté. Voir le résultat dans
 
 ```
     ingredients_text_with_allergens: 'Cheddar cheese (<span class=allergen>milk</span>), potato starch.',
+                                                                  ........
 ```
+
+Cette correction  n'est pas  faite par  `schema-check.pl`, il  faut la
+faire en amont.
 
 Description du schéma
 =====================
@@ -723,60 +750,60 @@ document `"00187251"`.
 
 ```
 {
-	"_id" : "00187251",
-	"ecoscore_data" : {
-		"status" : "unknown",
-		"missing" : {
-			"origins" : 1,
-			"labels" : 1
-		},
-		"adjustments" : {
-			"packaging" : {
-				"score" : -79,
-				"non_recyclable_and_non_biodegradable_materials" : 1,
-				"value" : -15,
-			},
-			"production_system" : {
-				"value" : 0,
-				"warning" : "no_label"
-			},
-			"origins_of_ingredients" : {
-				"epi_score" : 0,
-				"epi_value" : -5,
-				"transportation_values" : {
-					"no" : 0,
-					...
-					"eg" : 0,
-					"world" : 0,
-					"ad" : 0,
-					"se" : 0
-				},
-				"transportation_scores" : {
-					"va" : 0,
-					...
-					"it" : 0,
-					"world" : 0,
-					"ba" : 0,
-					...
-					"at" : 0
-				},
-				"values" : {
-					"lu" : -5,
-					...
-					"it" : -5,
-					"world" : -5,
-					"ba" : -5,
-					...
-					"ax" : -5
-				},
-				"warning" : "origins_are_100_percent_unknown"
-			},
-			"threatened_species" : {
-				"value" : -10,
-				"ingredient" : "en:palm-oil"
-			}
-		}
-	}
+        "_id" : "00187251",
+        "ecoscore_data" : {
+                "status" : "unknown",
+                "missing" : {
+                        "origins" : 1,
+                        "labels" : 1
+                },
+                "adjustments" : {
+                        "packaging" : {
+                                "score" : -79,
+                                "non_recyclable_and_non_biodegradable_materials" : 1,
+                                "value" : -15,
+                        },
+                        "production_system" : {
+                                "value" : 0,
+                                "warning" : "no_label"
+                        },
+                        "origins_of_ingredients" : {
+                                "epi_score" : 0,
+                                "epi_value" : -5,
+                                "transportation_values" : {
+                                        "no" : 0,
+                                        ...
+                                        "eg" : 0,
+                                        "world" : 0,
+                                        "ad" : 0,
+                                        "se" : 0
+                                },
+                                "transportation_scores" : {
+                                        "va" : 0,
+                                        ...
+                                        "it" : 0,
+                                        "world" : 0,
+                                        "ba" : 0,
+                                        ...
+                                        "at" : 0
+                                },
+                                "values" : {
+                                        "lu" : -5,
+                                        ...
+                                        "it" : -5,
+                                        "world" : -5,
+                                        "ba" : -5,
+                                        ...
+                                        "ax" : -5
+                                },
+                                "warning" : "origins_are_100_percent_unknown"
+                        },
+                        "threatened_species" : {
+                                "value" : -10,
+                                "ingredient" : "en:palm-oil"
+                        }
+                }
+        }
 }
 ```
 
@@ -1684,12 +1711,14 @@ Outre les  fichiers YAML du  schéma, le  programme reçoit des  noms de
 fichiers. On  considère que ces  fichiers contiennent du  texte varié,
 avec par moment  des documents JSON. On cherche des  documents JSON de
 deux variétés.  Tout d'abord, des  documents mono-lignes. Et  ce n'est
-pas  grave si  l'on obtient  une  ligne de  plus de 30 000 caractères.
+pas  grave si  l'on obtient  une ligne  de plus  de 30 000 caractères.
 Ensuite,  des  documents  bien  mis en  forme,  avec  une  indentation
 cohérente. Ces documents sont sur  plusieurs lignes, la première étant
 constituée d'une accolade ouvrante en  début de ligne et rien d'autre,
 la dernière étant constituée d'une accolade fermante en début de ligne
-et rien d'autre.
+et rien d'autre. Et enfin des objets JSON réunis dans un tableau JSON,
+délimités  par  deux  lignes  contenant chacune  un  crochet  et  rien
+d'autre.
 
 L'extraction  se fait  avec un  automate à  états finis.  Cet automate
 comporte uniquement trois états, `A`, `B` et `C`. L'état initial est l'état
@@ -1710,7 +1739,7 @@ Dans l'état `B`, le programme alimente la chaîne de caractères avec la
 ligne lue  dans le fichier.  Si cette  ligne est constituée  d'un seul
 caractère accolade fermante  (encore une fois avec un LF  ou un CRLF),
 l'automate  appelle  la fonction  de  vérification  du document,  puis
-transitionne vers l'état `A`.
+transite vers l'état `A`.
 
 Dans l'état  `A`, si  l'on tombe  sur une  ligne constituée  d'un seul
 caractère crochet  ouvrant (+ LF  ou CRLF), l'automate  initialise une
@@ -1722,8 +1751,8 @@ ligne lue  dans le fichier.  Si cette  ligne est constituée  d'un seul
 caractère crochet  fermant (encore une  fois avec  un LF ou  un CRLF),
 l'automate analyse le JSON contenu dans la chaîne (un tableau, puisque
 cela commence par  un crochet et que cela se  termine par un crochet),
-découpe ce  tableau en documents  élémentaires appelle la  fonction de
-vérification pour chaque document  élémentaire, puis transitionne vers
+découpe ce tableau  en documents élémentaires, appelle  la fonction de
+vérification  pour chaque  document  élémentaire,  puis transite  vers
 l'état `A`.
 
 Il n'y a pas de transition possible entre l'état `B` et l'état `C`.
