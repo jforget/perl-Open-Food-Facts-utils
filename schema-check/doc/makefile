@@ -12,4 +12,4 @@ MD2HTMLOPT = --export --no-inline
 	$(MD2HTML) $< $(MD2HTMLOPT)
 	perl -i -p -e 's/\<table\>/<table border="1">/; s/\xc2\xa0/\&nbsp;/g' $@
 
-target: Documentation.fr.html
+target: Documentation.fr.html Documentation.en.html
