@@ -189,6 +189,10 @@ mention this option in the command line:
 perl schema-check.pl --schema-listing example.txt
 ```
 
+In  this case,  the presence  of one  or more  filenames is  no longer
+mandatory. The program will load the schema and print its description,
+thus giving some information in its standard output.
+
 Using Another Schema
 --------------------
 

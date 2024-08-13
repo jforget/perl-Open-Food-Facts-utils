@@ -190,6 +190,10 @@ les 2000 lignes), précisez-le sur la ligne de commade :
 perl schema-check.pl --schema-listing exemple.txt
 ```
 
+Dans ce cas, vous n'êtes pas obligés de fournir le nom d'un fichier de
+données JSON.  Le programme se contentera  de charger le schéma  et de
+l'afficher.
+
 Utilisation d'un autre schéma
 -----------------------------
 

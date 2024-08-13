@@ -36,7 +36,7 @@ my @data_files;
 if (@ARGV) {
   @data_files = @ARGV;
 }
-else {
+elsif (!$schema_listing) {
   die "Please give the pathname for at least one JSON data file";
 }
 
@@ -301,7 +301,7 @@ sub check_hash($data, $stack, $schema) {
       next;
     }
     if (not exists $schema->{properties}{$key}{type}) {
-      say "Impossible to check $key ($stack)";
+      say "Invalid schema, no type defined for property $key ($stack)";
       next;
     }
     if ($schema->{properties}{$key}{type} eq 'object') {
@@ -378,6 +378,9 @@ Version 0.01
 
 One or more filenames where the JSON documents are stored (as plain text, UTF-8).
 
+Note:  if  using the  C<--schema-listing>  option,  you may  omit  the
+filenames.
+
 =head1 OPTIONS
 
 =head2 C<--schema>
@@ -406,6 +409,10 @@ By default,  the program does not  list the full data  schema. If this
 option is  activated, the  schema is  displayed before  displaying the
 error messages for the JSON documents.
 
+Note: if  this option  is activated, the  filename arguments  for JSON
+data  are now  optional. The  program will  still produce  interesting
+information in its standard output.
+
 =head1 DESCRIPTION
 
 The program  loads a YAML file  containing the schema of  the database
@@ -420,7 +427,8 @@ schema. Any errors are printed on standard output.
 =head1 CONFIGURATION AND ENVIRONMENT
 
 The pathname for the default schema  is hard-coded in the program. You
-should enter your hard-coded value instead of mine.
+should enter I<your> hard-coded value instead of mine when you install
+the program on your computer.
 
 I know,  this is not  a good  practice. But I  did not want  to bother
 about adding the processing of a configuration file.
