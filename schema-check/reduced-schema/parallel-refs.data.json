@@ -1,0 +1,39 @@
+{
+  "_id" : "no-errors",
+  "nova_groups_markers" : {
+      "3": [
+         [ "first string for '3'" , "second string for '3'" ]
+       , [ "third string for '3'" , "fourth string for '3'" ]
+      ]
+    , "4": [
+         [ "first string for '4'" , "second string for '4'" ]
+       , [ "third string for '4'" , "fourth string for '4'" ]
+       , [ "fifth string for '4'" , "sixth string for '4'" ]
+      ]
+    , "5": [ { } ]
+    , "2": [ { "a": 1, "b": 2 }, { "c": 3 }, { } ]
+    , "1": [
+         [ "first string for '1'" , "second string for '1'" ]
+      ]
+  }
+}
+
+{
+  "_id" : "with-errors",
+  "nova_groups_markers" : {
+      "3": [
+         [ "first string for '3'" , "second string for '3'" ]
+       , [ "third string for '3'" , "fourth string for '3'" ]
+      ]
+    , "5": [
+         { "z": 1, "y": 2 }
+      ]
+    , "4": [
+         [ "first string for '4'" , "second string for '4'" ]
+      ]
+    , "2": [ [21, 22, 23, 24, 25], [26, 27, 28], [29] ]
+    , "1": [
+         { "z": 1, "y": 2 }
+      ]
+  }
+}

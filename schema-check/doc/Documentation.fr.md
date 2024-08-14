@@ -1284,6 +1284,12 @@ inclus  dans  le  schéma  principal `product.yaml`.  En  revanche,  le
 fichier  `ingredient.yaml`  est  bien  utilisé  dans  le  schéma,  par
 l'intermédiaire de `product_ingredients.yaml`.
 
+Le caractère  `"#"` rappelle  les liens  hypertextes de  HTML. Peut-on
+envisager de  mêler les  références à des  fichiers externes  avec les
+références à une hiérarchie de clés ?  J'ai essayé de le faire dans le
+fichier  `parallel-refs-1.yaml`  du sous-répertoire  `reduced-schema`,
+mais le programme `schema-check.pl` n'est pas encore prêt pour cela.
+
 Contrôle de valeur
 ------------------
 
@@ -1660,7 +1666,8 @@ niveau 1.
 
 Un  autre cas  d'erreur se  rencontre si  le même  fichier `toto.yaml`
 contient deux références différentes. Voici  un exemple inspiré du cas
-réel (qui fonctionne bien, alors que l'exemple ci-dessous foire) :
+réel  (qui fonctionne  bien, alors  que l'exemple  ci-dessous pourrait
+foirer) :
 
 ```
 type: object
@@ -1707,6 +1714,16 @@ dynamique pour  toutes les clés `$ref`  sauf au niveau 1,  ce deuxième
 cas d'erreur est  présent dans de nombreux fichiers  YAML. Il faudrait
 abandonner l'idée des  clés simples `dyna`, `dynb`  et suivantes, pour
 adopter à la place des clés basées sur le nom du fichier à inclure.
+
+En  fait, l'exemple  ci-dessus fonctionne.  D'une part,  la différence
+entre les entiers de `"2"` et les chaînes de `"3"` ne se manifeste pas
+dans la version actuelle de l'utilitaire de vérification, puisque l'on
+vérifie  les clés  et les  valeurs  composites, mais  pas les  valeurs
+scalaires. Donc on peut mettre une chaîne là où l'on attend un entier,
+cela ne sera  pas détecté. Ensuite, même si l'on  remplace les entiers
+par  des   objets  (cf  les  fichiers   `parallel-ref*.yaml`  dans  le
+sous-répertoire `reduced-schema`), les sous-schémas dynamiques ne sont
+pas mélangés comme je le croyais.
 
 Extraction des documents JSON
 -----------------------------

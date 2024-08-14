@@ -1,0 +1,10 @@
+          type: object
+          description: |
+            This array has two object elements for each marker.
+          properties:
+            "a":
+              type: integer
+            "b":
+              type: integer
+            "c":
+              type: integer

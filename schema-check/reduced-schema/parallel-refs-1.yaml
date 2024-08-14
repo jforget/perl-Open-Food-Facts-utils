@@ -1,0 +1,35 @@
+type: object
+properties:
+  nova_groups_markers:
+    type: object
+    properties:
+      "1":
+        description: |
+          Markers of level 1
+        type: array
+        items:
+          $ref: "./parallel-refs-1a.yaml#/properties/nova_groups_markers/properties/3/items"
+      "2":
+        description: |
+          Markers of level 2
+        type: array
+        items:
+          $ref: "./parallel-refs-1a.yaml#/properties/nova_groups_markers/properties/2/items"
+      "3":
+        description: |
+          Markers of level 3
+        type: array
+        items:
+          $ref: "./parallel-refs-1a.yaml#/properties/nova_groups_markers/properties/3/items"
+      "4":
+        description: |
+          Markers of level 4
+        type: array
+        items:
+          $ref: "./parallel-refs-1a.yaml#/properties/nova_groups_markers/properties/3/items"
+      "5":
+        description: |
+          Markers of level 5
+        type: array
+        items:
+          $ref: "./parallel-refs-1a.yaml#/properties/nova_groups_markers/properties/2/items"
