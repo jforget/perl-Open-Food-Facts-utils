@@ -1620,20 +1620,16 @@ fichier en cours.
 Ensuite, une fois  que le schéma principal est  entièrement chargé, le
 programme  déroule  la  variable  `%dyn_schema`  pour  charger  chaque
 sous-schéma dynamique. Le fonctionnement est  presque le même que pour
-le schéma principal, avec deux différences.
+le schéma principal, avec une différence.
 
-La première différence  est que pour ajouter  l'attribut `dyn_sch` sur
-la propriété  récursive, on reprend  la valeur déjà attribuée  dans le
-schéma principal, au lieu d'en générer  une nouvelle. C'est la mise en
-œuvre de la récursivité et de l'auto-référence.
-
-La  deuxième  différence   se  voit  dans  le  cas   de  la  propriété
+Cette  différence   se  voit  dans  le  cas   de  la  propriété
 `nova_groups_markers`. Le sous-schéma dynamique ne correspond pas à la
 totalité du  fichier `product_extended.yaml`,  mais à une  partie très
 réduite de l'arborescence,  en fonction de la  sélection `properties /
 nova_groups_markers  /  properties /  3  /  items`. Avant  de  charger
 l'attribut `schema`  du sous-schéma  dynamique, le  programme effectue
-cette sélection.
+cette sélection. Mais  si la valeur de `'$ref'` est  réduite à `'#/'`,
+le sous-schéma est repris tel quel, sans sélection.
 
 ### Problèmes
 
