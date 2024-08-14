@@ -53,7 +53,7 @@ if ($schema->{allOf}) {
     my $fname = $entry->{'$ref'};
     my $path  = catfile($dir_sch, $fname);
     if ($schema_listing) {
-      say "processing $path";
+      say "processing 1 $path";
     }
     my $subschema = YAML::Load(slurp($path));
     find_ref_rec($subschema, $dir_sch, $fname, 1);
@@ -78,10 +78,10 @@ for my $dyn_sch (keys %dyn_schema) {
   my @keys  = split('/', substr($dyn_schema{$dyn_sch}{ref}, 2));
   my $path  = catfile($dir, $fname);
   if ($schema_listing) {
-    say "processing $dyn_sch $path";
+    say "processing $level $dyn_sch $path";
   }
   my $subschema = YAML::Load(slurp($path));
-  find_ref_rec($subschema, $dir_sch, $fname, $level + 1);
+  find_ref_rec($subschema, $dir_sch, $fname, $level);
   for my $key (@keys) {
     $subschema = $subschema->{$key};
   }
@@ -144,24 +144,25 @@ sub slurp($fname) {
 sub find_ref_rec($schema, $dir, $fname, $level) {
   if ($schema->{properties}) {
     for my $key (keys %{$schema->{properties}}) {
-      find_ref_rec( $schema->{properties}{$key}, $dir, $fname, $level + 1);
+      find_ref_rec( $schema->{properties}{$key}, $dir, $fname, $level);
     }
   }
   if ($schema->{items}) {
-    find_ref_rec( $schema->{items}, $dir, $fname, $level + 1);
+    find_ref_rec( $schema->{items}, $dir, $fname, $level);
   }
 
   if (exists $schema->{'$ref'} && substr($schema->{'$ref'}, 0, 1) eq '#') {
     my $full_ref = catfile($dir, $fname) . $schema->{'$ref'};
+    $schema->{dyn_sch} = $full_ref;
     if (not exists $dyn_schema{$full_ref}) {
-      $schema->{dyn_sch} = $full_ref;
+      my $new_level = $level + 1;
       $dyn_schema{$full_ref} = { ref   => $schema->{'$ref'}
                                , dir   => $dir
                                , fname => $fname
-                               , level => $level
+                               , level => $new_level
                                };
       if ($schema_listing) {
-        say join(' ', $level, $schema->{'$ref'}, $dir, $fname);
+        say join(' ', $new_level, $schema->{'$ref'}, $dir, $fname);
         say $full_ref;
       }
     }
@@ -178,20 +179,25 @@ sub find_ref_rec($schema, $dir, $fname, $level) {
       $fname = $schema->{'$ref'};
       $ref   = '#/';
     }
-    my $path  = catfile($dir, $fname);
-    my $full_ref = catfile($dir, $fname) . $ref;
+    my $path      = catfile($dir, $fname);
+    my $full_ref  = $path . $ref;
+    my $new_level = $level + 1;
     if ($schema_listing) {
-      say "processing $path";
+      say "processing $new_level $path";
       say $full_ref;
     }
       $subschema = YAML::Load(slurp($path));
       my $subpath = dirname($fname);
       for my $prop_name (keys %{$subschema->{properties}}) {
-        find_ref_rec( $subschema->{properties}{$prop_name}, catfile($dir, $subpath), $fname, $level + 1);
+        find_ref_rec( $subschema->{properties}{$prop_name}, catfile($dir, $subpath), $fname, $new_level);
       }
       if ($subschema->{items}) {
-        find_ref_rec( $subschema->{items}, catfile($dir, $subpath), $fname, $level + 1);
+        find_ref_rec( $subschema->{items}, catfile($dir, $subpath), $fname, $new_level);
       }
+    my @keys  = split('/', substr($ref, 2));
+    for my $key (@keys) {
+      $subschema = $subschema->{$key};
+    }
     if ($subschema->{type}) {
       $schema->{type} = $subschema->{type};
     }
