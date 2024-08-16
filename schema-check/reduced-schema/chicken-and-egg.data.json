@@ -1,0 +1,71 @@
+{
+    '_id': "Litterature and biology"
+  , name: 'Edmond Rostand'
+  , eggs: [
+      {   hatch: '1894'
+        , chick: {
+              name: 'Jean Rostand'
+            , eggs: [
+                {   hatch: '1954'
+                  , chick: { name: "Notes d'un biologiste" }
+                }
+              , { chick: {"deliberate_error_in_chick": 1 }
+                }
+              , { "deliberate_error_in_egg": 1
+                }
+              ]
+            }
+      }
+    , {   hatch: '1897'
+        , chick: { name: 'Cyrano de Bergerac' }
+      }
+    , {   hatch: '1910'
+        , chick: { name: 'Chanteclerc' }
+      }
+    ]
+}
+{
+    '_id': 'Chemistry'
+  , name: 'Paul-Émile Lecoq'
+  , eggs: [
+      {   hatch: '1875'
+        , chick: { name: 'Gallium' }
+      }
+    ]
+}
+{
+    '_id': 'Sport'
+  , name: 'Le Coq Sportif'
+  , eggs: [
+      {
+        chick: {
+            name: 'Adidas'
+          , eggs: [
+              {
+                chick: {
+                  name: 'Nike'
+                , eggs: [
+                    {
+                      chick: {
+                          name: 'Reebok'
+                        , eggs: [
+                            {
+                              chick: {
+                                  name: 'Puma'
+                                , eggs: [
+                                      "Deliberate error in egg"
+                                    , "Another deliberate error in egg"
+                                  ]
+                                }
+                            }
+                          ]
+                        }
+                    }
+                  ]
+                }
+              }
+            ]
+        }
+      }
+    ]
+}

@@ -1,0 +1,6 @@
+type: object
+properties:
+  hatch:
+    type: string
+  chick:
+    '$ref': chicken.yaml

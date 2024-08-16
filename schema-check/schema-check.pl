@@ -142,6 +142,11 @@ sub slurp($fname) {
 }
 
 sub find_ref_rec($schema, $dir, $fname, $level) {
+
+  if ($level > 20) {
+    say "stopgap measure: break the recursivity";
+    return;
+  }
   if ($schema->{properties}) {
     for my $key (keys %{$schema->{properties}}) {
       find_ref_rec( $schema->{properties}{$key}, $dir, $fname, $level);

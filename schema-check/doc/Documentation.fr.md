@@ -1287,8 +1287,9 @@ l'intermédiaire de `product_ingredients.yaml`.
 Le caractère  `"#"` rappelle  les liens  hypertextes de  HTML. Peut-on
 envisager de  mêler les  références à des  fichiers externes  avec les
 références à une hiérarchie de clés ?  J'ai essayé de le faire dans le
-fichier  `parallel-refs-1.yaml`  du sous-répertoire  `reduced-schema`,
-mais le programme `schema-check.pl` n'est pas encore prêt pour cela.
+fichier  `parallel-refs-1.yaml`  du sous-répertoire  `reduced-schema`.
+Même si je n'ai  aucun exemple en ce sens dans  les exemples d'OFF, je
+pense que c'est la marche à suivre.
 
 Contrôle de valeur
 ------------------
