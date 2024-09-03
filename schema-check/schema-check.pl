@@ -217,29 +217,31 @@ sub find_ref_rec($schema, $dir, $fname, $level) {
   my $subschema = YAML::Load(slurp($path));
   my @keys  = split('/', substr($full_ref, 1 + index($full_ref, '#')));
   for my $key (@keys) {
-    $subschema = $subschema->{$key};
+    if ($key) {
+      $subschema = $subschema->{$key};
+    }
   }
-    my $subpath = dirname($fname);
-    for my $prop_name (keys %{$subschema->{properties}}) {
-      find_ref_rec( $subschema->{properties}{$prop_name}, catdir($dir, $subpath), $fname, $new_level);
-    }
-    if ($subschema->{items}) {
-      find_ref_rec( $subschema->{items}, catdir($dir, $subpath), $fname, $new_level);
-    }
-    if ($subschema->{type}) {
-      $schema->{type} = $subschema->{type};
-    }
-    if ($subschema->{items}) {
-      $schema->{items} = $subschema->{items};
-    }
-    for my $prop_name (keys %{$subschema->{properties}}) {
-      #say "adding $prop_name";
-      $schema->{properties}{$prop_name} = $subschema->{properties}{$prop_name};
-    }
-    for my $pattern (keys %{$subschema->{patternProperties}}) {
-      #say "adding $pattern";
-      $schema->{patternProperties}{$pattern} = $subschema->{patternProperties}{$pattern};
-    }
+  my $subpath = dirname($fname);
+  for my $prop_name (keys %{$subschema->{properties}}) {
+    find_ref_rec( $subschema->{properties}{$prop_name}, catdir($dir, $subpath), $fname, $new_level);
+  }
+  if ($subschema->{items}) {
+    find_ref_rec( $subschema->{items}, catdir($dir, $subpath), $fname, $new_level);
+  }
+  if ($subschema->{type}) {
+    $schema->{type} = $subschema->{type};
+  }
+  if ($subschema->{items}) {
+    $schema->{items} = $subschema->{items};
+  }
+  for my $prop_name (keys %{$subschema->{properties}}) {
+    #say "adding $prop_name";
+    $schema->{properties}{$prop_name} = $subschema->{properties}{$prop_name};
+  }
+  for my $pattern (keys %{$subschema->{patternProperties}}) {
+    #say "adding $pattern";
+    $schema->{patternProperties}{$pattern} = $subschema->{patternProperties}{$pattern};
+  }
 }
 
 # Ensure that the "type" property is dumped first
