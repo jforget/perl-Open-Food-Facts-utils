@@ -25,11 +25,11 @@ use File::Spec::Functions;
 my $dir_sch = '/home/jf/Documents/prog/perl/openfoodfacts-server/docs/api/ref/schemas';
 my $f_sch   = 'product.yaml';
 my $schema_file = catfile($dir_sch, $f_sch);
-my $schema_listing  = 0;
-my $max_depth       = 5;
+my $list_schema = 0;
+my $max_depth   = 5;
 
 GetOptions("schema=s"       => \$schema_file
-         , "schema-listing" => \$schema_listing
+         , "list-schema"    => \$list_schema
          , "max-depth=i"    => \$max_depth
     )
   or die "Error in command line options";
@@ -39,7 +39,7 @@ my @data_files;
 if (@ARGV) {
   @data_files = @ARGV;
 }
-elsif (!$schema_listing) {
+elsif (!$list_schema) {
   die "Please give the pathname for at least one JSON data file";
 }
 
@@ -54,7 +54,7 @@ if ($schema->{allOf}) {
   for my $entry (@{$schema->{allOf}}) {
     my $fname = $entry->{'$ref'};
     my $path  = catfile($dir_sch, $fname);
-    if ($schema_listing) {
+    if ($list_schema) {
       say "processing 1 $path";
     }
     my $subschema = YAML::Load(slurp($path));
@@ -79,7 +79,7 @@ for my $dyn_sch (keys %dyn_schema) {
   my $level = $dyn_schema{$dyn_sch}{level};
   my @keys  = split('/', substr($dyn_schema{$dyn_sch}{ref}, 2));
   my $path  = catfile($dir, $fname);
-  if ($schema_listing) {
+  if ($list_schema) {
     say "processing $level $dyn_sch $path";
   }
   my $subschema = YAML::Load(slurp($path));
@@ -90,7 +90,7 @@ for my $dyn_sch (keys %dyn_schema) {
   $dyn_schema{$dyn_sch}{schema} = tweak_hash($subschema);
 }
 
-if ($schema_listing) {
+if ($list_schema) {
   say YAML::Dump($schema);
   say YAML::Dump(\%dyn_schema);
 }
@@ -169,7 +169,7 @@ sub find_ref_rec($schema, $dir, $fname, $level) {
                                , fname => $fname
                                , level => $new_level
                                };
-      if ($schema_listing) {
+      if ($list_schema) {
         say join(' ', $new_level, $schema->{'$ref'}, $dir, $fname);
         say $full_ref;
       }
@@ -190,7 +190,7 @@ sub find_ref_rec($schema, $dir, $fname, $level) {
     my $path      = catfile($dir, $fname);
     my $full_ref  = $path . $ref;
     my $new_level = $level + 1;
-    if ($schema_listing) {
+    if ($list_schema) {
       say "processing $new_level $path";
       say $full_ref;
     }
@@ -400,13 +400,13 @@ Version 0.01
 
 =head1 USAGE
 
-  perl schema-check.pl [--schema=schemas/product.yaml] [--schema-listing] data1 [data2 data3]
+  perl schema-check.pl [--schema=schemas/product.yaml] [--list-schema] data1 [data2 data3]
 
 =head1 REQUIRED ARGUMENTS
 
 One or more filenames where the JSON documents are stored (as plain text, UTF-8).
 
-Note:  if  using the  C<--schema-listing>  option,  you may  omit  the
+Note:  if  using  the  C<--list-schema>   option,  you  may  omit  the
 filenames.
 
 =head1 OPTIONS
@@ -431,7 +431,7 @@ elsewhere, fix it and use it.
 
 =back
 
-=head2 C<--schema-listing>
+=head2 C<--list-schema>
 
 By default,  the program does not  list the full data  schema. If this
 option is  activated, the  schema is  displayed before  displaying the

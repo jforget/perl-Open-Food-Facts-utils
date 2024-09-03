@@ -187,7 +187,7 @@ Si vous voulez avoir  la description du schéma de données (dans
 les 2000 lignes), précisez-le sur la ligne de commade :
 
 ```
-perl schema-check.pl --schema-listing exemple.txt
+perl schema-check.pl --list-schema exemple.txt
 ```
 
 Dans ce cas, vous n'êtes pas obligés de fournir le nom d'un fichier de
@@ -225,7 +225,7 @@ perl schema-check.pl --schema=schemas/product.yaml exemple.txt
 ou bien
 
 ```
-perl schema-check.pl --schema-listing --schema=schemas/product.yaml exemple.txt
+perl schema-check.pl --list-schema --schema=schemas/product.yaml exemple.txt
 ```
 
 Ne pas oublier  de vérifier de temps  à autre si le  schéma de données
