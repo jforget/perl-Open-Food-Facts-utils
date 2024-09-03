@@ -27,6 +27,7 @@ my $f_sch   = 'product.yaml';
 my $schema_file = catfile($dir_sch, $f_sch);
 my $list_schema = 0;
 my $max_depth   = 5;
+my @dyn_sch_to_do   = ();
 
 GetOptions("schema=s"       => \$schema_file
          , "list-schema"    => \$list_schema
@@ -145,11 +146,7 @@ sub slurp($fname) {
 
 sub find_ref_rec($schema, $dir, $fname, $level) {
 
-  if ($level > $max_depth) {
-    say "stopgap measure: break the recursivity (dir $dir, fname $fname)";
-    say YAML::Dump($schema);
-    return;
-  }
+  # basic schema entry (no loop for '$ref' entry)
   if ($schema->{properties}) {
     for my $key (keys %{$schema->{properties}}) {
       find_ref_rec( $schema->{properties}{$key}, $dir, $fname, $level);
@@ -159,52 +156,65 @@ sub find_ref_rec($schema, $dir, $fname, $level) {
     find_ref_rec( $schema->{items}, $dir, $fname, $level);
   }
 
-  if (exists $schema->{'$ref'} && substr($schema->{'$ref'}, 0, 1) eq '#') {
-    my $full_ref = catfile($dir, $fname) . $schema->{'$ref'};
-    $schema->{dyn_sch} = $full_ref;
-    if (not exists $dyn_schema{$full_ref}) {
-      my $new_level = $level + 1;
-      $dyn_schema{$full_ref} = { ref   => $schema->{'$ref'}
-                               , dir   => $dir
-                               , fname => $fname
-                               , level => $new_level
-                               };
-      if ($list_schema) {
-        say join(' ', $new_level, $schema->{'$ref'}, $dir, $fname);
-        say $full_ref;
-      }
-    }
+  my $ref = $schema->{'$ref'} // '';
+  if ($ref eq '') {
+    return;
   }
 
-  if (exists $schema->{'$ref'} && substr($schema->{'$ref'}, 0, 1) ne '#') {
-    my $subschema;
-    my $fname;
-    my $ref;
-    if (index($schema->{'$ref'}, '#') > -1) {
-      ($fname, $ref) = $schema->{'$ref'} =~ /^ (.*?) (\#.*) $/x;
+  # now we are dealing only with a '$ref' schema entry
+  if ($level > $max_depth) {
+    say "stopgap measure: break the recursivity (dir $dir, fname $fname)";
+    say YAML::Dump($schema);
+    return;
+  }
+  my $full_ref = '';
+  my $path     = '';
+  my $hier     = '';
+  if (index($ref, '#') >= 0) {
+    ($path, $hier) = $ref =~ / ^ (.*) (\#.*) $/x;
+  }
+  else {
+    $path = $ref;
+    $hier = '#/';
+  }
+  if ($path eq '') {
+    $path = catfile($dir, $fname);
+  }
+  else {
+    my $sub_dir = '';
+    ($sub_dir, $fname) = "./$path" =~ / ^ (.*) \/ (.*) $ /x;
+    $dir  = catdir( $dir, $sub_dir);
+    $path = catfile($dir, $fname);
+  }
+  $full_ref = "$path$hier";
+
+  my $new_level = $level + 1;
+  my $entry = { ref      => $ref
+              , dir      => $dir
+              , fname    => $fname
+              , path     => $path
+              , full_ref => $full_ref      
+              , level    => $new_level
+  };
+  if ($list_schema) {
+    say YAML::Dump($entry);
+  }
+
+  if ($list_schema) {
+    say "processing $new_level $path";
+    say $full_ref;
+  }
+  my $subschema = YAML::Load(slurp($path));
+  my @keys  = split('/', substr($full_ref, 1 + index($full_ref, '#')));
+  for my $key (@keys) {
+    $subschema = $subschema->{$key};
+  }
+    my $subpath = dirname($fname);
+    for my $prop_name (keys %{$subschema->{properties}}) {
+      find_ref_rec( $subschema->{properties}{$prop_name}, catdir($dir, $subpath), $fname, $new_level);
     }
-    else {
-      $fname = $schema->{'$ref'};
-      $ref   = '#/';
-    }
-    my $path      = catfile($dir, $fname);
-    my $full_ref  = $path . $ref;
-    my $new_level = $level + 1;
-    if ($list_schema) {
-      say "processing $new_level $path";
-      say $full_ref;
-    }
-      $subschema = YAML::Load(slurp($path));
-      my $subpath = dirname($fname);
-      for my $prop_name (keys %{$subschema->{properties}}) {
-        find_ref_rec( $subschema->{properties}{$prop_name}, catfile($dir, $subpath), $fname, $new_level);
-      }
-      if ($subschema->{items}) {
-        find_ref_rec( $subschema->{items}, catfile($dir, $subpath), $fname, $new_level);
-      }
-    my @keys  = split('/', substr($ref, 2));
-    for my $key (@keys) {
-      $subschema = $subschema->{$key};
+    if ($subschema->{items}) {
+      find_ref_rec( $subschema->{items}, catdir($dir, $subpath), $fname, $new_level);
     }
     if ($subschema->{type}) {
       $schema->{type} = $subschema->{type};
@@ -220,7 +230,6 @@ sub find_ref_rec($schema, $dir, $fname, $level) {
       #say "adding $pattern";
       $schema->{patternProperties}{$pattern} = $subschema->{patternProperties}{$pattern};
     }
-  }
 }
 
 # Ensure that the "type" property is dumped first
