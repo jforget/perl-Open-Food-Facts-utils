@@ -74,25 +74,34 @@ if ($schema->{allOf}) {
 
 $schema = tweak_hash($schema);
 
-for my $dyn_sch (keys %dyn_schema) {
-  my $dir   = $dyn_schema{$dyn_sch}{dir};
-  my $fname = $dyn_schema{$dyn_sch}{fname};
-  my $level = $dyn_schema{$dyn_sch}{level};
-  my @keys  = split('/', substr($dyn_schema{$dyn_sch}{ref}, 2));
+while (my $entry = pop @dyn_sch_to_do) {
+  my $dir   = $entry->{dir};
+  my $fname = $entry->{fname};
+  my $level = $entry->{level};
+  my $ref   = $entry->{full_ref};
+  my @keys  = split('/', substr($ref, 1 + index($ref, '#')));
   my $path  = catfile($dir, $fname);
   if ($list_schema) {
-    say "processing $level $dyn_sch $path";
+    say "processing $level $path $ref";
   }
-  my $subschema = YAML::Load(slurp($path));
-  find_ref_rec($subschema, $dir_sch, $fname, $level);
-  for my $key (@keys) {
-    $subschema = $subschema->{$key};
+  unless ($dyn_schema{$ref}) {
+    my $subschema = YAML::Load(slurp($path));
+    for my $key (@keys) {
+      $subschema = $subschema->{$key};
+    }
+    find_ref_rec($subschema, $dir_sch, $fname, $level);
+    $dyn_schema{$ref}{schema} = tweak_hash($subschema);
   }
-  $dyn_schema{$dyn_sch}{schema} = tweak_hash($subschema);
 }
 
 if ($list_schema) {
+  say '-' x 50;
+  say "Main schema";
+  say '-' x 50;
   say YAML::Dump($schema);
+  say '-' x 50;
+  say "Dynamically inserted subschema(s)";
+  say '-' x 50;
   say YAML::Dump(\%dyn_schema);
 }
 
@@ -162,11 +171,6 @@ sub find_ref_rec($schema, $dir, $fname, $level) {
   }
 
   # now we are dealing only with a '$ref' schema entry
-  if ($level > $max_depth) {
-    say "stopgap measure: break the recursivity (dir $dir, fname $fname)";
-    say YAML::Dump($schema);
-    return;
-  }
   my $full_ref = '';
   my $path     = '';
   my $hier     = '';
@@ -193,11 +197,17 @@ sub find_ref_rec($schema, $dir, $fname, $level) {
               , dir      => $dir
               , fname    => $fname
               , path     => $path
-              , full_ref => $full_ref      
+              , full_ref => $full_ref
               , level    => $new_level
   };
   if ($list_schema) {
     say YAML::Dump($entry);
+  }
+  if ($new_level > $max_depth) {
+    say "Break the recursivity (dir $dir, fname $fname, ref $full_ref)";
+    push @dyn_sch_to_do, $entry;
+    $schema->{dyn_sch} = $full_ref;
+    return;
   }
 
   if ($list_schema) {
