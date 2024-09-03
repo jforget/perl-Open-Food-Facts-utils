@@ -1291,6 +1291,32 @@ fichier  `parallel-refs-1.yaml`  du sous-répertoire  `reduced-schema`.
 Même si je n'ai  aucun exemple en ce sens dans  les exemples d'OFF, je
 pense que c'est la marche à suivre.
 
+Au début, je considérais que les  clés `'$ref'` faisant référence à un
+nom de fichier donneraient lieu à une insertion statique (recopie dans
+la variable `$schema`) et les clés `'$ref'` constituées d'un caractère
+dièse puis d'une  sélection sur clés donneraient lieu  à une insertion
+dynamique. En  fait, même avec  des clés `'$ref'` faisant  référence à
+des  fichiers,  on  peut  avoir  une  situation  de  poule  et  d'œuf,
+nécessitant une insertion dynamique. On  peut le voir avec les schémas
+`chicken.yaml`  et `egg.yaml`  du  répertoire  `reduced-schema` et  le
+fichier   de   données   `chicken-and-egg.data.json`  dans   le   même
+répertoire.
+
+Donc, le programme `schéma-check.pl` admet un paramètre supplémentaire
+`max-depth`, avec une  valeur entière. Tant que  le niveau d'inclusion
+n'a pas atteint  cette valeur `$max_depth`, le  programme effectue une
+insertion statique. Si le niveau  d'inclusion dépasse cette valeur, le
+programme effectue une insertion dynamique  du schéma référencé par la
+clé `'$ref'`,  après avoir  vérifié qu'elle n'a  pas déjà  été insérée
+dynamiquement. Ainsi, il n'y a plus de récursion infinie à craindre.
+
+Pour  savoir si  une référence  a déjà  été insérée  dynamiquement, le
+programme normalise cette référence en mettant systématiquement le nom
+du fichier, un dièse et  une sélection. Si nécessaire, cette sélection
+est réduite à un simple slash pour signifier que l'on prend le fichier
+dans sa  totalité. Cette valeur normalisée  sert de clé à  la table de
+hachage mémorisant les sous-schémas dynamiques.
+
 Contrôle de valeur
 ------------------
 

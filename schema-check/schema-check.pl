@@ -26,9 +26,11 @@ my $dir_sch = '/home/jf/Documents/prog/perl/openfoodfacts-server/docs/api/ref/sc
 my $f_sch   = 'product.yaml';
 my $schema_file = catfile($dir_sch, $f_sch);
 my $schema_listing  = 0;
+my $max_depth       = 5;
 
 GetOptions("schema=s"       => \$schema_file
          , "schema-listing" => \$schema_listing
+         , "max-depth=i"    => \$max_depth
     )
   or die "Error in command line options";
 $dir_sch = dirname($schema_file);
@@ -143,8 +145,9 @@ sub slurp($fname) {
 
 sub find_ref_rec($schema, $dir, $fname, $level) {
 
-  if ($level > 20) {
-    say "stopgap measure: break the recursivity";
+  if ($level > $max_depth) {
+    say "stopgap measure: break the recursivity (dir $dir, fname $fname)";
+    say YAML::Dump($schema);
     return;
   }
   if ($schema->{properties}) {
@@ -437,6 +440,14 @@ error messages for the JSON documents.
 Note: if  this option  is activated, the  filename arguments  for JSON
 data  are now  optional. The  program will  still produce  interesting
 information in its standard output.
+
+=head2 C<--max-depth>
+
+Integer  option, to  control the  choice between  static insertion  of
+subschemas and dynamic insertion of subschemas.
+
+Default value is 5, so with schema C<product.yaml>, all insertions are
+static, except for recursive insertion of C<ingredient.yaml>.
 
 =head1 DESCRIPTION
 
