@@ -45,15 +45,30 @@ this allows the programmer to execute regression tests.
 
 =head1 USAGE
 
+  sh full-test.sh test1
+  #
+  # make a few modifications in program C<schema-check.pl>
+  #
   sh full-test.sh test2
   cd results
   diff test1-basic test2-basic
   diff test1-listing test2-listing
-  ...
+  # ...
 
-=head2 Parameters
+=head2 Parameter
 
 The basename for the listing files.
+
+=head2 Remark
+
+When requesting the listing of the schema (C<--list-schema> option
+for C<schema-check.pl>), the program displays several trace messages
+about the processing of C<'$ref'> entries. Since this processing
+uses an loop over the keys of a hashtable, the order of the individual
+iterations is not constant. Therefore, when invoking C<diff>, you
+will find many differences between, say, F<test1-listing> and F<test2-listing>.
+This is normal. What would show a regression is differences
+within the schema listing part and within the data checking part.
 
 =head1 COPYRIGHT and LICENCE
 
