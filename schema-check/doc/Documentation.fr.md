@@ -191,7 +191,7 @@ perl schema-check.pl --list-schema exemple.txt
 ```
 
 Dans ce cas, vous n'êtes pas obligés de fournir le nom d'un fichier de
-données JSON.  Le programme se contentera  de charger le schéma  et de
+données JSON. Le programme se contentera alors de charger le schéma et de
 l'afficher.
 
 Utilisation d'un autre schéma
