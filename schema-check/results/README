@@ -1,0 +1,12 @@
+-*- encoding: utf-8; indent-tabs-mode: nil -*-
+
+This directory is meant to store the results of the various tests.
+See the script file `full-test.sh`
+Regression testing can be done with, for example,
+
+  diff test1-basic test2-basic
+  diff test1-dyn test2-dyn
+  # etc
+
+The various test listing files are not managed by git and
+they do not appear in the Github repository.
