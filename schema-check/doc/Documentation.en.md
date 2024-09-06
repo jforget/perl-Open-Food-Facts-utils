@@ -237,7 +237,8 @@ Where To Find Test Data
 -----------------------
 
 You can  type your  JSON test  data directly within  Vi, Emacs  or any
-source editor that fits your needs.
+source editor  that fits your  needs. But  this is rather  lengthy and
+error-prone.
 
 You can download an archive which  gives the same data as the complete
 OFF database. See the explanations

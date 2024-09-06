@@ -245,7 +245,8 @@ Où trouver des données de test ?
 --------------------------------
 
 Vous pouvez toujours  les taper directement en JSON sous  Vi, Emacs ou
-tout autre éditeur de source à votre convenance.
+tout autre  éditeur de source à  votre convenance. Mais c'est  long et
+sujet à erreurs.
 
 Vous  pouvez  charger une  archive  représentant  la base  de  données
 complète. Voir les explications
@@ -497,8 +498,10 @@ Première étape
 --------------
 
 Le schéma est défini dans le fichier `product.yaml` du sous-répertoire
-`docs/api/ref/schemas` du dépôt Git du serveur. En enlevant le libellé
-documentaire, le fichier contient :
+`docs/api/ref/schemas` du dépôt Git du serveur, lequel sous-répertoire
+a  été recopié,  avec  quelques corrections,  dans le  sous-répertoire
+`schemas` du  présent dépôt. En  enlevant le libellé  documentaire, le
+fichier contient :
 
 ```
 type: object
@@ -586,7 +589,7 @@ Ainsi  qu'on  peut le  voir,  les  clés  sont facultatives,  comme  en
 témoigne la clé `abbreviated_product_name` absente du document servant
 d'exemple. D'autre part, l'ordre des clés n'a pas d'importance. La clé
 `product_name_en` arrive après `nova_group`  et `product_name` dans le
-document, elle arrive avant dans le schéma.
+schéma, elle arrive avant dans le document.
 
 La question  que je  me pose  d'après cet exemple  est le  contrôle de
 format des  valeurs. Pour l'information `product_quantity`,  le format
@@ -659,7 +662,7 @@ Dans le programme de vérification, il faut bien prendre soin
 d'encadrer les expressions rationnelles par des balises début-fin
 `/^ ... $/`. Sinon, on pourrait trouver une clé
 `"ingredients_text_(?<language_code>\w\w)"` avec un code langue
-`"with_allergens"`. Ça ferait désordre...
+`"with_allergens"`, ou plus précisément `"wi"`. Ça ferait désordre...
 
 Ces clés  servent donc  au multilinguisme. Cela  dit, si  vous relisez
 l'exemple du
@@ -698,6 +701,25 @@ Exemple extrait de `product_nutrition.yaml`
         description: |
           The standardized value of a serving for this product.
         type: number
+```
+
+Et dans le produit `"00187251"`, on trouve :
+
+```
+        "nutriments" : {
+                "fruits-vegetables-nuts-estimate-from-ingredients_serving" : 0,
+                "fiber_100g" : 3.3333333333333,
+                "sugars_unit" : "g",
+                "nova-group_serving" : 4,
+                "salt_100g" : 0.70833333333333,
+                "sodium_100g" : 0.283333333333332,
+                "proteins_100g" : 6.6666666666667,
+                "energy-kcal_unit" : "kcal",
+                "fruits-vegetables-legumes-estimate-from-ingredients_serving" : 0,
+                "proteins_unit" : "g",
+                "fruits-vegetables-legumes-estimate-from-ingredients_100g" : 0,
+                (etc)
+        },
 ```
 
 Champs implicites
@@ -1520,7 +1542,9 @@ compte  de cet  attribut  `additionalProperties` et  considère que  la
 propriété `category_properties` est un  objet dont les sous-propriétés
 sont inconnues. En fait, dans  les quelques exemples que j'ai extraits
 de la  collection `products`,  la propriété  `category_properties` est
-toujours un objet vide `{}`.
+presque  toujours  un  objet   vide  `{}`  (exceptions,  les  produits
+`"0052833225082"`,  `"0078742054797"`,  `"0078742102047"` et  quelques
+autres dans le fichier `multiligne`).
 
 Déroulement
 ===========
@@ -1638,115 +1662,40 @@ champs `description` et `example`.
 
 ### Références récursives
 
-Dans  le cas  des trois  `$ref` spéciaux,  pour `nova_groups_markers`,
-`nutrient.yaml` et `ingredient.yaml`, le  programme ajoute un attribut
-`dyn_sch` (schéma dynamique) et  insère une entrée correspondante dans
-la variable  `%dyn_schema`, avec le répertoire  en cours et le  nom du
-fichier en cours.
+Les    trois    `'$ref'`   spéciaux,    dans    `nova_groups_markers`,
+`nutrient.yaml` et `ingredient.yaml`, sont  traités comme les `'$ref'`
+qui appellent simplement un fichier,  avec une légère différence. Dans
+le cas de la propriété `nova_groups_markers`, le sous-schéma dynamique
+ne correspond  pas à  la totalité du  fichier `product_extended.yaml`,
+mais à  une partie très réduite  de l'arborescence, en fonction  de la
+sélection `properties / nova_groups_markers / properties / 3 / items`.
+Avant  de charger  l'attribut  `schema` du  sous-schéma, le  programme
+effectue cette sélection.
+
+Toutefois,  on tient  compte  du niveau  d'imbrication  des appels  de
+référence.   Si  ce   niveau   d'imbrication   dépasse  le   paramètre
+`--max-depth`, alors on bascule du mécanisme d'insertion statique vers
+le mécanisme  d'insertion dynamique.  Le programme ajoute  un attribut
+`dyn_sch` (schéma  dynamique) contenant  la référence  complète. Cette
+référence  complète   est  constituée   du  chemin  du   fichier  avec
+l'arborescence  des répertoires,  d'un caractère  `'#'`, et  enfin des
+sélections dans  l'arborescence des clés  de hachage séparées  par des
+slashs. S'il  n'y a pas de  sélection dans l'arborescence des  clés de
+hachage, la référence complète comportera quand même un simple slash à
+la suite du dièse. En même temps que l'attribut `dyn_sch` est alimenté
+dans le schéma principal, le programme ajoute une entrée dans la liste
+`@dyn_sch_to_do`  avec   toutes  les  informations   nécessaires  pour
+identifier et extraire le sous-schéma dynamique.
 
 Ensuite, une fois  que le schéma principal est  entièrement chargé, le
-programme  déroule  la  variable  `%dyn_schema`  pour  charger  chaque
-sous-schéma dynamique. Le fonctionnement est  presque le même que pour
-le schéma principal, avec une différence.
+programme  déroule la  variable `@dyn_sch_to_do`  pour charger  chaque
+sous-schéma  dynamique  et  le  stocker   dans  la  table  de  hachage
+`%dyn_schema`, sauf si la référence complète a déjà été traitée.
 
-Cette  différence   se  voit  dans  le  cas   de  la  propriété
-`nova_groups_markers`. Le sous-schéma dynamique ne correspond pas à la
-totalité du  fichier `product_extended.yaml`,  mais à une  partie très
-réduite de l'arborescence,  en fonction de la  sélection `properties /
-nova_groups_markers  /  properties /  3  /  items`. Avant  de  charger
-l'attribut `schema`  du sous-schéma  dynamique, le  programme effectue
-cette sélection. Mais  si la valeur de `'$ref'` est  réduite à `'#/'`,
-le sous-schéma est repris tel quel, sans sélection.
-
-### Problèmes
-
-La récursivité simple, qui concerne seulement le fichier en cours, est
-bien traitée.  En revanche,  la récursivité croisée  ne l'est  pas. La
-récursivité croisée est,  par exemple, le cas de figure  où un fichier
-`poule.yaml`  fait  référence  au   fichier  `oeuf.yaml`,  tandis  que
-`oeuf.yaml` faire référence à `poule.yaml`. Dans ce cas, le chargement
-du schéma part dans une boucle infinie.
-
-En fait, même la récursivité simple peut conduire à une boucle infinie.
-Prenons le fichier `ingredient.yaml`. L'appel récursif est
-défini par :
-
-```
-          $ref: '#/'
-```
-
-S'il avait été défini en revanche par :
-
-```
-          $ref: './ingredient.yaml'
-```
-
-là aussi il y aurait eu une boucle récursive infinie.
-
-La solution  serait peut-être  d'utiliser la méthode  des sous-schémas
-dynamiques pour  toutes les clés  `$ref`, sauf éventuellement  pour le
-niveau 1.
-
-Un  autre cas  d'erreur se  rencontre si  le même  fichier `toto.yaml`
-contient deux références différentes. Voici  un exemple inspiré du cas
-réel  (qui fonctionne  bien, alors  que l'exemple  ci-dessous pourrait
-foirer) :
-
-```
-type: object
-properties:
-  nova_groups_markers:
-    type: object
-    properties:
-      "2":
-        description: |
-          Markers of level 2
-        type: array
-        items:
-          type: array
-          description: |
-            This array has two integer elements for each marker.
-          items:
-            type: integer
-      "3":
-        description: |
-          Markers of level 3
-        type: array
-        items:
-          type: array
-          description: |
-            This array has two string elements for each marker.
-          items:
-            type: string
-      "4":
-        description: |
-          Markers of level 4
-        type: array
-        items:
-          $ref: "#/properties/nova_groups_markers/properties/3/items"
-      "5":
-        description: |
-          Markers of level 5
-        type: array
-        items:
-          $ref: "#/properties/nova_groups_markers/properties/2/items"
-```
-
-Si, comme suggéré juste au-dessus,  on adopte le mécanisme d'insertion
-dynamique pour  toutes les clés `$ref`  sauf au niveau 1,  ce deuxième
-cas d'erreur est  présent dans de nombreux fichiers  YAML. Il faudrait
-abandonner l'idée des  clés simples `dyna`, `dynb`  et suivantes, pour
-adopter à la place des clés basées sur le nom du fichier à inclure.
-
-En  fait, l'exemple  ci-dessus fonctionne.  D'une part,  la différence
-entre les entiers de `"2"` et les chaînes de `"3"` ne se manifeste pas
-dans la version actuelle de l'utilitaire de vérification, puisque l'on
-vérifie  les clés  et les  valeurs  composites, mais  pas les  valeurs
-scalaires. Donc on peut mettre une chaîne là où l'on attend un entier,
-cela ne sera  pas détecté. Ensuite, même si l'on  remplace les entiers
-par  des   objets  (cf  les  fichiers   `parallel-ref*.yaml`  dans  le
-sous-répertoire `reduced-schema`), les sous-schémas dynamiques ne sont
-pas mélangés comme je le croyais.
+Pour  l'anecdote,  signalons que  le  parcours  de l'arborescence  des
+`'$ref'`  est  un  parcours  en  profondeur  tant  que  l'on  fait  de
+l'insertion statique,  mais que  cela devient  un parcours  en largeur
+lorsque l'on traite les insertions dynamiques.
 
 Extraction des documents JSON
 -----------------------------
@@ -1754,14 +1703,14 @@ Extraction des documents JSON
 Outre les  fichiers YAML du  schéma, le  programme reçoit des  noms de
 fichiers. On  considère que ces  fichiers contiennent du  texte varié,
 avec par moment  des documents JSON. On cherche des  documents JSON de
-deux variétés.  Tout d'abord, des  documents mono-lignes. Et  ce n'est
+trois variétés. Tout d'abord, des  documents mono-lignes. Et  ce n'est
 pas  grave si  l'on obtient  une ligne  de plus  de 30 000 caractères.
 Ensuite,  des  documents  bien  mis en  forme,  avec  une  indentation
 cohérente. Ces documents sont sur  plusieurs lignes, la première étant
 constituée d'une accolade ouvrante en  début de ligne et rien d'autre,
 la dernière étant constituée d'une accolade fermante en début de ligne
 et rien d'autre. Et enfin des objets JSON réunis dans un tableau JSON,
-délimités  par  deux  lignes  contenant chacune  un  crochet  et  rien
+délimité   par  deux  lignes  contenant chacune  un  crochet  et  rien
 d'autre.
 
 L'extraction  se fait  avec un  automate à  états finis.  Cet automate
