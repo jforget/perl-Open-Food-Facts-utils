@@ -25,6 +25,8 @@ perl schema-check.pl -s reduced-schema/parallel-refs.yaml   reduced-schema/paral
 perl schema-check.pl -s reduced-schema/parallel-refs-1.yaml reduced-schema/parallel-refs.data.json   > $dir_res/$base-parallel-1
 perl schema-check.pl -s reduced-schema/parallel-refs-2.yaml reduced-schema/parallel-refs.data.json   > $dir_res/$base-parallel-2
 
+perl -n -e 'print if (/^Main schema/ .. eof)' < $dir_res/$base-listing > $dir_res/$base-list-short
+perl -n -e 'print if (/^Main schema/ .. eof)' < $dir_res/$base-dyn     > $dir_res/$base-dyn-short
 
 exit;
 
@@ -52,7 +54,7 @@ this allows the programmer to execute regression tests.
   sh full-test.sh test2
   cd results
   diff test1-basic test2-basic
-  diff test1-listing test2-listing
+  diff test1-list-short test2-list-short
   # ...
 
 =head2 Parameter
@@ -69,6 +71,16 @@ iterations is not constant. Therefore, when invoking C<diff>, you
 will find many differences between, say, F<test1-listing> and F<test2-listing>.
 This is normal. What would show a regression is differences
 within the schema listing part and within the data checking part.
+
+Therefore you should not check
+
+  diff test1-listing  test2-listing
+  diff test1-dyn      test2-dyn
+
+but rather
+  
+  diff test1-list-short test2-list-short
+  diff test1-dyn-short  test2-dyn-short
 
 =head1 COPYRIGHT and LICENCE
 
