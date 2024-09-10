@@ -359,10 +359,8 @@ printed in the JSON file with a type in this way:
 NumberLong(123456789)
 ```
 
-I am not sure that is the exact  keyword, but this is the gist. See by
-yourself when you build the JSON  file. This syntax is rejected by the
-JSON parser called by `schema-check.pl`,  so you have to convert these
-values to plain numbers, without the type and without the parentheses.
+See for example property  `popularity_key` in document `"04148623"` in
+file `multiligne`.
 
 ### After 21st June 2024
 
@@ -448,7 +446,8 @@ The  solution   suggested  by  the  mongosh   documentation,  applying
 `JSON::PP`,  we  can  define  a  parser  which  accepts  keys  without
 delimiters and  values with single  quote delimiters. Yet,  the parser
 will still detect errors  when a single-quote-delimited value contains
-double quotes. For example:
+double quotes. See for example property `ingredients_text_with_allergens`
+in document `"5000169107829"` in file `multiline-1` :
 
 ```
     ingredients_text_with_allergens: 'Cheddar cheese (<span class="allergen">milk</span>), potato starch.',

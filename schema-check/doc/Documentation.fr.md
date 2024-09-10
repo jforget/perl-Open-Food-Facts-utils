@@ -372,10 +372,8 @@ certains nombres sont extraits dans le fichier JSON sous la forme :
 NumberLong(123456789)
 ```
 
-Je ne  suis pas sûr du  mot-clé `NumberLong`, voyez vous-même  dans le
-fichier lorsque vous l'aurez obtenu.  Cette syntaxe est refusée par le
-module  d'analyse JSON  du programme  `schema-check.pl`, il  faut donc
-convertir ces nombres en enlevant le type et les parenthèses.
+Voir la propriété `popularity_key`  dans le document `"04148623"` dans
+le fichier `multiligne`.
 
 ### Après le 21 juin 2024
 
@@ -460,10 +458,12 @@ au lieu de
 ```
 
 La  solution  proposée  par  la  documentation  de  MongoDB,  apliquer
-`EJSON.stringify()` à toutes les requêtes, est peu ergonomique. À la place,
-_a  priori_,  on  peut  s'en  sortir avec  les  bons  paramètres  pour
+`EJSON.stringify()` à toutes  les requêtes, est peu  ergonomique. À la
+place, _a priori_,  on peut s'en sortir avec les  bons paramètres pour
 l'analyseur  JSON fourni  par `JSON::PP`.  Sauf que  certaines valeurs
-contiennent des doubles quotes et `JSON::PP` n'aime pas. Par exemple :
+contiennent des doubles quotes et  `JSON::PP` n'aime pas. Par exemple,
+dans  la   propriété  `ingredients_text_with_allergens`   du  document
+`"5000169107829"` du fichier `multiline-1` :
 
 ```
     ingredients_text_with_allergens: 'Cheddar cheese (<span class="allergen">milk</span>), potato starch.',
@@ -1692,6 +1692,15 @@ programme  déroule la  variable `@dyn_sch_to_do`  pour charger  chaque
 sous-schéma  dynamique  et  le  stocker   dans  la  table  de  hachage
 `%dyn_schema`, sauf si la référence complète a déjà été traitée.
 
+Remarquons  que   si  l'on   appelle  le  programme   avec  l'attribut
+`--max-depth=1`, alors  presque tous les attributs  `'$ref'` donneront
+lieu à  une insertion dynamique. Les  seuls qui se traduiront  par une
+insertion  statique sont  les  12 `'$ref'`  de  l'attribut `allOf`  du
+fichier   `product.yaml`.   Mais   avec    la   valeur   par   défaut,
+`--max-depth=5`,  seul l'appel  récursif  de `ingredients.yaml`  donne
+lieu à une insertion dynamique, après  avoir quand même donné lieu à 3
+insertions statiques.
+
 Pour  l'anecdote,  signalons que  le  parcours  de l'arborescence  des
 `'$ref'`  est  un  parcours  en  profondeur  tant  que  l'on  fait  de
 l'insertion statique,  mais que  cela devient  un parcours  en largeur
@@ -2126,6 +2135,77 @@ est plus appropriée.  Il faut donc tester avec
 en balisant avec le début et la fin de la chaîne de caractères et on a
 bien le `language_code` capturé égal à `en`.
 
+JSON ou JSON5 ? Quel module Perl ?
+----------------------------------
+
+Ainsi qu'il a été écrit dans le
+[paragraphe sur l'extraction de données](#user-content-où-trouver-des-données-de-test-),
+l'utilitaire CLI  `mongosh` formatte  les données JSON  avec certaines
+caractéristiques  de JSON5 :  pas de  quotes  pour les  clés dans  les
+paires clé-valeur,  parfois des simples  quotes pour les  valeurs dans
+les paires  clé-valeur. Faut-il donc  abandonner la version 4  de JSON
+pour adopter
+[JSON5](https://json5.org/) ?
+
+J'ai essayé d'utiliser le
+[module Perl JSON5](https://metacpan.org/pod/JSON5).
+Résultat, de nombreux messages d'erreur  
+
+```
+Deep recursion on subroutine "JSON5::Parser::_parse_object_kv" at /home/jf/perl5/lib/perl5/JSON5/Parser.pm line 189.
+```
+
+En consultant le  source Perl et enfaisant  des tests complémentaires,
+j'ai trouvé que  cela se produisait lorsqu'un objet  JSON comporte une
+centaire de  paires clé-valeur. Je n'ai  même pas eu besoin  de tester
+des structures emboîtées. J'ai soumis un
+[rapport de bug](https://github.com/karupanerura/p5-JSON5/issues/2).
+En attendant, il faut trouver autre chose que `JSON5.pm`.
+
+Parmi les modules Perl permettant d'analyser du JSON, j'ai regardé
+[`JSON::PP`](https://metacpan.org/pod/JSON::PP).
+
+La première  raison, c'est  qu'un module  pur Perl  est plus  simple à
+installer  qu'un  module   XS  et  que  je  n'ai   pas  de  contrainte
+particulière pour les performances.
+
+Lorsque j'ai été confronté aux extractions par `mongosh`, qui utilisent
+certaines particularités de JSON5, j'ai relu la documentation de
+`JSON::PP` et j'ai découvert
+[l'option `allow_barekey`](https://metacpan.org/pod/JSON::PP#allow_barekey)
+qui règle le cas des clés sans quotes, ainsi que
+[l'option `allow_singlequote`](https://metacpan.org/pod/JSON::PP#allow_singlequote)
+qui  traite le  cas des  valeurs  délimitées par  des simples  quotes.
+Hélas, même avec ces deux  options, le module `JSON::PP` déclenche une
+erreur  sur certaines  chaînes  de caractères  comportant des  doubles
+quotes :
+
+```
+    ingredients_text_with_allergens: 'Cheddar cheese (<span class="allergen">milk</span>), potato starch.',
+                                     .............................*........*..............................
+```
+
+J'ai soumis une
+[demande de correction](https://github.com/makamaka/JSON-PP/issues/90).
+
+L'auteur du module l'a rejetée, en expliquant que je pouvais utiliser
+['option `loose`](https://metacpan.org/pod/JSON::PP#loose)
+ou, de  manière préférable, un  module analysant réellement  du JSON5.
+L'inconvénient qu'il donne pour `loose` est que cela pourrait accepter
+des sources JSON incorrects au  lieu de déclencher un message d'erreur
+de syntaxe. Pour  les raisons indiquées ci-dessus et parce  que le but
+de mon  programme n'est pas de  vérifier la syntaxe JSON,  j'ai adopté
+l'option `loose` plutôt que le module `JSON5`.
+
+Et si je puis me permettre une remarque acerbe, je ferai remarquer que
+le but du  langage JSON5 est de faciliter la  saisie de documents JSON
+par des  humains. On pense  notamment à des fichiers  de configuration
+qu'il  faut éditer  lorsque  l'on  installe tel  ou  tel logiciel.  En
+revanche, si un document JSON est généré par un programme, alors c'est
+la version stricte  de JSON (v4 ?) qui doit  être utilisée. Jusque-là,
+je  suis d'accord.  Mais  dans ces  conditions, pourquoi  l'utilitaire
+`mongosh` de MongoDB  génère-t-il du JSON5 au lieu de  la syntaxe plus
+rigoureuse de JSON v4 ?
 
 Licence
 =======
