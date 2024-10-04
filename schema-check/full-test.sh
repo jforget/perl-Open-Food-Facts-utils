@@ -4,7 +4,7 @@
 # Test complet, avec les valeurs habituelles des paramètres
 # Full test, with the usual values for the parameters
 #
-# See the licence in the POD documentation below.
+# See the license in the POD documentation below.
 #
 
 export dir_res=results
@@ -47,6 +47,8 @@ this allows the programmer to execute regression tests.
 
 =head1 USAGE
 
+Regression tests:
+
   sh full-test.sh test1
   #
   # make a few modifications in program C<schema-check.pl>
@@ -56,6 +58,12 @@ this allows the programmer to execute regression tests.
   diff test1-basic test2-basic
   diff test1-list-short test2-list-short
   # ...
+
+Most frequent errors:
+
+  sh full-test.sh test1
+  cd results
+  grep -i -h invalid test1*|sort|uniq -c|sort -n -r|less
 
 =head2 Parameter
 
@@ -69,7 +77,7 @@ about the processing of C<'$ref'> entries. Since this processing
 uses an loop over the keys of a hashtable, the order of the individual
 iterations is not constant. Therefore, when invoking C<diff>, you
 will find many differences between, say, F<test1-listing> and F<test2-listing>.
-This is normal. What would show a regression is differences
+This is normal. What would show a real regression is differences
 within the schema listing part and within the data checking part.
 
 Therefore you should not check
@@ -82,7 +90,11 @@ but rather
   diff test1-list-short test2-list-short
   diff test1-dyn-short  test2-dyn-short
 
-=head1 COPYRIGHT and LICENCE
+By the way, that means that the command extracting the most frequent
+errors is not completely accurate, because some errors are counted
+twice, e.g. in F<test1-dyn> and in F<test1-dyn-short>.
+
+=head1 COPYRIGHT and LICENSE
 
 Copyright (C) 2024, Jean Forget, all rights reserved
 

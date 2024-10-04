@@ -2135,8 +2135,7 @@ est plus appropriée.  Il faut donc tester avec
 en balisant avec le début et la fin de la chaîne de caractères et on a
 bien le `language_code` capturé égal à `en`.
 
-JSON ou JSON5 ? Quel module Perl ?
-----------------------------------
+### JSON ou JSON5 ? Quel module Perl ?
 
 Ainsi qu'il a été écrit dans le
 [paragraphe sur l'extraction de données](#user-content-où-trouver-des-données-de-test-),
@@ -2149,7 +2148,7 @@ pour adopter
 
 J'ai essayé d'utiliser le
 [module Perl JSON5](https://metacpan.org/pod/JSON5).
-Résultat, de nombreux messages d'erreur  
+Résultat, de nombreux messages d'erreur
 
 ```
 Deep recursion on subroutine "JSON5::Parser::_parse_object_kv" at /home/jf/perl5/lib/perl5/JSON5/Parser.pm line 189.
@@ -2187,9 +2186,8 @@ quotes :
 
 J'ai soumis une
 [demande de correction](https://github.com/makamaka/JSON-PP/issues/90).
-
 L'auteur du module l'a rejetée, en expliquant que je pouvais utiliser
-['option `loose`](https://metacpan.org/pod/JSON::PP#loose)
+[l'option `loose`](https://metacpan.org/pod/JSON::PP#loose)
 ou, de  manière préférable, un  module analysant réellement  du JSON5.
 L'inconvénient qu'il donne pour `loose` est que cela pourrait accepter
 des sources JSON incorrects au  lieu de déclencher un message d'erreur

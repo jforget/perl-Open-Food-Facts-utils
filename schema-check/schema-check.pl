@@ -6,7 +6,7 @@
 #
 # Copyright (c) 2024 Jean Forget
 #
-# See the licence in the embedded documentation below
+# See the license in the embedded documentation below
 #
 
 use v5.38;
@@ -521,7 +521,7 @@ Modules used (outside the core):
 
 Jean Forget (jforget on Github).
 
-=head1 COPYRIGHT AND LICENCE
+=head1 COPYRIGHT AND LICENSE
 
 Copyright (c) 2024 Jean Forget
 
