@@ -13,12 +13,12 @@ export base=$1
 echo $1
 
 
-perl schema-check.pl --schema=schemas/product.yaml examples/off* examples/test-errors         > $dir_res/$base-basic
-perl schema-check.pl --schema=schemas/product.yaml examples/off* examples/test-errors -l      > $dir_res/$base-listing
-perl schema-check.pl --schema=schemas/product.yaml examples/off* examples/test-errors -l -m 1 > $dir_res/$base-dyn
-perl schema-check.pl -s schemas/product.yaml examples/example.txt examples/ingredients examples/nova-groups > $dir_res/$base-other
-perl schema-check.pl -s schemas/product.yaml examples/products-324.json > $dir_res/$base-324
-perl schema-check.pl -s schemas/product.yaml examples/multi*            > $dir_res/$base-multi
+perl schema-check.pl --schema=schemas/schemas/product.yaml examples/off* examples/test-errors         > $dir_res/$base-basic
+perl schema-check.pl --schema=schemas/schemas/product.yaml examples/off* examples/test-errors -l      > $dir_res/$base-listing
+perl schema-check.pl --schema=schemas/schemas/product.yaml examples/off* examples/test-errors -l -m 1 > $dir_res/$base-dyn
+perl schema-check.pl -s schemas/schemas/product.yaml examples/example.txt examples/ingredients examples/nova-groups > $dir_res/$base-other
+perl schema-check.pl -s schemas/schemas/product.yaml examples/products-324.json > $dir_res/$base-324
+perl schema-check.pl -s schemas/schemas/product.yaml examples/multi*            > $dir_res/$base-multi
 perl schema-check.pl -s reduced-schema/chicken.yaml         reduced-schema/chicken-and-egg.data.json > $dir_res/$base-egg
 perl schema-check.pl -s reduced-schema/product_meta.yaml    reduced-schema/product_meta.data.json    > $dir_res/$base-meta
 perl schema-check.pl -s reduced-schema/parallel-refs.yaml   reduced-schema/parallel-refs.data.json   > $dir_res/$base-parallel

@@ -55,13 +55,26 @@ find_ref_rec($schema, $dir_sch, $schema_file, 1);
 
 if ($schema->{allOf}) {
   for my $entry (@{$schema->{allOf}}) {
-    my $fname = $entry->{'$ref'};
+    my $ref   = $entry->{'$ref'};
+    my $dir   = $dir_sch;
+    my $fname = $ref;
+    my @keys  = ();
+    if (index($ref, '#')) {
+      $fname = substr($ref, 0, index($ref, '#'));
+      @keys  = split('/', substr($ref, 1 + index($ref, '#')));
+    }
     my $path  = catfile($dir_sch, $fname);
     if ($list_schema) {
       say "processing 1 $path";
     }
     my $subschema = YAML::Load(slurp($path));
-    find_ref_rec($subschema, $dir_sch, $fname, 1);
+    $dir = dirname($path);
+    for my $key (@keys) {
+      if ($key) {
+        $subschema = $subschema->{$key};
+      }
+    }
+    find_ref_rec($subschema, $dir, $fname, 1);
     #say JSON::PP::encode_json($subschema);
     for my $prop_name (keys %{$subschema->{properties}}) {
       #say "adding $prop_name";
