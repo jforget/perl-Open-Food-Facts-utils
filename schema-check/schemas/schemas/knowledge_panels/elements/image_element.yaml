@@ -11,7 +11,7 @@ properties:
     description: |
       Width of the image.
 
-      This is just a suggestion coming from the server, 
+      This is just a suggestion coming from the server,
       the client may choose to use its own dimensions for the image.
   height:
     type: integer
@@ -23,4 +23,4 @@ properties:
   alt_text:
     type: string
     description: Alt Text of the image.
-  
+
