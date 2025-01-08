@@ -13,7 +13,7 @@ description stored in the Github repository.
 COPYRIGHT AND LICENSE
 =====================
 
-Copyright 2024 Jean Forget
+Copyright (c) 2024, 2025 Jean Forget
 
 This  repository contains  free  software; you  can redistribute  this
 software and  modify it  under the GNU  Affero General  Public License

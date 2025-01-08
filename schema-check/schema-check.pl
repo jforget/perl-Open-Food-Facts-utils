@@ -4,7 +4,7 @@
 # Vérifie qu'un document est compatible avec le schéma de données
 # Check that a document is compatible with the data schema
 #
-# Copyright (c) 2024 Jean Forget
+# Copyright (c) 2024, 2025 Jean Forget
 #
 # See the license in the embedded documentation below
 #
@@ -536,7 +536,7 @@ Jean Forget (jforget on Github).
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2024 Jean Forget
+Copyright (c) 2024, 2025 Jean Forget
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as

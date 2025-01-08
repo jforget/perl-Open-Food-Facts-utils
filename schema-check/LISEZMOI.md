@@ -11,7 +11,7 @@ documents qui figure dans le dépôt Github d'OFF.
 COPYRIGHT ET LICENCE
 ====================
 
-Copyright (c) 2024 Jean Forget
+Copyright (c) 2024, 2025 Jean Forget
 
 Cette   bibliothèque  contient   du   logiciel   libre.  Vous   pouvez
 redistribuer les programmes  de cette bibliothèque et  vous pouvez les

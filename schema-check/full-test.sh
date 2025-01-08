@@ -42,7 +42,7 @@ full-test.sh -- Full test, with the usual values for the parameters
 
 Conveniency script to run the tests, using the proper parameters.
 
-Since the parameters are the same from one run to the next, 
+Since the parameters are the same from one run to the next,
 this allows the programmer to execute regression tests.
 
 =head1 USAGE
@@ -86,7 +86,7 @@ Therefore you should not check
   diff test1-dyn      test2-dyn
 
 but rather
-  
+
   diff test1-list-short test2-list-short
   diff test1-dyn-short  test2-dyn-short
 
@@ -96,7 +96,7 @@ twice, e.g. in F<test1-dyn> and in F<test1-dyn-short>.
 
 =head1 COPYRIGHT and LICENSE
 
-Copyright (C) 2024, Jean Forget, all rights reserved
+Copyright (C) 2024, 2025 Jean Forget, all rights reserved
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
