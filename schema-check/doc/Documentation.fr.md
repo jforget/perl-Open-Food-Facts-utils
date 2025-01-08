@@ -494,14 +494,27 @@ de la  description pourront  être incomplètes  et contredites  par les
 étapes  suivantes.  Néanmoins,  cette   progression  permet  de  mieux
 comprendre comment le schéma est défini.
 
+D'autre part, dans  ce chapitre de la documentation,  je n'utilise pas
+la description la plus récente du schéma. Le 21 octobre 2024 a eu lieu
+une refonte des fichiers sources décrivant le schéma de données. Cette
+refonte  devait  avoir  pour  but   d'augmenter  la  puissance  et  la
+maintenabilité  du schéma  de données,  aux dépens  de sa  simplicité.
+Donc, pour des raisons pédagogiques,  la description fait référence au
+schéma tel  qu'il était avant le  21 octobre 2024 et  dupliqué dans le
+sous-répertoire  `old-schema`  de  ce  dépôt  Git.  Pour  des  raisons
+pratiques en plus des raisons  pédagogiques, j'ai choisi la version du
+4 octobre, avant l'intégration le  11 octobre d'une _pull request_ que
+j'ai soumise.
+
 Première étape
 --------------
 
 Le schéma est défini dans le fichier `product.yaml` du sous-répertoire
-`docs/api/ref/schemas` du dépôt Git du serveur, lequel sous-répertoire
-a  été recopié,  avec  quelques corrections,  dans le  sous-répertoire
-`schemas` du  présent dépôt. En  enlevant le libellé  documentaire, le
-fichier contient :
+`docs/api/ref/schemas`  du dépôt  Git  du serveur.  Le  contenu de  ce
+sous-répertoire  pour  le  2024-10-04  a été  recopié,  avec  quelques
+corrections, dans le sous-répertoire `old-schema` du présent dépôt (la
+version à jour  étant recopiée dans le  sous-répertoire `schemas`). En
+enlevant le libellé documentaire, le fichier contient :
 
 ```
 type: object
@@ -529,7 +542,7 @@ ou un `require` en Perl.
 
 Le mot-clé `$ref` est utilisé  12 fois dans le fichier `product.yaml`,
 mais il est  utilisé également dans les autres fichiers.  Au total, il
-est utilisé  51 fois, 48  fois pour  importer un fichier  extérieur, 3
+est utilisé  52 fois, 49  fois pour  importer un fichier  extérieur, 3
 fois pour un autre mécanisme (décrit ultérieurement).
 
 Paires clé-valeur
@@ -721,6 +734,27 @@ Et dans le produit `"00187251"`, on trouve :
                 (etc)
         },
 ```
+
+Cela permet d'identifier les cas d'usage suivants :
+
+* `serving`,
+* `100g`,
+* `unit`
+
+ainsi que les nutriments suivants :
+
+* `fruits-vegetables-nuts-estimate-from-ingredients`,
+* `fiber`,
+* `sugar`,
+* `salt`,
+* `sodium`,
+* `proteins`
+* `fruits-vegetables-legumes-estimate-from-ingredients`
+
+et même quelques pseudo-nutriments comme :
+
+* `nova-group`,
+* `energy-kcal`.
 
 Champs implicites
 -----------------
@@ -927,7 +961,9 @@ Une petite  remarque en  passant. Les  clés `"transportation_scores"`,
 subordonnées  `"(?<language_code>\w\w)"`.  Néanmoins,   on  trouve  la
 valeur `"world"`  qui n'est pas un  code langue connu et  qui ne colle
 pas à  l'expression rationnelle. D'où  un message d'erreur lors  de la
-vérification.
+vérification. Cette remarque a donné lieu à la _pull request_ intégrée
+le 2024-10-11 dans le dépôt OFF, donc après la version récupérée dans
+le sous-répertoire `old-schema` du présent dépôt.
 
 Chaque  niveau  d'emboîtement  du  texte JSON  contenant  les  données
 correspond à deux  niveaux du texte YAML décrivant le  schéma. Si l'on
@@ -1046,30 +1082,19 @@ x-stoplight:
 type: object
 description: The title of a panel.
 properties:
+  name:
+    type: string
+    description: A short name of this panel, not including any actual values
   title:
     type: string
-  grade:
-    type: string
-    description: Indicates that the panel corresponds to a A to E grade such as the Nutri-Score of the Eco-Score.
-    enum:
-      - a
-      - b
-      - c
-      - d
-      - e
-      - unknown
-  icon_url:
-    type: string
-  icon_color_from_evaluation:
-    type: string
-  icon_size:
-    type: string
-    description: |
-      If set to "small", the icon should be displayed at a small size.
   <strong>type:</strong>
     type: string
-    example: grade
-    description: 'Used to indicate a special type for the title, such as "grade" for Nutri-Score and Eco-Score.'
+    enum:
+      - grade
+      - percentage
+    description: 'Used to indicate how the value of this item is measured, such as "grade" for Nutri-Score and Eco-Score or "percentage" for Salt'
+  grade:
+    type: string
 </pre>
 
 
@@ -1111,7 +1136,7 @@ technique `type`. Tant pis, on fera attention.
 Est-il possible d'avoir des tableaux d'éléments `number` ou d'éléments
 `integer` ? Je pense que oui, mais je n'en ai trouvé aucun.
 
-D'autres tableaux sont décrits ainsi :
+D'autres tableaux sont décrits ainsi (cf fichier `product_ingredients.yaml`) :
 
 ```
   ingredients_from_palm_oil_tags:
@@ -1178,8 +1203,8 @@ le fichier `product_extended.yaml` :
 Les clés `$ref` restantes
 -------------------------
 
-J'ai écrit que les fichiers YAML contenaient 51 attributs `$ref`, dont
-48 correspondaient à des appels de fichier similaires à `#include`. Et
+J'ai écrit que les fichiers YAML contenaient 52 attributs `$ref`, dont
+49 correspondaient à des appels de fichier similaires à `#include`. Et
 les trois derniers ?
 
 Reprenons    la    propriété    `nova_groups_markers`    du    fichier
@@ -1311,7 +1336,10 @@ envisager de  mêler les  références à des  fichiers externes  avec les
 références à une hiérarchie de clés ?  J'ai essayé de le faire dans le
 fichier  `parallel-refs-1.yaml`  du sous-répertoire  `reduced-schema`.
 Même si je n'ai  aucun exemple en ce sens dans  les exemples d'OFF, je
-pense que c'est la marche à suivre.
+pense  que c'est  la  marche  à suivre.  (Cette  remarque est  devenue
+caduque avec  la réorganisation  du 2024-10-21, il  y a  maintenant de
+nombreuses  références combinant  un  nom de  fichier  externe et  une
+hiérarchie de clés).
 
 Au début, je considérais que les  clés `'$ref'` faisant référence à un
 nom de fichier donneraient lieu à une insertion statique (recopie dans
@@ -1346,31 +1374,28 @@ Comme on l'a vu,  le contrôle de valeur des clés  est intrinsèque à la
 description  du  schéma,  soit  par l'entrée  `properties`,  soit  par
 l'entrée `patternProperties`. On  a déjà vu le cas  des codes langues,
 il  y a  aussi les  tailles d'images,  ainsi que  le montre  l'extrait
-suivant
+suivant extrait de `image.yaml`
 
 ```
     properties:
-      1:
+      sizes:
         type: object
-        description: "This represents an image uploaded for this product.\n"
-        properties:
-          sizes:
-            type: object
+        description: |
+          The available image sizes for the product (both reduced and full).
+          The reduced images are the ones with numbers as the key( 100, 200 etc)
+          while the full images have `full` as the key.
+        patternProperties:
+          (?<image_size>100|400):
+            type: string
             description: |
-              The available image sizes for the product (both reduced and full).
-              The reduced images are the ones with numbers as the key( 100, 200 etc)
-              while the full images have `full` as the key.
-            patternProperties:
-              (?<image_size>100|400):
-                type: string
-                description: |
-                  properties of thumbnail of size `image_size`.
-                  **TODO** explain how to compute name
+              properties of thumbnail of size `image_size`.
+              **TODO** explain how to compute name
 ```
 
 Si  les  clés  sont  contrôlées,  est-ce le  cas  également  pour  les
 valeurs ?  C'est   rare,  mais   cela  existe.  Voici   l'exemple  des
-sous-propriétés de la propriété `nutrient_levels`
+sous-propriétés de  la propriété `nutrient_levels` qui  se trouve dans
+`product_misc.yaml`
 
 ```
   nutrient_levels:
@@ -1379,33 +1404,26 @@ sous-propriétés de la propriété `nutrient_levels`
     properties:
       fat:
         type: string
-        enum:
-          - low
-          - moderate
-          - high
+        enum: ["low", "moderate", "high"]
       salt:
         type: string
-        enum:
-          - low
-          - moderate
-          - high
+        enum: ["low", "moderate", "high"]
       saturated-fat:
         type: string
-        enum:
-          - low
-          - moderate
-          - high
+        enum: ["low", "moderate", "high"]
       sugars:
         type: string.
-        enum:
-          - low
-          - moderate
-          - high
+        enum: ["low", "moderate", "high"]
 ```
 
 Mais le  programme de  vérification n'en tient  pas compte.  On trouve
 également des valeurs à titre d'exemple (attribut `example`) qui elles
 non plus ne sont pas utilisées dans le programme de vérification.
+
+Remarquons que  les tableaux sont donnés  ici avec la syntaxe  JSON au
+lieu de la syntaxe YAML (des  tirets sur des lignes sucessives). C'est
+valide, la spécification  du langage YAML précise que  la syntaxe JSON
+est acceptée.
 
 Dans l'exemple de  tableau, vous avez pu remarquer que  les valeurs se
 ressemblent,  avec un  code  langue, suivi  d'un  deux-points et  d'un
@@ -1500,6 +1518,14 @@ elements[*] . type` (donc un `type` métier) n'a pas de champ technique
 
 ```
                 type:
+                  element_type: string
+                  enum:
+                    - text
+                    - image
+                    - action
+                    - panel
+                    - panel_group
+                    - table
                   description: |
                     The type of the included element object.
                     The type also indicates which field contains the included element object.
@@ -1509,14 +1535,6 @@ elements[*] . type` (donc un `type` métier) n'a pas de champ technique
                     so your code should ignore unrecognized types, and unknown properties.
 
                     TODO: add Map type
-                  element_type: string
-                  enum:
-                    - text
-                    - image
-                    - action
-                    - panel
-                    - panel_group
-                    - table
 ```
 
 Et une dernière curiosité, dans le fichier `product_extended.yaml`, le
@@ -1531,6 +1549,9 @@ entrée `additionalProperties`.
       description: those are properties taken from the category taxonomy
       type: string
 ```
+
+Attention, il s'agit bien de `category_properties` avec un « `y` », ne
+regardez pas `categories_properties` avec « `ies` ».
 
 Remarquons  que cette  clé  `additionalProperties` se  trouve au  même
 niveau que  l'attribut `type`, donc  est elle-même un  attribut, alors
