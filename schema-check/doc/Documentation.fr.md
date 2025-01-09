@@ -958,12 +958,15 @@ mais aussi des types `object` avec la description associée.
 
 Une petite  remarque en  passant. Les  clés `"transportation_scores"`,
 `"transportation_values"`   et    `"values"`   admettent    des   clés
-subordonnées  `"(?<language_code>\w\w)"`.  Néanmoins,   on  trouve  la
-valeur `"world"`  qui n'est pas un  code langue connu et  qui ne colle
-pas à  l'expression rationnelle. D'où  un message d'erreur lors  de la
+subordonnées `"(?<language_code>\w\w)"`.  Néanmoins, on trouve  la clé
+`"world"` qui  n'est pas un  code langue connu et  qui ne colle  pas à
+l'expression  rationnelle.  D'où  un   message  d'erreur  lors  de  la
 vérification. Cette remarque a donné lieu à la _pull request_ intégrée
-le 2024-10-11 dans le dépôt OFF, donc après la version récupérée dans
-le sous-répertoire `old-schema` du présent dépôt.
+le 2024-10-11 dans le dépôt OFF,  donc après la version récupérée dans
+le sous-répertoire `old-schema` du présent  dépôt. De plus, le fichier
+`product_ecoscore.yaml`  a été  scindé le  19 novembre  pour créer  le
+fichier  `ecoscore-country-code.yaml`  et  l'utilisation  d'expression
+rationnelle est passée à la trappe dans ce nouveau fichier.
 
 Chaque  niveau  d'emboîtement  du  texte JSON  contenant  les  données
 correspond à deux  niveaux du texte YAML décrivant le  schéma. Si l'on
@@ -2175,7 +2178,7 @@ Résultat, de nombreux messages d'erreur
 Deep recursion on subroutine "JSON5::Parser::_parse_object_kv" at /home/jf/perl5/lib/perl5/JSON5/Parser.pm line 189.
 ```
 
-En consultant le  source Perl et enfaisant  des tests complémentaires,
+En consultant le  source Perl et en faisant des tests complémentaires,
 j'ai trouvé que  cela se produisait lorsqu'un objet  JSON comporte une
 centaire de  paires clé-valeur. Je n'ai  même pas eu besoin  de tester
 des structures emboîtées. J'ai soumis un

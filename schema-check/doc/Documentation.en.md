@@ -466,6 +466,635 @@ in `examples/multiline-2`.
 This fix is  not executed within `schema-check.pl`, you have  to do it
 before submitting the file to `schema-check.pl`.
 
+Schema Description
+==================
+
+Warning
+-------
+
+In the following,  you will find the descrition of  the data schema in
+_incremental_  fashion. Since  this  description  is incremental,  the
+first steps will  be incomplete and even contradicted  by later steps.
+Anyhow, this progression will allow  you, I hope, to understand better
+and easier how we define a data schema.
+
+Also, I do not  use the current description of the  data schema in the
+documentation. On 21 october 2024, there was an overhaul of the schema
+source files. This overhaul aimed at increasing the maintainability or
+the power of the data schema, but it increased its complexity. So, for
+pedagogical reasons, the description below  will refer to the state of
+the schema before  21 October 2024. For practical  reasons in addition
+to pedagogical reasons, I use  the version from 2024-10-04, before the
+application of a pull request I submitted (applied on 2024-10-11). The
+pedagogical version  of the  schema can be  found in  the `old-schema`
+directory in this repository.
+
+First Step
+----------
+
+The data schema is defined in file `product.yaml` within sub-directory
+`docs/api/ref/schemas` of  the Git repository. The  2024-10-04 content
+of  this  sub-directory  has  been  copied, with  a  few  fixes,  into
+sub-directory `old-schema` within the  present repository. The current
+version (post  2024-10-21) is copied into  sub-directory `schemas`. If
+we remove the documentary label, the file contents is:
+
+```
+type: object
+allOf:
+  - $ref: './product_base.yaml'
+  - $ref: './product_misc.yaml'
+  - $ref: './product_tags.yaml'
+  - $ref: './product_images.yaml'
+  - $ref: './product_ecoscore.yaml'
+  - $ref: './product_ingredients.yaml'
+  - $ref: './product_nutrition.yaml'
+  - $ref: './product_quality.yaml'
+  - $ref: './product_extended.yaml'
+  - $ref: './product_meta.yaml'
+  - $ref: './product_knowledge_panels.yaml'
+```
+
+The first  line (`type: object`)  tells us that  a document is  a JSON
+object,  beginning with  an  open brace,  including several  key-value
+pairs and ending with a closing brace. But what is allowed and what is
+forbidden within  these key-value pairs?  When reading the  YAML file,
+you  guess easily  that you  have to  read other  YAML files,  keyword
+`$ref`  acting as  keyword `#include`  in C  and keyword  `require` in
+Perl.
+
+The `$ref` keyword is used 12  times in file `product.yaml`, but it is
+used also in the other files. All in all, it appears 52 times, with 49
+file inclusions and 3 times for another mechanism.
+
+Key-Value Pairs
+---------------
+
+Here is an extract of file `product_base.yaml`.
+
+```
+type: object
+description: |
+  Base product data
+properties:
+  abbreviated_product_name:
+    type: string
+    description: Abbreviated name in requested language
+  code:
+    type: string
+    description: |
+      barcode of the product (can be EAN-13 or internal codes for some food stores),
+      for products without a barcode,
+      Open Food Facts assigns a number starting with the 200 reserved prefix
+  nova_group:
+    type: integer
+    description: |
+      Nova group as an integer from 1 to 4. See https://world.openfoodfacts.org/nova
+  product_name:
+    type: string
+    description: |
+      The name of the product
+  product_name_en:
+    type: string
+    description: |
+      The name of the product can also
+      be in many other languages like
+      product_name_fr (for French).
+  product_quantity:
+    type: string
+    description: |
+      The size in g or ml for the whole product.
+      It's a normalized version of the quantity field.
+    example: "500"
+```
+
+This extract describes, for example, this document:
+
+```
+{
+        "code" : "00187251",
+        "product_name_en" : "choclatey cats",
+        "nova_group" : 4,
+        "product_name" : "choclatey cats",
+        "product_quantity" : 453.59237
+}
+```
+
+As you  can see in  this example, the keys  are optional, such  as key
+`abbreviated_product_name` which  is missing from the  document above.
+Also, the order of the  keys is not significant. Key `product_name_en`
+appears after keys  `nova_group` and `product_name` in  the schema and
+before them in the document.
+
+This example brings another question, checking the values in key-value
+pairs.  For data  `product_quantity`, the  expected data  format is  a
+string, yet  the example gives a  float number. Is this  an error that
+needs to be reported to the OFF team? Or is this specification nothing
+more than a hint?
+
+Generic Keys
+------------
+
+Let us take a look at file `product_ingredients.yaml`.
+
+```
+type: object
+description: Fields about ingredients of a product
+properties:
+  ingredients_text:
+    type: string
+  ingredients_text_with_allergens:
+    type: string
+patternProperties:
+  'ingredients_text_(?<language_code>\w\w)':
+    type: string
+    description: |
+      Raw list of ingredients in language given by 'language_code'.
+
+      See `ingredients_text`
+  'ingredients_text_with_allergens_(?<language_code>\w\w)':
+    description: |
+      Like `ingredients_text_with_allergens` for a particular language
+    type: string
+```
+
+This describes the document below (an excerpt from  document `00187251`):
+
+```
+{
+        "ingredients_text_en" : "unbleached enriched flour ( wheat  flour, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, soy lecithin (an emulsifier), contain  wheat , soy, may contain traces of peanuts and tree nuts,",
+        "ingredients_text_with_allergens_en" : "unbleached enriched flour ( <span class=\"allergen\">wheat  flour</span>, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, <span class=\"allergen\">soy lecithin</span> (an emulsifier), contain  wheat , <span class=\"allergen\">soy</span>, may contain traces of <span class=\"allergen\">peanuts</span> and <span class=\"allergen\">tree nuts</span>,",
+        "ingredients_text_with_allergens" : "unbleached enriched flour ( <span class=\"allergen\">wheat  flour</span>, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, <span class=\"allergen\">soy lecithin</span> (an emulsifier), contain  wheat , <span class=\"allergen\">soy</span>, may contain traces of <span class=\"allergen\">peanuts</span> and <span class=\"allergen\">tree nuts</span>,",
+        "ingredients_text" : "unbleached enriched flour ( wheat  flour, niacin, reduced iron, thiamine mononitrate, riboflavin, folic acid), sugar, defatted cocoa powder (processed with alkali), invert syrup, palm oil, whole wheat flour, natural flavour, sodium bicarbonate, salt, vegetable mono and diglycerides, soy lecithin (an emulsifier), contain  wheat , soy, may contain traces of peanuts and tree nuts,"
+}
+
+```
+
+We recognize the specific keys `ingredients_text` and
+`ingredients_text_with_allergens`, but we also find keys
+`ingredients_text_en` and `ingredients_text_with_allergens_en` which
+are not listed in the data schema. They are implied with the regular
+expressions `ingredients_text_(?<language_code>\w\w)` and
+`ingredients_text_with_allergens_(?<language_code>\w\w)`.
+
+Within the  existing JSON documents, I  have not found any  example in
+which there  generic keys are  used for actual multi-linguism.  Yet, I
+suppose there is  no unicity check and that multiple  instances of the
+same generic key are allowed in a single document:
+
+```
+{
+  "ingredients_text_fr": "eau",
+  "ingredients_text_en": "water",
+  "ingredients_text_de": "wasser"
+}
+```
+
+In the check program, we need  to bracket the regular expressions with
+begin-end  anchors `/^  ... $/`.  Failing that,  we could  find a  key
+matching  `"ingredients_text_(?<language_code>\w\w)"` with  a language
+code `"with_allergens"`, or more accurately `"wi"`. How silly!
+
+So a typical  use of generic keys is multi-linguism.  Yet, if you read
+again the example from the
+[last paragraph](#user-content-Key-Value-Pairs)
+about specific keys, you will find a specific key `product_name_en` in
+addition   to  key   `product_name`,   which  gives   an  attempt   at
+multi-linguism using specific keys.
+
+We find also generic keys in files `nutrition_search.yaml` and `product_nutrition.yaml`,
+to define a series of properties by combining an explicite use case with
+a nutrient. Excerpt from `product_nutrition.yaml`
+
+```
+    patternProperties:
+      '(?<nutrient>[\w-]+)_unit':
+        description: |
+          The unit in which the nutrient for 100g or per serving is measured.
+
+          The possible values depends on the nutrient.
+
+          * `g` for grams
+          * `mg` for milligrams
+          * `μg` for micrograms
+          * `cl` for centiliters
+          * `ml` for mililiters
+          * `dv` for recommended daily intakes (aka [Dietary Reference Intake](https://en.wikipedia.org/wiki/Dietary_Reference_Intake))
+          * `% vol` for alcohol vol per 100 ml
+        type: string
+      '(?<nutrient>[\w-]+)_100g':
+        description: |
+          The standardized value of a serving of 100g (or 100ml for liquids)
+          for the nutrient.
+        type: number
+      '(?<nutrient>[\w-]+)_serving':
+        description: |
+          The standardized value of a serving for this product.
+        type: number
+```
+
+And the document `"00187251"` contains:
+
+```
+        "nutriments" : {
+                "fruits-vegetables-nuts-estimate-from-ingredients_serving" : 0,
+                "fiber_100g" : 3.3333333333333,
+                "sugars_unit" : "g",
+                "nova-group_serving" : 4,
+                "salt_100g" : 0.70833333333333,
+                "sodium_100g" : 0.283333333333332,
+                "proteins_100g" : 6.6666666666667,
+                "energy-kcal_unit" : "kcal",
+                "fruits-vegetables-legumes-estimate-from-ingredients_serving" : 0,
+                "proteins_unit" : "g",
+                "fruits-vegetables-legumes-estimate-from-ingredients_100g" : 0,
+                (etc)
+        },
+```
+
+This corresponds to the following use cases:
+
+* `serving`,
+* `100g`,
+* `unit`
+
+and the following nutrients:
+
+* `fruits-vegetables-nuts-estimate-from-ingredients`,
+* `fiber`,
+* `sugar`,
+* `salt`,
+* `sodium`,
+* `proteins`
+* `fruits-vegetables-legumes-estimate-from-ingredients`
+
+and even some pseudo-nutrients such as:
+
+* `nova-group`,
+* `energy-kcal`.
+
+Implicit Fields
+---------------
+
+Let us take again the document from the
+[paragraph about specific keys](#user-content-Key-Value-Pairs).
+Actually, the contents of this document is rather:
+
+```
+{
+        "_id" : "00187251",
+        "code" : "00187251",
+        "product_name_en" : "choclatey cats",
+        "nova_group" : 4,
+        "product_name" : "choclatey cats",
+        "product_quantity" : 453.59237,
+        "_keywords" : [
+                "cat",
+                "trader",
+                "joe",
+                "choclatey"
+        ]
+}
+```
+
+I have already read about field `_id`. It is mentionned in the O'Reilly
+book on MongoDB bases, written by
+[Kristina  Chodorow](https://www.oreilly.com/pub/au/4500).
+If  we write  into a  MongoDB database  a document  without a  `"_id"`
+key-value pair, then MongoDB automatically adds one.
+
+For database `off`, I guess that the data administrator has not deemed
+necessary to  mention that each  document contains an `"_id"`  key. So
+the check program  automatically adds this key to the  data schema, so
+the presence of this key-value pair  in a document will not trigger an
+error.
+
+Kristina  Chodorow's  book does  not  mention  the key  `"_keywords"`.
+Because it  begins with an underscore,  I suppose it might  be another
+implicit key, even  if it does not appear in  every database document.
+Yet, I am not  sure of this, so my program will  stil display an error
+message when seeing this key.
+
+Multi-Level Data
+----------------
+
+In a key-value pair, the value  is not always a scalar value: integer,
+floating number,  character string.  It can be  an embedded  full JSON
+object. Let us take a look at a new excerpt of document `"00187251"`.
+
+```
+{
+        "_id" : "00187251",
+        "ecoscore_data" : {
+                "status" : "unknown",
+                "missing" : {
+                        "origins" : 1,
+                        "labels" : 1
+                },
+                "adjustments" : {
+                        "packaging" : {
+                                "score" : -79,
+                                "non_recyclable_and_non_biodegradable_materials" : 1,
+                                "value" : -15,
+                        },
+                        "production_system" : {
+                                "value" : 0,
+                                "warning" : "no_label"
+                        },
+                        "origins_of_ingredients" : {
+                                "epi_score" : 0,
+                                "epi_value" : -5,
+                                "transportation_values" : {
+                                        "no" : 0,
+                                        ...
+                                        "eg" : 0,
+                                        "world" : 0,
+                                        "ad" : 0,
+                                        "se" : 0
+                                },
+                                "transportation_scores" : {
+                                        "va" : 0,
+                                        ...
+                                        "it" : 0,
+                                        "world" : 0,
+                                        "ba" : 0,
+                                        ...
+                                        "at" : 0
+                                },
+                                "values" : {
+                                        "lu" : -5,
+                                        ...
+                                        "it" : -5,
+                                        "world" : -5,
+                                        "ba" : -5,
+                                        ...
+                                        "ax" : -5
+                                },
+                                "warning" : "origins_are_100_percent_unknown"
+                        },
+                        "threatened_species" : {
+                                "value" : -10,
+                                "ingredient" : "en:palm-oil"
+                        }
+                }
+        }
+}
+```
+
+This corresponds  to the  following data  schema, extracted  from file
+`product_ecoscore.yaml`. I have modified  the order of definitions, to
+better stick with the actual data shown above.
+
+```
+type: object
+description: |
+  Fields related to Eco-Score for a product.
+
+  See also: `ecoscore_score`, `ecoscore_grade` and `ecoscore_tags`.
+
+properties:
+  ecoscore_data:
+    type: object
+    description: |
+      An object about a lot of details about data needed for Eco-Score computation
+      and complementary data of interest.
+    properties:
+      status:
+        type: string
+      missing:
+        type: object
+        properties:
+          labels:
+            type: integer
+          origins:
+            type: integer
+          packagings:
+            type: integer
+      adjustments:
+        type: object
+        properties:
+          packaging:
+            type: object
+            properties:
+              non_recyclable_and_non_biodegradable_materials:
+                type: integer
+              score:
+                type: integer
+              value:
+                type: integer
+              warning:
+                type: string
+          production_system:
+            type: object
+            properties:
+              value:
+                type: integer
+              warning:
+                type: string
+          origins_of_ingredients:
+            type: object
+            properties:
+              epi_score:
+                type: integer
+              epi_value:
+                type: integer
+              transportation_values:
+                type: object
+                properties:
+                  world:
+                    type: integer
+                patternProperties:
+                  (?<country_code>\w\w):
+                    type: integer
+              transportation_scores:
+                type: object
+                properties:
+                  world:
+                    type: integer
+                patternProperties:
+                  (?<country_code>\w\w):
+                    type: integer
+              values:
+                type: object
+                properties:
+                  world:
+                    type: integer
+                patternProperties:
+                  (?<country_code>\w\w):
+                    type: integer
+              warning:
+                type: string
+          threatened_species:
+            type: object
+            properties:
+              ingredient:
+                type: string
+              value:
+                type: integer
+```
+
+As we can see, besides the  types `string` and `integer`, there is the
+already mentioned  type `object`,  which is accompanied  by a  list of
+`properties` or a list of  `patternProperties` (or both). Within these
+`properties`, we  find embedded  types `string`,  `integer as  well as
+`object`, with the corresponding sub-description.
+
+A little remark. keys `"transportation_scores"`,
+`"transportation_values"`    and     `"values"`    include    sub-keys
+`"(?<language_code>\w\w)"`. Yet, we find key  `"world"` which is not a
+known language code  and which does not match  the regular expression.
+This triggers  an error  message when running  the check.  This remark
+gave a  _pull request_,  which was  applied to  the OFF  repository on
+2024-10-11, later than the version duplicated onto `old-schema` in the
+current  repository.  In  addition, file  `product_ecoscore.yaml`  was
+split   on   2024-11-19,   which   gave    way   to   the   new   file
+`ecoscore-country-code.yaml`  and the  regular expression  disappeared
+from this new file.
+
+In  the  JSON   document  holding  the  data,   each  embedding  level
+corresponds to  two embedding levels  in the YAML file  describing the
+data. If we number  the YAML levels from 0, the even  levels (0, 2, 4,
+etc) contains technical keys:
+
+* `description`,
+* `type`,
+* `properties`,
+* `patternProperties`
+
+and other not yet explained. The odd levels contain "business" keys:
+
+* `ecoscore_data`,
+* `status`,
+* `missing`,
+* `labels`,
+* `origins`
+
+and  so on.  In the  following, I  will use  the word  "attribute" for
+technical keys and the word "property" for business keys.
+
+There is a special case. `type` is a technical key, as we have already seen.
+But in some cases, it is also a business key. For example, see file
+fichier `knowledge_panels/panel.yaml`:
+
+<pre>
+<em>type:</em> object
+description: Each panel contains an optional title and an optional array of elements.
+properties:
+  <strong>type:</strong>
+    <em>type:</em> string
+    description: 'Type of the panel. If set to "card", the panel and its sub-panels should be displayed in a card. If set to "inline", the panel should have its content always displayed.'
+  expanded:
+    <em>type:</em> boolean
+    description: 'If true, the panel is to be displayed already expanded. If false, only the title should be displayed, and the user should be able to click or tap it to open the panel and display the elements.'
+  expand_for:
+    <em>type:</em> string
+    description: 'If set to "large", the content of the panel should be expanded on large screens, but it should still be possible to unexpand it.'
+</pre>
+
+The  level-1  business  keys  are  `expanded`,  `expanded_for`  and...
+`type`. And we also have a technical  key `type` at level 0 (once) and
+at level 2 (three times). The same case appears in
+`knowledge_panels/elements/table_element.yaml`
+
+<pre>
+title: table_element
+x-stoplight:
+  id: 38zu3z4sruqo7
+type: object
+description: Element to display a table.
+properties:
+  id:
+    type: string
+    description: An id for the table.
+  title:
+    type: string
+    description: |
+      Title of the column.
+  rows:
+    type: string
+  columns:
+    type: array
+    items:
+      type: object
+      title: table_column
+      properties:
+        <strong>type:</strong>
+          type: string
+        text:
+          type: string
+        text_for_small_screens:
+          type: string
+        style:
+          type: string
+        column_group_id:
+          type: string
+        shown_by_default:
+          type: boolean
+</pre>
+
+and in `knowledge_panels/elements/text_element.yaml`
+
+<pre>
+title: text_element
+x-stoplight:
+  id: vdwxlt73qnqfa
+type: object
+description: |-
+  A text in simple HTML format to display.
+
+  For some specific texts that correspond to a product field (e.g. a product name, the ingredients list of a product),the edit_field_* fields are used to indicate how to edit the field value.
+properties:
+  <strong>type:</strong>
+    type: string
+    description: |
+      the type of text, might influence the way you display it.
+    enum:
+      - summary
+      - warning
+      - notes
+  html:
+    type: string
+    description: Text to display in HTML format.
+...
+</pre>
+
+and in `knowledge_panels/elements/title_element.yaml`
+
+<pre>
+title: title_element
+x-stoplight:
+  id: lox0wvl9bdgy2
+type: object
+description: The title of a panel.
+properties:
+  title:
+    type: string
+  grade:
+    type: string
+    description: Indicates that the panel corresponds to a A to E grade such as the Nutri-Score of the Eco-Score.
+    enum:
+      - a
+      - b
+      - c
+      - d
+      - e
+      - unknown
+  icon_url:
+    type: string
+  icon_color_from_evaluation:
+    type: string
+  icon_size:
+    type: string
+    description: |
+      If set to "small", the icon should be displayed at a small size.
+  <strong>type:</strong>
+    type: string
+    example: grade
+    description: 'Used to indicate a special type for the title, such as "grade" for Nutri-Score and Eco-Score.'
+</pre>
+
+
+
 License
 =======
 
