@@ -482,7 +482,8 @@ components:
         The value is structured as: user_id&username&user_session&session_token
         e.g. "user_id&exampleuser&user_session&abcdefghijklmnopqrstuvwxyz123456789ABCDEFGHIJKLM"
     userAgentAuth:
-      description: Authentication using User-Agent header
+      description: |
+        Authentication using User-Agent header
         User-Agent header in the format 'app_name/app_version (email)'
       type: apiKey
       in: header
