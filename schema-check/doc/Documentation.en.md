@@ -1500,6 +1500,88 @@ the following syntax a valid one?
             - number
 ```
 
+Another  curious  element,  in  file `knowledge_panels  /  elements  /
+element.yaml`, the property `knowledge_panels . additionalProperties .
+elements[*]  . type`  (which is  a business  `type`) has  no technical
+field `type`, but a technical field `element_type`.
+
+```
+                type:
+                  element_type: string
+                  enum:
+                    - text
+                    - image
+                    - action
+                    - panel
+                    - panel_group
+                    - table
+                  description: |
+                    The type of the included element object.
+                    The type also indicates which field contains the included element object.
+                    e.g. if the type is "text", the included element object will be in the "text_element" field.
+
+                    Note that in the future, new type of element may be added,
+                    so your code should ignore unrecognized types, and unknown properties.
+
+                    TODO: add Map type
+```
+
+And a  last curiosity,  in file `product_extended.yaml`,  the business
+field  `category_properties`  has  a `type`  attribute  `object`,  but
+neither  `properties`  attribute, nor  `patternProperties`  attribute,
+only a key `additionalProperties`.
+
+```
+  category_properties:
+    type: object
+    additionalProperties:
+      description: those are properties taken from the category taxonomy
+      type: string
+```
+
+Do not confuse this `category_properties` key (with an `"y"`) with the
+other key, `categories_properties` (with `"ies"`) found elsewhere.
+
+Let us note  that this `additionalProperties` key is a  the same level
+than  attribute `type`  and,  therefore, is  itself another  attribut,
+while  in   the  `owner_fields`   example  a  few   paragraphs  above,
+`additionalProperties` was  a property. Let  us note also that  at the
+next level, we find again technical keys `description` and `type`. The
+checking program does not pay attention to this `additionalProperties`
+attribute and it considers  that the property `category_properties` is
+an  object with  unknown properties.  Actually, after  digging in  the
+`products`  collection,  I  found  a  few  examples  with  a  property
+`category_properties`  and this  property  is nearly  always an  empty
+object      `{}`     (exceptions,      products     `"0052833225082"`,
+`"0078742054797"`,  `"0078742102047"`   and  a  few  others   in  file
+`multiligne`).
+
+```
+{
+   "_id" : "0052833225082",
+   "category_properties" : {
+      "ciqual_food_name:en" : "Cheddar cheese, from cow's milk",
+      "ciqual_food_name:fr" : "Fromage -aliment moyen-"
+   }
+}
+{
+   "_id" : "0078742054797",
+   "category_properties" : {
+      "ciqual_food_name:en" : "Sausage -average-",
+      "ciqual_food_name:fr" : "Saucisse -aliment moyen-"
+   }
+}
+{
+   "_id" : "0078742102047",
+   "category_properties" : {
+      "ciqual_food_name:en" : "Cheddar cheese, from cow's milk",
+      "ciqual_food_name:fr" : "Fromage -aliment moyen-"
+   }
+}
+```
+
+Actually, I  do not know  how to  interpret these cases.  The examples
+above fail to enlighten my understanding.
 
 License
 =======

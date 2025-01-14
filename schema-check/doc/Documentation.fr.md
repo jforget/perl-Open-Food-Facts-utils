@@ -1569,6 +1569,33 @@ presque  toujours  un  objet   vide  `{}`  (exceptions,  les  produits
 `"0052833225082"`,  `"0078742054797"`,  `"0078742102047"` et  quelques
 autres dans le fichier `multiligne`).
 
+```
+{
+   "_id" : "0052833225082",
+   "category_properties" : {
+      "ciqual_food_name:en" : "Cheddar cheese, from cow's milk",
+      "ciqual_food_name:fr" : "Fromage -aliment moyen-"
+   }
+}
+{
+   "_id" : "0078742054797",
+   "category_properties" : {
+      "ciqual_food_name:en" : "Sausage -average-",
+      "ciqual_food_name:fr" : "Saucisse -aliment moyen-"
+   }
+}
+{
+   "_id" : "0078742102047",
+   "category_properties" : {
+      "ciqual_food_name:en" : "Cheddar cheese, from cow's milk",
+      "ciqual_food_name:fr" : "Fromage -aliment moyen-"
+   }
+}
+```
+
+En  fait, je  ne  sais  pas comment  interprêter  cette définition  de
+schéma, les exemples ne m'éclairent pas.
+
 Déroulement
 ===========
 
