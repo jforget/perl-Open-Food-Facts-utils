@@ -51,7 +51,7 @@ Votre machine doit contenir une copie locale du dépôt
 [`openfoodfacts-server`](https://github.com/openfoodfacts/openfoodfacts-server)
 ou d'un clone ce de dépôt.
 
-Dans le programme `schéma-check.pl`,  il faut changer l'initialisation
+Dans le programme `schema-check.pl`,  il faut changer l'initialisation
 de la  variable `$dir_sch`  pour y  mettre le  répertoire de  la copie
 locale  du dépôt  `openfoodfacts-server` contenant  les fichiers  YAML
 décrivant le schéma des données.
@@ -1100,7 +1100,6 @@ properties:
     type: string
 </pre>
 
-
 Tableaux
 --------
 
@@ -1355,7 +1354,7 @@ nécessitant une insertion dynamique. On  peut le voir avec les schémas
 fichier   de   données   `chicken-and-egg.data.json`  dans   le   même
 répertoire.
 
-Donc, le programme `schéma-check.pl` admet un paramètre supplémentaire
+Donc, le programme `schema-check.pl` admet un paramètre supplémentaire
 `max-depth`, avec une  valeur entière. Tant que  le niveau d'inclusion
 n'a pas atteint  cette valeur `$max_depth`, le  programme effectue une
 insertion statique. Si le niveau  d'inclusion dépasse cette valeur, le
@@ -1425,8 +1424,8 @@ non plus ne sont pas utilisées dans le programme de vérification.
 
 Remarquons que  les tableaux sont donnés  ici avec la syntaxe  JSON au
 lieu de la syntaxe YAML (des  tirets sur des lignes sucessives). C'est
-valide, la spécification  du langage YAML précise que  la syntaxe JSON
-est acceptée.
+valide, la spécification du langage  YAML inclut un style appelé _flow
+style_ et très similaire à la syntaxe JSON.
 
 Dans l'exemple de  tableau, vous avez pu remarquer que  les valeurs se
 ressemblent,  avec un  code  langue, suivi  d'un  deux-points et  d'un

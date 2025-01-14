@@ -1093,6 +1093,412 @@ properties:
     description: 'Used to indicate a special type for the title, such as "grade" for Nutri-Score and Eco-Score.'
 </pre>
 
+Arrays
+------
+
+The JSON documents from database `off` may contain arrays. Here is yet
+another excerpt from product `00187251`:
+
+```
+{
+        "_id" : "00187251",
+        "ingredients_analysis_tags" : [
+                "en:palm-oil",
+                "en:vegan-status-unknown",
+                "en:vegetarian-status-unknown"
+        ]
+}
+```
+
+The file `product_ingredients.yaml`  contains the description of this array:
+
+```
+  ingredients_analysis_tags:
+    type: array
+    items:
+      type: string
+```
+
+When I wrote about technical keys  and business keys for JSON objects,
+I wrote that  technical keys appear at even embedding  levels and that
+business  keys  appear at  odd  embedding  levels. When  dealing  with
+arrays,  this  is no  longer  the  case.  You  have the  business  key
+`ingredients_analysis_tags` at  level 1 and the  technical keys `type`
+and `items` at level 2, but at level 3 you find another technical key,
+`type`.
+
+Is it possible to define arrays  of `number` or arrays of `integer`? I
+guess so, but I have found no example in the data schema.
+
+Other arrays are described in this way (see file `product_ingredients.yaml`):
+
+```
+  ingredients_from_palm_oil_tags:
+    type: array
+    items:
+      type: object
+```
+
+There is a problem, because the  schema does not list the keys allowed
+for  the objects  stored within  the array:  neither `properties`  nor
+`patternProperties` at level  3. Is this a mistake in  the data schema
+or is this an  idiom allowing any key without any  check for the array
+elements? For the  moment, my checking program triggers  an error, yet
+noting that the error  applies to the YAML data schema  and not to the
+JSON data.
+
+In other cases, yet much fewer than the cases above, the description
+of the array elements is complete, with a list of `properties`. Here
+is a description merging files `product_misc.yaml`,
+`packagings/packagings.yaml`, `packaging_component.yaml` and some
+others:
+
+```
+  packagings:
+    type: array
+    items:
+      type: object
+      properties:
+        material:
+          type: object
+          properties:
+            id:
+              type: string
+            lc_name:
+              type: string
+        number_of_units:
+          type: integer
+        quantity_per_unit:
+          type: string
+        ...
+```
+
+Lastly, I found even an array of arrays. This is sub-property `"3"` of
+property `"nova_groups_markers"` from file `product_extended.yaml`:
+
+```
+  nova_groups_markers:
+    type: object
+    description: "Detail of ingredients or processing that makes the products having Nova 3 or 4\n"
+    properties:
+      3:
+        type: array
+        description: |
+          Markers of level 3
+        items:
+          type: array
+          description: |
+            This array has two element for each marker.
+            One
+          items:
+            type: string
+```
+
+The Remaining `$ref` Keys
+-------------------------
+
+I wrote that the YAML files  contain 52 `$ref` attributes, 49 of which
+doing a action similar to `#include`. What about the last 3?
+
+Let  us  consider  again property  `"nova_groups_markers"`  from  file
+`product_extended.yaml`. Its full description is:
+
+```
+type: object
+properties:
+  [...]
+  nova_groups_markers:
+    type: object
+    description: |
+      Detail of ingredients or processing that makes the products having Nova 3 or 4
+    properties:
+      "3":
+        description: |
+          Markers of level 3
+        type: array
+        items:
+          type: array
+          description: |
+            This array has two element for each marker.
+            One
+          items:
+            type: string
+      "4":
+        description: |
+          Markers of level 4
+        type: array
+        items:
+          # same as above
+          $ref: "#/properties/nova_groups_markers/properties/3/items"
+```
+
+This `$ref` attribute  means that we must copy the  description of the
+items from  business key `"3"`  into the  description of the  items of
+business key  `"4"`. The idea is  still a kind of  `#include`, but the
+implementation  is  different.  The  intended  result  is  to  have  a
+description equivalent to:
+
+```
+type: object
+properties:
+  [...]
+  nova_groups_markers:
+    type: object
+    description: |
+      Detail of ingredients or processing that makes the products having Nova 3 or 4
+    properties:
+      "3":
+        description: |
+          Markers of level 3
+        type: array
+        items:
+          type: array
+          description: |
+            This array has two element for each marker.
+            One
+          items:
+            type: string
+      "4":
+        description: |
+          Markers of level 4
+        type: array
+        items:
+          # same as above
+          # $ref: "#/properties/nova_groups_markers/properties/3/items"
+          type: array
+          description: |
+            This array has two element for each marker.
+            One
+          items:
+            type: string
+```
+
+The  last  two  `$ref`  keys appear  in  files  `ingredient.yaml`  and
+`nutrients.yaml`. Here is the complete contents of `nutrients.yaml`.
+
+```
+type: array
+description: |
+  Nutrients and sub-nutrients of a product, with their name and default unit.
+items:
+  type: object
+  properties:
+    id:
+      type: string
+      description: id of the nutrient
+    name:
+      type: string
+      description: Name of the nutrient in the requested language
+    important:
+      type: boolean
+      description: Indicates if the nutrient is always shown on the nutrition facts table
+    display_in_edit_form:
+      type: boolean
+      description: Indicates if the nutrient should be shown in the nutrition facts edit form
+    unit:
+      description: Default unit of the nutrient
+      $ref: "./nutrient_unit.yaml"
+    nutrients:
+      description: |
+        Sub-nutrients (e.g. saturated-fat is a sub-nutrient of fat).
+      # self recursive
+      $ref: "#/"
+```
+
+The aim  is copying  an existing description  into another.  But here,
+there is no filter on `properties / nova_groups_markers / properties /
+3 / items`, and the invoked sub-schema contains a reference to itself.
+As hinted  by the comment,  this is a recursive  copy and there  is no
+limit to  this recursion.  Of course,  the JSON  document will  have a
+finite size, therefore a finite embedding level, so the recursion will
+stop sooner or later. But the  recursion cannot be limited in the YAML
+data schema. So we will use  a "dynamic" insertion mechanism, that is,
+the referred  sub-schema will be  included while the JSON  document is
+being analysed, not  during the initialisation of the  program. In the
+following, I will use the  phrase "dynamic sub-schema" as a short-hand
+for "dynamically included sub-schema".
+
+Just  one remark  about  this  example. I  use  `nutrient.yaml` as  an
+example.  Yet,  this file  is  never  included  into the  main  schema
+`product.yaml`,  directly  or  indirectly.  On the  other  hand,  file
+`ingredient.yaml` is included from `product_ingredients.yaml`.
+
+The char  `"#"` reminds us of  HTML hyperlinks. Can we  imagine mixing
+references to external files with references to a hierarchy of keys? I
+tried  to  to this  in  file  `parallel-refs-1.yaml` in  sub-directory
+`reduced-schema`.  Even if  I  have no  examples of  this  in the  OFF
+database, I think it is the way  to go. (This remark is obsolete after
+the 2024-10-21 reorganisation, now you can find many references mixing
+an external file name with a key hierarchy.)
+
+At first, I  thought that `'$ref'` entries targetting a  file would be
+processed with  a static  include mechanism  (full copy  into variable
+`$schema`) and `'$ref'` entries containing  a hash char and targetting
+a key hierarchy  would be processed with a  dynamic include mechanism.
+Actually, even with  `'$ref'` entries targetting files, we  may have a
+chicken-and-egg  situation, requiring  a  dynamic  mechanism. You  can
+refer   to  schemas   `egg.yaml`  and   `chicken.yaml`  in   directory
+`reduced-schema` and  to data file `chicken-and-egg.data.json`  in the
+same directory.
+
+The solution in  program `schema-check.pl` is to add  a new parameter,
+`max-depth`, with an  integer value. While the include  level is lower
+than  parameter  `$max_depth`, the  program  uses  the static  include
+mechanism. If the include level reaches this level, the program uses a
+dynamic mechanism to include the sub-schema pointed at by the `'$ref'`
+key, after checking  it has not already been included.  The problem of
+infinite recursion is avoided.
+
+To know whether the sub-schema  has already been dynamically included,
+the program first  normalise the key, to have all  three elements, the
+file name, the hash char and  the key hierarchy. If necessary, the key
+hierarchy is reduced  to a single slash to represent  the inclusion of
+the  complete file.  This normalised  value is  used as  a key  to the
+hashtable of dynamic sub-schemas.
+
+Value Checking
+--------------
+
+As we have already seen, checking the  keys is the essence of a schema
+description,  either  through  entry `properties`,  or  through  entry
+`patternProperties`.  We have  seen the  language (or  country) codes.
+There is  also the image  sizes, as can be  seen in this  excerpt from
+`image.yaml`
+
+```
+    properties:
+      sizes:
+        type: object
+        description: |
+          The available image sizes for the product (both reduced and full).
+          The reduced images are the ones with numbers as the key( 100, 200 etc)
+          while the full images have `full` as the key.
+        patternProperties:
+          (?<image_size>100|400):
+            type: string
+            description: |
+              properties of thumbnail of size `image_size`.
+              **TODO** explain how to compute name
+```
+
+If the  keys are checked,  what about  the values in  key-value pairs?
+This  is  seldom  done,  but  this exists.  See  the  example  of  the
+sub-properties     of    property     `nutrient_levels`    in     file
+`product_misc.yaml`
+
+```
+  nutrient_levels:
+    type: object
+    description: "Traffic light indicators on main nutrients levels\n"
+    properties:
+      fat:
+        type: string
+        enum: ["low", "moderate", "high"]
+      salt:
+        type: string
+        enum: ["low", "moderate", "high"]
+      saturated-fat:
+        type: string
+        enum: ["low", "moderate", "high"]
+      sugars:
+        type: string.
+        enum: ["low", "moderate", "high"]
+```
+
+But the checking  program does not care (for now).  We find also value
+examples  (attribute  `example`) which  are  not  used either  in  the
+checking program.
+
+You may have  noticed that in the example above,  arrays are specified
+with the JSON syntax instead of  the YAML syntax (dashes on successive
+lines). This  is valid, the  YAML specification allows a  "flow style"
+which is similar to the JSON syntax.
+
+In the  paragraph about arrays, you  may have noticed that  the values
+are very  similar to each other,  with a language code,  followed by a
+colon, followed by a label.
+
+```
+                "en:palm-oil"
+                "en:vegan-status-unknown"
+                "en:vegetarian-status-unknown"
+```
+
+Nothing  in  the  YAML  files   describes  such  structure  within  an
+alphanumeric string and the checking program will do nothing.
+
+Special Case in Type Declarations
+---------------------------------
+
+For scalars,  I have already  mentioned types `string`,  `integer` and
+`number`. There  is also a  type `null`, used in  property `normalize`
+and property `white_magic`,  both in file `image_role.yaml`.  I do not
+know what this type `null` represents.
+
+Sometimes, some properties are flagged with:
+
+```
+        readOnly: true
+```
+
+Even if  I guess  what it  is about,  I do  not care.  This `readOnly`
+attribute  does not  apply  to the  checking  program, which  examines
+documents as static data, not  dynamic data which are created, updated
+and erased at various instants.
+
+Checking the types  of the values (even if not  yet implemented in the
+checking program) can be extended.  For example, we can accept several
+basic  types instead  of  just one.  This is  the  case with  property
+`additionalProperties`   within   property  `owner_fields`   in   file
+`product_extended.yaml`. For this  property, we can use  either a char
+string,  or an  integer, or  an  object (without  specifying the  keys
+within this object), but  we cannot use a float number,  an array or a
+`null`.
+
+```
+  owner_fields:
+    type: object
+    description: |
+      Those are fields provided by the producer (through producers platform),
+      and the value he provided.
+    properties:
+      additionalProperties:
+        description: |
+          you can retrieve all kind of properties, the same as on the parent object (the product).
+          It's not processed entries (like tags for example) but raw ones.
+        oneOf:
+          - type: integer
+          - type: string
+          - type: object
+```
+
+In  file `ingredient.yaml`,  I have  found this  syntax, in  which the
+attribute `type` is associated to an array.
+
+```
+        percent_estimate:
+          type:
+            - number
+        percent_max:
+          type:
+            - number
+```
+
+In this case, the lists have one element each, but we can imagine they
+could include several. Is this list syntax equivalent to the attribute
+`oneOf` seen above in file `product_extended.yaml`? In other words, is
+the following syntax a valid one?
+
+```
+        percent_estimate:
+          type:
+            - integer
+            - number
+        percent_max:
+          type:
+            - integer
+            - number
+```
 
 
 License
