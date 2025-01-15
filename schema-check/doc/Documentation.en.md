@@ -1640,7 +1640,115 @@ Checking the JSON Documents
 Comments After Implementation
 -----------------------------
 
+### Function `find_ref_rec`
+
 (to do)
+
+### Function `check_hash`
+
+(to do)
+
+### JSON or JSON5? Which Perl module?
+
+(to do)
+
+### YAML or YAML::XS? Which Perl module?
+
+Module `YAML` is  better in one way than `YAML::XS`,  it is compatible
+with module  `YAML::Node`, which  enables you  to sort  the keys  of a
+hashtable in  any way  you want. In  my utility  `schema-check.pl`, it
+allows  me to  display the  attributes  of a  property with  attribute
+`type`  in  the first  slot  and  then  the other  attributes,  sorted
+alphabetically. The readability  is much improved. This  is the reason
+why I chose `YAML.pm` at first.
+
+After the  overhaul of  YAML schema files  on 2024-10-21,  some syntax
+errors appeared in  some files, mainly because of the  flow style. The
+"flow style" is  a style very similar to the  JSON syntax which relies
+on brackets and separators, instead  of the "block style" which relies
+on linefeeds and indentation.
+
+Example from `product_nutriscore.yaml`
+
+```
+      properties:
+        id:
+          type: string
+          examples:
+            [
+              "energy",
+              "sugars",
+              "saturated_fat",
+              "salt",
+              "fiber",
+              "fruits_vegetables_legumes",
+            ]
+        points:
+          type: integer
+          examples: [5, 6, 7, 2, 1, 0]
+        points_max:
+          type: integer
+          examples: [10, 15, 20, 25, 5, 5]
+```
+
+The arrays  associated with attribues  `examples` use the  flow style,
+while everything else uses the block style. Both styles are valid with
+the YAML syntax.
+
+The problem with `YAML.pm` is that it cannot deal with flow style when
+an array or  an object spans several lines. In  the example above, the
+module would trigger  an error when dealing with  the `examples` array
+from the `id`  property. On the other hand, there  is no problems with
+the `examples`  arrays from the `points`  and `points_max` properties.
+Yet, module  `YAML::XS` accept  this whole example  without triggering
+any error.
+
+I reacted by putting the cart before the horse.
+
+I first rewrote the YAML file  by fixing the points at which `YAML.pm`
+triggered errors, for example:
+
+```
+        id:
+          type: string
+          examples:
+            - "energy"
+            - "sugars"
+            - "saturated_fat"
+            - "salt"
+            - "fiber"
+            - "fruits_vegetables_legumes"
+```
+
+I created a
+[_pull request_](https://github.com/openfoodfacts/openfoodfacts-server/pull/11220)
+to send these updates to the
+[OFF repository](https://github.com/openfoodfacts/openfoodfacts-server).
+
+Then I reread the 
+[YAML specification](https://yaml.org/spec/1.2.2/)
+and I realised that the flow  style was supposed to be compatible with
+linefeeds.
+
+I wrote a
+[much shorter utility](https://github.com/jforget/perl-Open-Food-Facts-utils/tree/master/yaml-check)
+to just  check YAML syntax  in a file.  This utility would  use either
+`YAML.pm` or `YAML::XS`.
+
+So I found  that `YAML::XS` would accept linefeeds  within flow style.
+So  I closed  my pull  request and  I fixed  `schema-check.pl` to  use
+`YAML::XS`.
+
+The problem  was that, in  the listings,  the attribute `type`  was no
+longer in the  first line after the property name.  So I modified once
+more `schema-check.pl` to use both  `YAML.pm` and `YAML::XS`, each one
+with its own role:
+
+* `YAML::XS` to read  the YAML files, parse them and  store the result
+in the program's memory,
+
+* `YAML.pm` to  print the  full schema into  the listing,  if required
+with option `--list-schema`.
 
 License
 =======

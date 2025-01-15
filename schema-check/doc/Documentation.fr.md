@@ -2280,6 +2280,104 @@ je  suis d'accord.  Mais  dans ces  conditions, pourquoi  l'utilitaire
 `mongosh` de MongoDB  génère-t-il du JSON5 au lieu de  la syntaxe plus
 rigoureuse de JSON v4 ?
 
+### YAML ou YAML::XS ? Quel module Perl ?
+
+`YAML`  a  un   avantage  sur  `YAML::XS`,  il   est  compatible  avec
+`YAML::Node`, module  qui permet de  trier les clés d'un  hachage dans
+l'ordre que  l'on souhaite.  Cela me  permet d'afficher  les attributs
+d'une  propriété en  commençant par  l'attribut `type`  et en  listant
+ensuite les  autres attributs  dans l'ordre  alphabétique. On  y gagne
+beaucoup en  lisibilité. C'est pour  cela que, dans un  premier temps,
+j'ai choisi `YAML.pm`.
+
+Suite  à la  refonte  des  schémas le  2024-10-21,  sont apparues  des
+erreurs   de  syntaxe   dans  les   fichiers  YAML.   Cela  concernait
+essentiellement  l'écriture  de  tableaux  en  _flow  style_  (que  je
+traduirai par « style  au fil de l'eau », un style  qui rappelle JSON,
+par opposition au _block style_ (« style en blocs »), qui est le style
+basé sur l'indentation des divers éléments.
+
+Exemple, tiré de `product_nutriscore.yaml`
+
+```
+      properties:
+        id:
+          type: string
+          examples:
+            [
+              "energy",
+              "sugars",
+              "saturated_fat",
+              "salt",
+              "fiber",
+              "fruits_vegetables_legumes",
+            ]
+        points:
+          type: integer
+          examples: [5, 6, 7, 2, 1, 0]
+        points_max:
+          type: integer
+          examples: [10, 15, 20, 25, 5, 5]
+```
+
+Les tableaux associés  aux attributs `examples` utilisent  le style au
+fil de l'eau, tandis que tout le  reste utilise le style en blocs. Les
+deux styles sont parfaitement valides pour la syntaxe YAML.
+
+Le problème avec le module `YAML.pm`,  c'est qu'il coince sur le style
+au fil de l'eau quand il  s'étale sur plusieurs lignes. Dans l'exemple
+ci-dessus, le  module déclenche  une erreur sur  les `examples`  de la
+propriété `id`. À  l'inverse, pas de problème pour  les `examples` des
+propriétés `points` et `points_max`. En revanche, le module `YAML::XS`
+traite sans problème cet extrait.
+
+J'ai réagi en mettant la charrue avant les bœufs.
+
+J'ai commencé par réécrire les fichiers YAML en corrigeant les points
+où le module `YAML.pm` déclenchait une erreur, par exemple :
+
+```
+        id:
+          type: string
+          examples:
+            - "energy"
+            - "sugars"
+            - "saturated_fat"
+            - "salt"
+            - "fiber"
+            - "fruits_vegetables_legumes"
+```
+
+J'ai créé une
+[_pull request_](https://github.com/openfoodfacts/openfoodfacts-server/pull/11220)
+pour reporter ces modifications sur le
+[dépôt OFF](https://github.com/openfoodfacts/openfoodfacts-server).
+
+J'ai relu la
+[spécification de YAML](https://yaml.org/spec/1.2.2/)
+et j'ai  constaté que le style  au fil de l'eau  était bien compatible
+avec les passages à la ligne.
+
+J'ai écrit un
+[utilitaire beaucoup plus succint](https://github.com/jforget/perl-Open-Food-Facts-utils/tree/master/yaml-check)
+dont le seul but  est de vérifier la syntaxe d'un  fichier YAML, en se
+basant soit sur le module `YAML.pm`, soit sur `YAML::XS`.
+
+Après avoir constaté que `YAML::XS` acceptait les changements de ligne
+dans  un passage  en  style au  fil  de l'eau,  j'ai  annulé ma  _pull
+request_ et j'ai adapté mon utilitaire `schema-check.pl` pour utiliser
+le module `YAML::XS`.
+
+Hélas, dans  les listings,  on ne trouvait  plus l'attribut  `type` en
+première position  pour une  propriété. Donc  maintenant, l'utilitaire
+`schema-check.pl` utilise  les deux  modules `YAML::XS`  et `YAML.pm`,
+chacun pour un besoin particulier :
+
+* `YAML::XS` pour lire les fichiers YAML et les charger en mémoire,
+
+* `YAML` pour afficher le schéma chargé dans le fichier compte-rendu,
+si cela a été demandé par l'option `--list-schema`.
+
 Licence
 =======
 
