@@ -1756,6 +1756,31 @@ Pour  l'anecdote,  signalons que  le  parcours  de l'arborescence  des
 l'insertion statique,  mais que  cela devient  un parcours  en largeur
 lorsque l'on traite les insertions dynamiques.
 
+### Références récursives après le 2024-10-21
+
+Avant le 21 octobre, quasiment toutes les entrées `'$ref'` dépendaient
+d'une  propriété  définie  dans  le  même  fichier  YAML.  Les  seules
+exceptions étaient les 12  entrées `'$ref'` du fichier `product.yaml`.
+Depuis le 21  octobre, il y a aussi les  entrées `'$ref'` dépendant de
+la hiérarchie  de clés  `components /  schema /  xxx` dans  le fichier
+`api.yml`. Si l'on  fixe le seuil à 1 pour  les insertions dynamiques,
+les entrées `'$ref'` du fichier  `api.yml` n'étaient pas stockées dans
+la  table de  hachage des  sous-schémas dynamiques,  donc les  clés de
+premier niveau  des documents JSON étaient  considérés comme invalides
+(à part la clé `_id` chargée automatiquement).
+
+La fonction de vérification ne  tient compte des références dynamiques
+que si elles dépendent d'une propriété. Elle ne tient pas compte d'une
+entrée `'$ref'`  qui concernerait la  totalité du hachage en  cours de
+vérification.  J'ai   conservé  ce   principe  dans  la   fonction  de
+vérification  et  j'ai  préféré   changer  la  fonction  récursive  de
+chargement  du schéma.  Si une  entrée  `'$ref'` se  trouve au  niveau
+principal du  fichier YAML, alors  le chargement du  fichier référencé
+sera un chargement _statique_, même si l'on a dépassé le seuil pour le
+niveau d'insertion.  Donc la fonction de  vérification rencontrera des
+insertions  dynamiques   uniquement  dans  le  cadre   du  test  d'une
+propriété.
+
 Extraction des documents JSON
 -----------------------------
 

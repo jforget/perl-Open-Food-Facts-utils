@@ -1583,6 +1583,65 @@ object      `{}`     (exceptions,      products     `"0052833225082"`,
 Actually, I  do not know  how to  interpret these cases.  The examples
 above fail to enlighten my understanding.
 
+Running the Checks
+==================
+
+Extracting the Schema
+---------------------
+
+(to do)
+
+### Recursive References
+
+(to do)
+
+### Recursive References After 2024-10-21
+
+Before 21st October, nearly all  `'$ref'` entries were attributes of a
+property being defined  in the current YAML file.  The only exceptions
+were  the  12 `'$ref'`  entries  in  file `product.yaml`.  Since  21st
+October, some other `'$ref'` entries appear at the top level of a YAML
+file, or  rather in a hierarchy  that contains no properties.  This is
+the case with the `'$ref'` entries  within the `components / schemas /
+xxx`  hierarchy  in  file  `api.yml`. With  a  threshold  for  dynamic
+insertion equal  to 1, these `'$ref'`  entries were not stored  in the
+program's hashtable  storing the  dynamic subschemas,  so in  the JSON
+documents, all  first-level keys were  flagged as invalid  (except for
+`_id` which was automatically inserted).
+
+The  checking function  processes  a dynamic  reference  only if  this
+reference  is  within  the  definition of  a  property.  the  checking
+function does not process a `'$ref'`  entry which applies to the whole
+hashtable being checked.  I kept this operating way and  I changed the
+function  loading the  schema. If  the `'$ref'`  entry appears  at the
+first  level of  the YAML  file, it  is _statically_  loaded into  the
+schema,  event  if the  current  include  level  is greater  than  the
+threshold for  dynamic insertion. So  the checking function  will find
+dynamic insertions only for the properties being checked.
+
+Extracting the JSON Documents
+-----------------------------
+
+(to do)
+
+Checking the JSON Documents
+---------------------------
+
+(to do)
+
+### Checking a Hashtable
+
+(to do)
+
+### Checking an Array
+
+(to do)
+
+Comments After Implementation
+-----------------------------
+
+(to do)
+
 License
 =======
 
