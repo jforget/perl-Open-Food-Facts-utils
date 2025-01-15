@@ -1,14 +1,5 @@
 -*- encoding: utf-8; indent-tabs-mode: nil -*-
 
-This repository  gives a few utilities  for Open Food Facts.  They are
-not part of the programmes needed for the day-to-day operation of OFF.
-
-schema-check
-============
-
-Compares the  contents of the  MongoDB collection `Products`  with the
-description stored in the Github repository.
-
 yaml-check
 ==========
 

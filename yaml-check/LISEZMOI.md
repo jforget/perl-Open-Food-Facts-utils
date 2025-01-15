@@ -1,16 +1,5 @@
 -*- encoding: utf-8; indent-tabs-mode: nil -*-
 
-Ce dépôt  propose quelques  utilitaires pour Open  Food Facts.  Ils ne
-font  pas  partie des  programmes  nécessaires  pour l'utilisation  au
-quotidien de OFF.
-
-schema-check
-============
-
-Cet  utilitaire compare  le  contenu des  documents  de la  collection
-`products`  de la  base  MongoDB  d'OFF, avec  la  description de  ces
-documents qui figure dans le dépôt Github d'OFF.
-
 yaml-check
 ==========
 
