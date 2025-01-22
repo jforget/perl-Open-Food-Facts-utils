@@ -40,6 +40,7 @@ Installation
 
 Il y a besoin de Perl 5.38, ainsi que des modules
 [`YAML`](https://metacpan.org/dist/YAML/view/lib/YAML.pod),
+[`YAML::XS`](https://metacpan.org/dist/YAML-LibYAML/view/lib/YAML/XS.pod),
 [`YAML::Node`](https://metacpan.org/dist/YAML/view/lib/YAML/Node.pod)
 et [`JSON::PP`](https://metacpan.org/pod/JSON::PP).
 J'ai eu l'intention  de prendre `YAML::Any`, mais comme l'explique la
@@ -219,13 +220,13 @@ schéma  de données.  C'est ce  que j'ai  fait avec  le sous-répertoire
 JSON, la ligne de commande devient alors :
 
 ```
-perl schema-check.pl --schema=schemas/product.yaml exemple.txt
+perl schema-check.pl --schema=schemas/schemas/product.yaml exemple.txt
 ```
 
 ou bien
 
 ```
-perl schema-check.pl --list-schema --schema=schemas/product.yaml exemple.txt
+perl schema-check.pl --list-schema --schema=schemas/schemas/product.yaml exemple.txt
 ```
 
 Ne pas oublier  de vérifier de temps  à autre si le  schéma de données
@@ -239,6 +240,14 @@ est :
 
 ```
 perl schema-check.pl --schema=reduced-schema/product_meta.yaml reduced-schema/off1
+```
+
+Pour des raisons
+[expliquées ultérieurement](#user-content-champs-implicites),
+il est possible de fusionner plusieurs schémas.
+
+```
+perl schema-check.pl --schema=schemas/schemas/product.yaml --schema=schemas/schemas/product_hidden.yaml exemple.txt
 ```
 
 Où trouver des données de test ?
@@ -787,18 +796,34 @@ Si l'on alimente une base MongoDB avec un document ne contenant pas de
 paire   clé-valeur  avec   `"_id"`,  alors   MongoDB  en   ajoute  une
 automatiquement.
 
-Pour la  base de  données `off`,  je considère que  l'on n'a  pas jugé
-utile de signaler  dans le fichier `product.yaml`  que chaque document
-de  la base  de  données comporte  une clé  `"_id"`.  Le programme  de
-vérification du schéma ajoute automatiquement  cette clé au schéma, ce
-qui fait que la présence de cette paire clé-valeur dans un document ne
-provoquera pas d'erreur.
-
 Le livre de  Kristina Chodorow ne mentionne pas  la clé `"_keywords"`.
 Néanmoins, à  cause du  caractère souligné  initial, je  suppose qu'il
 pourrait s'agir également d'une clé implicite, même si son ajout n'est pas
 systématique. Cependant, comme ce n'est pas une certitude, je continue
 à déclencher un message d'erreur sur cette clé.
+
+Dans un premier temps, j'ai décidé de :
+
+1. insérer arbitrairement le champ `"_id"` dans le schéma,
+
+2. procrastiner,
+
+3. créer et soumettre une  _pull request_ demandant d'insérer le champ
+`"_keywords"` dans le fichier `product_meta.yaml`.
+
+Pendant que je procrastinais, je suis  tombé par hasard sur le fichier
+`product_hidden.yaml`, qui décrit les champs `"_id"` et `"_keywords"`,
+ainsi que de nombreux autres champs  auxquels je ne m'étais pas encore
+intéressé. Ce  fichier n'est  pas inclus  dans `product.yaml`  par une
+entrée `"$ref"`,  car il s'agit  de champs  à usage interne,  que l'on
+évite donc d'ajouter à l'API publique.
+
+L'étape 3  a consisté alors  à revenir en arrière  sur l'étape 1  et à
+adapter   le  programme   `schéma-check.pl`  pour   inclure  également
+`product_hidden.yaml`  dans  le  schéma. J'avais  prévu  d'ajouter  un
+nouveau paramètre  appelé `--hidden-schema`. Après une  nouvelle étape
+de procrastination, j'ai  trouvé qu'il était plus  simple de convertir
+le paramètre scalaire `--schema` en paramètre liste.
 
 Données multi-niveaux
 ---------------------
@@ -1602,12 +1627,13 @@ Déroulement
 Extraction du schéma
 --------------------
 
-Le fichier `product.yaml` est chargé et converti pour donner le schéma
-de  données.  On y  ajoute  la  propriété auto-générée  `"_id"`,  pour
-désactiver les messages d'erreur sur cette propriété.
+Les fichiers  `product.yaml` et `product_hidden.yaml` sont  chargés et
+convertis pour donner le schéma de données.
 
-Ensuite,  le programme  traite  en boucle  les  entrées de  l'attribut
-`allOf`. Chacune  de ces entrées a  pour clé `$ref` et  pour valeur un
+Pour chaque  fichier, le  programme traite en  boucle les  entrées des
+attributs  `properties`  et  `patternProperties`, s'ils  existent.  Il
+traite  également les  entrées de  l'attribut `allOf`,  également s'il
+existe. Chacune de ces entrées a pour clé `$ref` et pour valeur un
 nom de  fichier contenant un  schéma partiel (appelé  sous-schéma dans
 cette documentation).  À chaque itération  de la boucle,  le programme
 charge le  fichier désigné, le  convertit en donnée interne.  Il copie
@@ -1622,7 +1648,7 @@ le cas,  on insère  le sous-sous-schéma dans  le sous-schéma  avant de
 l'insérer  dans  le schéma.  Et  si  besoin,  cette recherche  et  ces
 insertions se font  récursivement. Avec un exemple,  c'est plus clair.
 
-Voici un extrait du fichier `product.yaml` :
+Voici un extrait du fichier `product.yaml` (version avant le 2024-10-21) :
 
 ```
 type: object
@@ -1710,7 +1736,7 @@ On peut remarquer  que les attributs `$ref` sont  conservés, cela peut
 servir  pour le  débugage. En  revanche,  on peut  laisser tomber  les
 champs `description` et `example`.
 
-### Références récursives
+### Références récursives avant le 2024-10-21
 
 Les    trois    `'$ref'`   spéciaux,    dans    `nova_groups_markers`,
 `nutrient.yaml` et `ingredient.yaml`, sont  traités comme les `'$ref'`

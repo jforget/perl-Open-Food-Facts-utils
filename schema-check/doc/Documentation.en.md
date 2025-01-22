@@ -39,6 +39,7 @@ Installation
 
 You need Perl  5.38 (or later), with modules
 [`YAML`](https://metacpan.org/dist/YAML/view/lib/YAML.pod),
+[`YAML::XS`](https://metacpan.org/dist/YAML-LibYAML/view/lib/YAML/XS.pod),
 [`YAML::Node`](https://metacpan.org/dist/YAML/view/lib/YAML/Node.pod)
 and [`JSON::PP`](https://metacpan.org/pod/JSON::PP).
 I briefly intended to  require `YAML::Any`, but as the
@@ -218,7 +219,13 @@ created the  `schemas` subdirectory of this  repository. When checking
 the JSON documents, the command line expands to:
 
 ```
-perl schema-check.pl --schema=schemas/product.yaml example.txt
+perl schema-check.pl --schema=schemas/schemas/product.yaml example.txt
+```
+
+or:
+
+```
+perl schema-check.pl --list-schema --schema=schemas/schemas/product.yaml exemple.txt
 ```
 
 Do not forget to check, from time to time, whether the data schema has
@@ -231,6 +238,14 @@ in this repository. The commande line is:
 
 ```
 perl schema-check.pl --schema=reduced-schema/product_meta.yaml reduced-schema/off1
+```
+
+Actually, as
+[explained below](#user-content-implicit-fields),
+you can merge several schema files.
+
+```
+perl schema-check.pl --schema=schemas/schemas/product.yaml --schema=schemas/schemas/product_hidden.yaml exemple.txt
 ```
 
 Where To Find Test Data
@@ -308,7 +323,7 @@ case the `00187251` product and the cheese products
         C-x C-w result
 ```
 
-6. closing the shell session and shutting the shell buffer
+6. closing the shell session and closing the Emacs buffer for the shell
 
 ```
         exit
@@ -763,17 +778,34 @@ book on MongoDB bases, written by
 If  we write  into a  MongoDB database  a document  without a  `"_id"`
 key-value pair, then MongoDB automatically adds one.
 
-For database `off`, I guess that the data administrator has not deemed
-necessary to  mention that each  document contains an `"_id"`  key. So
-the check program  automatically adds this key to the  data schema, so
-the presence of this key-value pair  in a document will not trigger an
-error.
-
 Kristina  Chodorow's  book does  not  mention  the key  `"_keywords"`.
 Because it  begins with an underscore,  I suppose it might  be another
 implicit key, even  if it does not appear in  every database document.
 Yet, I am not  sure of this, so my program will  stil display an error
 message when seeing this key.
+
+At first, I decided to:
+
+1. automatically insert filed `"_id"` into the schema,
+
+2. procrastinate,
+
+3. create and submit a pull request, to insert field `"_keywords"`
+into file `product_meta.yaml`.
+
+While   I   was   procrastinating,  I   serendipitously   found   file
+`product_hidden.yaml`,    which   describes    fields   `"_id"`    and
+`"_keywords"`, plus  some others that  I had not considered  yet. This
+file is  not included in  schema `product.yaml`, because  it describes
+fields for internal uses only  and therefore discarded from the public
+API.
+
+The  actual  step  3  consisted  in rolling  back  step  1  (automatic
+insertion  of  `"_id"`)  and  modifying  `schema-check.pl`  to  accept
+`product_hidden.yaml`  in  addition  to `product.yaml`.  At  first,  I
+intended  to add  a new  parameter `--hidden-schema`.  After a  second
+round  of procrastination,  I  found  it would  be  simpler to  change
+parameter `--schema` from a scalar to an array.
 
 Multi-Level Data
 ----------------
@@ -1589,11 +1621,158 @@ Running the Checks
 Extracting the Schema
 ---------------------
 
-(to do)
+Files   `product.yaml`  and   `product_hidden.yaml`  are   loaded  and
+converted to a Perl value to initialise the data schema.
 
-### Recursive References
+For  each file,  the  program  loops over  the  entries of  attributes
+`properties` and  `patternProperties`. If also loops  over the entries
+of `allOf`, if present. Each entry  is a key-value with key `$ref` and
+the value  is another  file describing a  partial data  schema (called
+subschema in this documentation). At  each loop iteration, the program
+loads the  file and converts the  YAML data to Perl  data. The program
+copies each subentry  of entry `properties` to  the entry `properties`
+of the  target schema  (possibly auto-vivified).  Same thing  with the
+subentries of  `patternProperties`, copied to  the `patternProperties`
+attribute in the schema.
 
-(to do)
+Before copying the content of the sub-schema into the main schema, the
+program   checks   if   the    sub-schema   contains   references   to
+sub-sub-schemas. If this  is the case, the  sub-sub-schema is inserted
+into the  sub-schema before the  sub-schema is inserted into  the main
+schema. If necessary, this quest  for sub-sub-schemas is recursive. It
+will be clearer with an example.
+
+Here is an excerpt from `product.yaml` (before 2024-10-21);
+
+```
+type: object
+description: |
+  This is all the fields describing a product and how to display it on a page.
+allOf:
+  - $ref: './product_ecoscore.yaml'
+```
+
+And now an excerpt from  `product_ecoscore.yaml`:
+
+```
+type: object
+properties:
+  ecoscore_data:
+    type: object
+    description: |
+      An object about a lot of details about data needed for Eco-Score computation
+      and complementary data of interest.
+    properties:
+      agribalyse:
+        $ref: "./agribalyse.yaml"
+      grade:
+        type: string
+      previous_data:
+        type: object
+        properties:
+          grade:
+            type: string
+          score:
+            type: integer
+          agribalyse:
+            $ref: "./agribalyse.yaml"
+```
+
+and an excerpt from `agribalyse.yaml`:
+
+```
+type: object
+properties:
+  agribalyse_food_code:
+    type: string
+  co2_agriculture:
+    type: number
+```
+
+The data schema will be a Perl  value which could be serialised as the
+following YAML text:
+
+```
+type: object
+allOf:
+  - $ref: './product_ecoscore.yaml'
+properties:
+  ecoscore_data:
+    type: object
+    properties:
+      agribalyse:
+        $ref: "./agribalyse.yaml"
+        type: object
+        properties:
+          agribalyse_food_code:
+            type: string
+          co2_agriculture:
+            type: number
+      grade:
+        type: string
+      previous_data:
+        type: object
+        properties:
+          grade:
+            type: string
+          score:
+            type: integer
+          agribalyse:
+            $ref: "./agribalyse.yaml"
+            type: object
+            properties:
+              agribalyse_food_code:
+                type: string
+              co2_agriculture:
+                type: number
+```
+
+You may notice that `$ref` attributes are kept, they may be useful for
+some  later  debugging.  On  the other  hand,  the  `description`  and
+`example` fields are discarded.
+
+### Recursive References Before 2024-10-21
+
+The  three  special  `'$ref'`  attributes,  in  `nova_groups_markers`,
+`nutrients.yaml` and  `ingredient.yaml`, are processed like  all other
+`'$ref'` which  just include a  file, with still a  little difference.
+When  processing  the   `nova_groups_markers`  property,  the  dynamic
+sub-schema   is   not   given   by    the   full   content   of   file
+`product_extended.yaml`, but a small part  of the tree structure, with
+the selection of `properties /  nova_groups_markers / properties / 3 /
+items`.  Before feeding  the value  to the  `schema` attribute  of the
+sub-schema, the program executes this selection.
+
+Yet, we pay  attention to the include level of  the reference. If this
+include level is greater than the `--max-depth` parameter, the program
+switches  from  the static  include  mechanism  to a  dynamic  include
+mechanism.  The program  adds a  `dyn_sch` attribute  (dynamic schema)
+storing  the full  reference. This  full reference  is built  with the
+filepath  (with directories),  a  `'#'` char,  and  the selection  key
+hierarchy (with slash separators). If the reference does not specify a
+selection with a  key hierarchy, the full reference  includes a single
+slash after the hash char. This  full reference is added to the schema
+as a `dyn_sch` attribute and at the same time a new entry is pushed to
+the  list  `@dyn_sch_to_do`,  holding all  necessary  informations  to
+identify and extract the dynamic subschema.
+
+Then, when the main schema is  complete, the program iterates over the
+`@dyn_sch_to_do` list  to load all  dynamic subschemas and  store them
+into the  `%dyn_schema` hashtable,  while checking that  the subschema
+has not been inserted already.
+
+We  can remark  that  if the  program is  run  with a  `--max-depth=1`
+parameter,  nearly   all  `'$ref'`  attributes  will   be  dynamically
+processed.  The  only  `'$ref'`  attributes that  will  be  statically
+inserted  are  the  12  `'$ref'`  from  attribute  `allOf`  from  file
+`product.yaml`.  But  if   it  is  run  with   the  default  parameter
+`--max-depth=5`,  only the  recursive  reference in  `ingredient.yaml`
+will use a dynamic insertion...  after having been statically inserted
+three times.
+
+By the  way, when dealing with  static insertions, the schema  tree is
+processed in _depth-first_  order, but when the  program processes the
+dynamic insertions, they are processed in _breadth-first_ fashion.
 
 ### Recursive References After 2024-10-21
 
@@ -1615,7 +1794,7 @@ function does not process a `'$ref'`  entry which applies to the whole
 hashtable being checked.  I kept this operating way and  I changed the
 function  loading the  schema. If  the `'$ref'`  entry appears  at the
 first  level of  the YAML  file, it  is _statically_  loaded into  the
-schema,  event  if the  current  include  level  is greater  than  the
+schema,  even   if the  current  include  level  is greater  than  the
 threshold for  dynamic insertion. So  the checking function  will find
 dynamic insertions only for the properties being checked.
 
