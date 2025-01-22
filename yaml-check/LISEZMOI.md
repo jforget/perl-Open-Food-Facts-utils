@@ -9,7 +9,7 @@ les fichiers YAML d'un répertoire.
 COPYRIGHT ET LICENCE
 ====================
 
-Copyright (c) 2024, 2025 Jean Forget
+Copyright (c) 2025 Jean Forget
 
 Cette   bibliothèque  contient   du   logiciel   libre.  Vous   pouvez
 redistribuer les programmes  de cette bibliothèque et  vous pouvez les
