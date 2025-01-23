@@ -2106,6 +2106,68 @@ in the program's memory,
 * `YAML.pm` to  print the  full schema into  the listing,  if required
 with option `--list-schema`.
 
+### Other Modules? Other Programs?
+
+While doing an
+[Internet search](https://www.qwant.com/?client=brz-moz&q=yaml+%24ref)
+of `YAML` and `$ref`, I found a
+[stackoverflow thread](https://stackoverflow.com/questions/53475979/how-to-use-ref-within-a-schema-in-openapi-3-0)
+which describes
+[Open API](https://www.openapis.org/).
+Somewhat later, I found project
+[JSON schema](https://json-schema.org/)
+which looks very much like what my checking program does and what this
+documentation describes. This website gives
+[a few command-line utilities](https://json-schema.org/implementations#validators-command-line)
+and many modules, including a few
+[Perl modules](https://json-schema.org/tools?query=&sortBy=name&sortOrder=ascending&groupBy=languages&licenses=&languages=&drafts=&toolingTypes=&environments=&showObsolete=false#perl).
+
+Still later, when looking at the 2024-10 schema overhaul in OFF, I read the
+[comments for the 2024-10-17 commit](https://github.com/openfoodfacts/openfoodfacts-server/commit/d605b4712288f9107370dca7d7059c47da4f1717)
+and those for the
+[2024-10-24 commit](https://github.com/openfoodfacts/openfoodfacts-server/commit/b7aefbd03b95fa863b39550250ddbe2f0712febb),
+and these comments mention
+[OpenAPI Generator](https://openapi-generator.tech/),
+which confirm my impression that the YAML files are processed by
+some utility.
+
+For my first visit to the JSON Schema website, the CLI programs were:
+
+* [`valbuddy`](https://www.json-buddy.com/json-validator-command-line-tool.htm),
+
+* [`ajv-cli`](https://www.npmjs.com/package/ajv-cli)
+
+* [`yajsv`](https://github.com/neilpa/yajsv)
+
+* [« Polyglottal JSON Schema Validator »](https://www.npmjs.com/package/pajv).
+
+During  some later  visits, there  were a  few more.  Listing them  is
+pointless, since  the list will  have increased  by the time  you read
+this documentation.
+
+The website gives the following Perl modules:
+
+* [`JSON::Schema::Modern`](https://metacpan.org/search?q=JSON%3A%3ASchema%3A%3AModern),
+
+* [`JSON::Schema::Tiny`](https://metacpan.org/pod/JSON::Schema::Tiny),
+
+* [`JSON::Validator`](https://metacpan.org/pod/JSON::Validator)
+
+* [`JSONSchema::Validator`](https://metacpan.org/pod/JSONSchema::Validator).
+
+Did  I  waste energy  and  time  writing  my  program? Is  my  program
+redundant?  I think  not, because  I  think that  these utilities  and
+modules do not fulfill all my needs.
+
+For example, `JSON::Schema::Tiny` does not process `$ref` entries when
+they  refer to  another file.  Since this  module contains  the `Tiny`
+adjective,  I  a   not  surprised.  Yet,  I  need   this  feature.  So
+`JSON::Schema::Tiny` is out.
+
+Maybe some time  later, I will install some of  the other Perl modules
+and I  will test them...  when I get enough  round tuits. Just  now, I
+still expand my current program with only JSON and YAML modules.
+
 License
 =======
 

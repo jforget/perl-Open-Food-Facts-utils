@@ -2405,6 +2405,70 @@ chacun pour un besoin particulier :
 * `YAML` pour afficher le schéma chargé dans le fichier compte-rendu,
 si cela a été demandé par l'option `--list-schema`.
 
+### Autres modules ? ou autres programmes ?
+
+En faisant une
+[recherche Internet](https://www.qwant.com/?client=brz-moz&q=yaml+%24ref)
+sur `YAML` et les clés `$ref`, je suis tombé sur un
+[article de stackoverflow](https://stackoverflow.com/questions/53475979/how-to-use-ref-within-a-schema-in-openapi-3-0)
+décrivant
+[Open API](https://www.openapis.org/).
+Un peu plus tard, j'ai trouvé également le projet
+[JSON schema](https://json-schema.org/)
+qui ressemble beaucoup à ce que je viens d'expliquer et de mettre
+en œuvre. Ce site propose
+[quelques utilitaires en ligne de commande](https://json-schema.org/implementations#validators-command-line)
+et de nombreux modules, dont
+[quelques-uns en Perl](https://json-schema.org/tools?query=&sortBy=name&sortOrder=ascending&groupBy=languages&licenses=&languages=&drafts=&toolingTypes=&environments=&showObsolete=false#perl)
+
+Ultérieurement, en lisant le
+[commit du 17 octobre](https://github.com/openfoodfacts/openfoodfacts-server/commit/d605b4712288f9107370dca7d7059c47da4f1717)
+et le
+[commit du 24 octobre](https://github.com/openfoodfacts/openfoodfacts-server/commit/b7aefbd03b95fa863b39550250ddbe2f0712febb),
+j'ai vu quelques mentions de
+[OpenAPI Generator](https://openapi-generator.tech/),
+ce  qui confirme  mon impression  que les  fichiers YAML  étaient bien
+traités par un utilitaire particulier.
+
+Lors de ma première visite au site JSON schema, les programmes en ligne de commande étaient :
+
+* [`valbuddy`](https://www.json-buddy.com/json-validator-command-line-tool.htm),
+
+* [`ajv-cli`](https://www.npmjs.com/package/ajv-cli)
+
+* [`yajsv`](https://github.com/neilpa/yajsv)
+
+* [« Polyglottal JSON Schema Validator »](https://www.npmjs.com/package/pajv).
+
+Et  lors d'une  visite  ultérieure, j'en  ai  trouvé quelques  autres.
+Inutile de les lister, la liste  aura encore changé lorsque vous lirez
+cette documentation.
+
+Pour les modules Perl, le site propose :
+
+* [`JSON::Schema::Modern`](https://metacpan.org/search?q=JSON%3A%3ASchema%3A%3AModern),
+
+* [`JSON::Schema::Tiny`](https://metacpan.org/pod/JSON::Schema::Tiny),
+
+* [`JSON::Validator`](https://metacpan.org/pod/JSON::Validator)
+
+* [`JSONSchema::Validator`](https://metacpan.org/pod/JSONSchema::Validator).
+
+Me suis-je fatigué pour rien ? Le programme Perl que j'ai écrit est-il
+inutile ?  Je pense  le contraire,  parce que  ces utilitaires  et ces
+modules ne  correspondent peut-être pas aux  fonctionnalités dont j'ai
+besoin.
+
+Par  exemple, `JSON::Schema::Tiny`  ne traite  pas les  entrées `$ref`
+pointant vers des fichiers externes. Étant  donné que le nom du module
+comporte la mention `Tiny`, ce n'est pas étonnant. Toujours est-il que
+cela ne correspond pas à mes besoins. Abandonné.
+
+Éventuellement,  j'installerai  les  autres  modules Perl  et  je  les
+testerai, quand j'aurai  le temps. Pour l'instant, je  continue sur ma
+lancée et  je me contente  des modules JSON  et YAML, sans  chercher à
+utiliser des solutions existantes pour JSON Schema.
+
 Licence
 =======
 
