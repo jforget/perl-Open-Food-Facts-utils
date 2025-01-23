@@ -1801,20 +1801,197 @@ dynamic insertions only for the properties being checked.
 Extracting the JSON Documents
 -----------------------------
 
-(to do)
+Beyond the YAML files for  the schema, the program receives filenames.
+We suppose that these files  contain unformatted text, with from place
+to place,  a few JSON  documents. There  are three categories  of JSON
+documents. First, single-line objects. It does not matter if this line
+is  30_000-char long.  Then, objects  spanning several  lines, with  a
+single open  brace and  nothing else  on the first  line and  a single
+close brace and nothing else on  the last line. And last, several JSON
+objects grouped in a JSON array, with an open bracket and nothing else
+on the first line  and a single close bracket and  nothing else on the
+last line.
+
+The extraction uses a finite-state automaton. This automaton has three
+states, `A`,  `B` and  `C`. The  initial state  is `A`.  The automaton
+process is  not a char-oriented  process, but a  line-oriented process
+(neither `chop` nor `chomp`).
+
+In state `A`, if we encounter a  line beginning with an open brace and
+ending with  a close  brace, the program  calls the  checking function
+with this line. The automaton stays at state `A`.
+
+In state `A`,  if we encounter a  line with a single  open brace (plus
+the line end LF or CRLF), the automaton initialises a char string with
+this brace (and line end) and shifts to state `B`.
+
+In state `B`, we add the current line to this char string. If the line
+contains a single  close brace (plus line end), the  program calls the
+object-checking function  with the char  string, then shifts  to state
+`A`.
+
+In state `A`, if  we encounter a line with a  single bracket (plus the
+line end), the  automaton initialises a char string  with this bracket
+(and line end) and shifts to state `C`.
+
+In state `C`, we add the current line to this char string. If the line
+contains a single close bracket (plus line end), the program adds this
+bracket to the char string, calls the array-checking function with the
+char string, then shifts to state `A`.
+
+In state `A`, if none of the three cases given above applies, the line
+is ignored and the next line is processed.
+
+There is no transition between states `B` and `C`.
+
+The allowed final state should be  state `A`, but the program does not
+check this. It  just closes the file and processes  the next data file
+if any remains.
 
 Checking the JSON Documents
 ---------------------------
 
-(to do)
+At  level  1, each  document  is  a hashtable  or  an  array, or  more
+precisely the  reference to a  hashtable or  to an array.  The program
+loads this  JSON document, converts it  to a Perl hashref  or arrayref
+and calls the proper checking function.
 
 ### Checking a Hashtable
 
-(to do)
+The checking function begins with checking that the reference received
+as a parameter is a hashref.
+
+The function checks  that the schema has a description  for the object
+being checked. It  often happens that the schema declares  an array of
+objects, without giving  a full description of  these objects. Example
+from `product_ecoscore.yaml`:
+
+```
+  environment_impact_level_tags:
+    type: array
+    items:
+      type: object
+```
+
+Actually, this error applies to the data schema, not the data content.
+By the way,  we can find places where the  schema is properly defined,
+with a full description for the embedded objets. Example from the same
+file `product_ecoscore.yaml`:
+
+```
+              aggregated_origins:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    origin:
+                      type: string
+                    percent:
+                      type: integer
+[...]
+              packagings:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    ecoscore_material_score:
+                      type: integer
+                    ecoscore_shape_ratio:
+                      type: integer
+                    material:
+                      type: string
+                    shape:
+                      type: string
+```
+
+Then the checking  function iterates over the keys  of this hashtable.
+For each  key, the  function checks  if this key  appears at  level 2,
+within the  `properties` entry of the  schema. If yes, so  good. Else,
+the function iterates over the `patternProperties` entries and compare
+the key  to each pattern. If  a match occurs, the  function leaves the
+loop over the `patternProperties` entries.
+
+If  nothing  appropriate was  found  in  the  `properties` or  in  the
+`patternProperties`, this is an error.
+
+If the property  `type` is `string`, `integer` or `number`,  as in the
+examples below,
+
+```
+properties:
+  abbreviated_product_name:
+    type: string
+    description: Abbreviated name in requested language
+  nova_group:
+    type: integer
+    description: |
+      Nova group as an integer from 1 to 4. See https://world.openfoodfacts.org/nova
+  completeness:
+    type: number
+patternProperties:
+  abbreviated_product_name_(?<language_code>\w\w):
+    type: string
+    description: Abbreviated name in language `language_code`.
+```
+
+no  further checking  is done,  the key-value  pair is  deemed correct
+(maybe the program should still check the value is a proper number for
+`integer` or `number`?).
+
+If the property `type` is `object`, as in the example below
+
+```
+properties:
+  ecoscore_data:
+    type: object
+    description: |
+      An object about a lot of details about data needed for Eco-Score computation
+      and complementary data of interest.
+    properties:
+      adjustments:
+        type: object
+        properties:
+          origins_of_ingredients:
+            type: object
+            properties:
+              epi_score:
+                type: integer
+```
+
+the function  calls itself recursively,  while going down  one logical
+level, that is  going down two levels in the  schema (`properties` and
+then the property value).
+
+If  the property  `type`  is  `array`, the  function  calls the  other
+checking function, the one which deals with arrays.
+
+If there is  no `type` attribute, but there is  a `dyn_sch` attribute,
+the  program fetches  the dynamic  sub-schema, checks  its `type`  and
+calls  the  hash-checking  function  or  the  array-checking  function
+accordingly.
+
+If there is neither `type`  nor `dyn_sch` attributes, then the program
+triggers an error.  There is also an error if  the `dyn_sch` attribute
+exists, but  the corresponding  subschema has  no `type`  attribute at
+level 0.
 
 ### Checking an Array
 
-(to do)
+As it  is done  for objects, the  array-checking function  begins with
+checking that the reference it received is an array-ref.
+
+Just like the object-checking function checks that there is at least a
+`properties` or `patternProperties` entry, the array-checking function
+checks that the schema contains an `items` entry.
+
+If the array  items are supposed to be strings  or numbers, no further
+checks are  done. If  they are  supposed to  be objects,  the function
+calls the hash-checking  function. If they are supposed  to be arrays,
+the function calls itself recursively.
+
+Like the  hash-checking function, the array-checking  function can use
+the  `dyn_sch` attribute  to fetch  a dynamic  sub-schema and  get the
+proper `type` attribute.
 
 Comments After Implementation
 -----------------------------

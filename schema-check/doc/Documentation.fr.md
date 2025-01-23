@@ -1852,11 +1852,11 @@ passe à l'état `C`.
 Dans l'état `C`, le programme alimente la chaîne de caractères avec la
 ligne lue  dans le fichier.  Si cette  ligne est constituée  d'un seul
 caractère crochet  fermant (encore une  fois avec  un LF ou  un CRLF),
-l'automate analyse le JSON contenu dans la chaîne (un tableau, puisque
-cela commence par  un crochet et que cela se  termine par un crochet),
-découpe ce tableau  en documents élémentaires, appelle  la fonction de
-vérification  pour chaque  document  élémentaire,  puis transite  vers
-l'état `A`.
+l'automate  appelle  la  fonction  de vérification  de  tableau,  puis
+transite vers l'état `A`.
+
+Dans  l'état  `A`,  si  aucun  des  trois  cas  exposés  ci-dessus  ne
+s'applique, le programme ignore la ligne et passe à la suivante.
 
 Il n'y a pas de transition possible entre l'état `B` et l'état `C`.
 
@@ -1867,10 +1867,11 @@ le fichier et de passer au suivant s'il en reste.
 Vérification du document
 ------------------------
 
-Au premier niveau,  chaque document est une table de  hachage, ou plus
-précisément la référence  à une table de hachage.  Le programme charge
-ce  document, du  texte  JSON  et le  convertit.  Puis  il appelle  la
-fonction de vérification d'une table de hachage.
+Au premier  niveau, chaque  document est  une table  de hachage  ou un
+tableau, ou plus précisément la référence  à une table de hachage ou à
+un tableau.  Le programme  charge ce  document, du  texte JSON,  et le
+convertit. Puis il appelle la  fonction de vérification d'une table de
+hachage ou la fonction de vérification d'un tableau, selon le cas.
 
 ### Fonction de vérification d'une table de hachage.
 
@@ -1974,7 +1975,6 @@ properties:
             properties:
               epi_score:
                 type: integer
-
 ```
 
 la  fonction  s'appelle  récursivement,   en  descendant  d'un  niveau
@@ -2005,10 +2005,11 @@ au moins une entrée `patternProperties` ou une entrée `properties`. De
 la même manière, la fonction de vérification d'un tableau contrôle que
 le schéma contient une entrée `items`.
 
-Si les éléments du tableau sont  des chaînes ou des numériques, pas de
-contrôle supplémentaire.  Si ce sont  des objets, la  fonction appelle
-récursivement  la fonction  de contrôle  des  objets. Si  ce sont  des
-tableaux, la fonction de vérification d'un tableau s'appelle elle-même
+Si  les éléments  du  tableau  sont censés  être  des  chaînes ou  des
+numériques, pas de  contrôle supplémentaire. Si le  schéma indique que
+ce sont des  objets, la fonction appelle récursivement  la fonction de
+contrôle des  objets. Si d'après  le schéma  ce sont des  tableaux, la
+fonction   de   vérification    d'un   tableau   s'appelle   elle-même
 récursivement.
 
 Comme pour  la vérification  d'une table  de hachage,  la vérification
