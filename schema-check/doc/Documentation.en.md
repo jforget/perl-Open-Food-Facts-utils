@@ -1575,7 +1575,7 @@ Do not confuse this `category_properties` key (with an `"y"`) with the
 other key, `categories_properties` (with `"ies"`) found elsewhere.
 
 Let us note  that this `additionalProperties` key is a  the same level
-than  attribute `type`  and,  therefore, is  itself another  attribut,
+than  attribute `type`  and,  therefore, is  itself another attribute,
 while  in   the  `owner_fields`   example  a  few   paragraphs  above,
 `additionalProperties` was  a property. Let  us note also that  at the
 next level, we find again technical keys `description` and `type`. The
@@ -1614,6 +1614,128 @@ object      `{}`     (exceptions,      products     `"0052833225082"`,
 
 Actually, I  do not know  how to  interpret these cases.  The examples
 above fail to enlighten my understanding.
+
+Intermission
+------------
+
+Even  if there  are  still  pending questions,  I  stop exploring  the
+2024-10-04   version  of   the   OFF  schema.   Now   I  examine   the
+post-2024-10-21 version of the schema.
+
+$ref Keys
+---------
+
+As I had foreseen, there are `$ref` entries with both a filename and a
+key hierarchy. Here are a few examples:
+
+```
+product_ecoscore.yaml:    $ref: "./ecoscore-country-code.yaml#/components/schemas/EcoscoreCountryValues"
+product_images.yaml:      $ref: "./image_role.yaml#/components/schemas/ImageRole"
+product_images.yaml:      $ref: "./image.yaml#/components/schemas/Image"
+product_images.yaml:      $ref: "./image_urls.yaml#/components/schemas/SelectedImage"
+product_ingredients.yaml: $ref: "./ingredient.yaml#/components/schemas/Ingredients"
+```
+
+What I  had not  foreseen is that  this happens as  soon as  the first
+include level, in `product.yaml`:
+
+```
+type: object
+allOf:
+  - $ref: "../api.yml#/components/schemas/Product-Base"
+  - $ref: "../api.yml#/components/schemas/Product-Misc"
+  - $ref: "../api.yml#/components/schemas/Product-Tags"
+  - $ref: "../api.yml#/components/schemas/Product-Images"
+  - $ref: "../api.yml#/components/schemas/Product-Eco-Score"
+  - $ref: "../api.yml#/components/schemas/Product-Ingredients"
+  - $ref: "../api.yml#/components/schemas/Product-Nutrition"
+  - $ref: "../api.yml#/components/schemas/Product-Nutriscore"
+  - $ref: "../api.yml#/components/schemas/Product-Data-Quality"
+  - $ref: "../api.yml#/components/schemas/Product-Extended"
+  - $ref: "../api.yml#/components/schemas/Product-Metadata"
+  - $ref: "../api.yml#/components/schemas/Product-Knowledge-Panels"
+  - $ref: "../api.yml#/components/schemas/Product-Attribute-Groups"
+```
+
+`oneOf` entries
+---------------
+
+Actually, I had  already found an entry `oneOf`  in the pre-2024-10-21
+schema in  `product_extended.yaml`, but  I had  decided to  ignore it.
+Now, I find two more entries in `product_ingredients.yaml`:
+
+```
+  traces_hierarchy:
+    type: array
+    items:
+      oneOf:
+        - type: "object"
+        - type: "string"
+  traces_lc:
+    type: string
+  traces_tags:
+    type: array
+    items:
+      oneOf:
+        - type: "object"
+        - type: "string"
+```
+
+The difference with `product_extended.yaml` is  that in this case, the
+`oneOf` entries apply to array items instead of key-valued properties.
+
+In these  cases, the objects  are generic objects, with  no properties
+defined,  which  already happens  often  with  array elements  without
+`oneOf`. So, if  the checking program takes the  `oneOf` attributes in
+account, and if the checked JSON array contains an element which is an
+object instead of a scalar value, then the message
+
+```
+Invalid schema, no item type for top traces_hierarchy
+```
+
+will vanish and will be replaced by the message
+
+```
+Invalid schema, no properties defined for top traces_hierarchy [0]
+```
+
+But it  is better. At  least, if  the element of  the JSON array  is a
+string, the message will vanish with no new error message.
+
+Although no examples  exist (yet), we can imagine that  the schema can
+define  properties for  the objects.  After all,  some arrays  without
+`oneOf` define properties  for their items-objects, such  as the array
+`packagings`   described  in   `packagings/packagings.yaml`.  Possible
+example:
+
+```
+  traces_hierarchy:
+    type: array
+    items:
+      oneOf:
+        - type: "object"
+          properties:
+            property1: string
+            property2: integer
+        - type: "string"
+  traces_lc:
+    oneOf:
+      - type: string
+      - type: object
+        properties:
+          foo: string
+          bar: integer
+  traces_tags:
+    type: array
+    items:
+      oneOf:
+        - type: "object"
+          properties:
+            some_property: string
+            another_property: integer
+        - type: "string"
+```
 
 Running the Checks
 ==================
@@ -2081,7 +2203,7 @@ I created a
 to send these updates to the
 [OFF repository](https://github.com/openfoodfacts/openfoodfacts-server).
 
-Then I reread the 
+Then I reread the
 [YAML specification](https://yaml.org/spec/1.2.2/)
 and I realised that the flow  style was supposed to be compatible with
 linefeeds.
@@ -2157,7 +2279,10 @@ The website gives the following Perl modules:
 
 Did  I  waste energy  and  time  writing  my  program? Is  my  program
 redundant?  I think  not, because  I  think that  these utilities  and
-modules do not fulfill all my needs.
+modules do not fulfill all my needs.  Also, I had to describe the JSON
+schema syntax  in a  incremental and pedagogical  way, instead  of the
+monolithic text of the
+[JSON schema specification](https://json-schema.org/specification).
 
 For example, `JSON::Schema::Tiny` does not process `$ref` entries when
 they  refer to  another file.  Since this  module contains  the `Tiny`
@@ -2166,7 +2291,10 @@ adjective,  I  a   not  surprised.  Yet,  I  need   this  feature.  So
 
 Maybe some time  later, I will install some of  the other Perl modules
 and I  will test them...  when I get enough  round tuits. Just  now, I
-still expand my current program with only JSON and YAML modules.
+still expand my  current program with only JSON and  YAML modules. And
+then I  will read the  specification, to  compare what I  have guessed
+until then with what I will read  and to learn which edge cases I have
+missed.
 
 License
 =======

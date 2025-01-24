@@ -1621,6 +1621,131 @@ autres dans le fichier `multiligne`).
 En  fait, je  ne  sais  pas comment  interprêter  cette définition  de
 schéma, les exemples ne m'éclairent pas.
 
+Interlude
+---------
+
+Même si j'ai encore quelques interrogations, j'arrête là l'exploration
+du schéma  du 2024-10-04.  J'examine maintenant  la version  du schéma
+après le 2024-10-21.
+
+Entrées $ref
+------------
+
+Ainsi que  je l'avais prévu,  il existe des  entrées `$ref` avec  à la
+fois un nom de fichier et une hiérarchie de clés. Quelques exemples :
+
+```
+product_ecoscore.yaml:    $ref: "./ecoscore-country-code.yaml#/components/schemas/EcoscoreCountryValues"
+product_images.yaml:      $ref: "./image_role.yaml#/components/schemas/ImageRole"
+product_images.yaml:      $ref: "./image.yaml#/components/schemas/Image"
+product_images.yaml:      $ref: "./image_urls.yaml#/components/schemas/SelectedImage"
+product_ingredients.yaml: $ref: "./ingredient.yaml#/components/schemas/Ingredients"
+```
+
+Ce  que je  n'avais  pas prévu,  c'est que  cela  apparaîtrait dès  le
+premier niveau, dans `product.yaml` :
+
+```
+type: object
+allOf:
+  - $ref: "../api.yml#/components/schemas/Product-Base"
+  - $ref: "../api.yml#/components/schemas/Product-Misc"
+  - $ref: "../api.yml#/components/schemas/Product-Tags"
+  - $ref: "../api.yml#/components/schemas/Product-Images"
+  - $ref: "../api.yml#/components/schemas/Product-Eco-Score"
+  - $ref: "../api.yml#/components/schemas/Product-Ingredients"
+  - $ref: "../api.yml#/components/schemas/Product-Nutrition"
+  - $ref: "../api.yml#/components/schemas/Product-Nutriscore"
+  - $ref: "../api.yml#/components/schemas/Product-Data-Quality"
+  - $ref: "../api.yml#/components/schemas/Product-Extended"
+  - $ref: "../api.yml#/components/schemas/Product-Metadata"
+  - $ref: "../api.yml#/components/schemas/Product-Knowledge-Panels"
+  - $ref: "../api.yml#/components/schemas/Product-Attribute-Groups"
+```
+
+Attribut `oneOf`
+----------------
+
+J'ai   déjà  signalé   avoir   vu  cet   attribut   dans  le   fichier
+`product_extended.yaml` d'avant le 2024-10-21  et j'avais décidé de ne
+pas  en tenir  compte. Maintenant,  je le  rencontre également  à deux
+endroits de `product_ingredients.yaml` :
+
+```
+  traces_hierarchy:
+    type: array
+    items:
+      oneOf:
+        - type: "object"
+        - type: "string"
+  traces_lc:
+    type: string
+  traces_tags:
+    type: array
+    items:
+      oneOf:
+        - type: "object"
+        - type: "string"
+```
+
+La  différence avec  `product_extended.yaml`  est  qu'il s'agit  cette
+fois-ci  des éléments  de deux  tableaux et  non plus  d'une propriété
+définie par une clé.
+
+Concernant la  définition des  objets, il s'agit  d'objets génériques,
+pour  lesquels   aucune  propriété  n'est  déclarée,   ce  qui  arrive
+fréquemment  avec  les  objets  éléments d'un  tableau  sans  attribut
+`oneOf`.  Donc,  si le  programme  de  vérification tient  compte  des
+entrées  `oneOf` pour  ses contrôles,  cela fait  que dans  le cas  où
+l'élément du tableau  JSON est un objet et non  pas un scalaire chaîne
+de caractères, le message
+
+```
+Invalid schema, no item type for top traces_hierarchy
+```
+
+disparaîtra et sera remplacé par le message
+
+```
+Invalid schema, no properties defined for top traces_hierarchy [0]
+```
+
+Mais c'est mieux ainsi. Au moins, si l'élément de tableau JSON est une
+chaîne de caractères, le message aura disparu à juste titre.
+
+On pourrait envisager que le schéma définisse des propriétés pour ces
+objets, comme cela arrive avec quelques objets éléments d'un tableau
+comme le tableau `packagings` décrit dans
+`packagings/packagings.yaml`. Exemple imaginé :
+
+```
+  traces_hierarchy:
+    type: array
+    items:
+      oneOf:
+        - type: "object"
+          properties:
+            property1: string
+            property2: integer
+        - type: "string"
+  traces_lc:
+    oneOf:
+      - type: string
+      - type: object
+        properties:
+          foo: string
+          bar: integer
+  traces_tags:
+    type: array
+    items:
+      oneOf:
+        - type: "object"
+          properties:
+            some_property: string
+            another_property: integer
+        - type: "string"
+```
+
 Déroulement
 ===========
 
@@ -2457,7 +2582,11 @@ Pour les modules Perl, le site propose :
 Me suis-je fatigué pour rien ? Le programme Perl que j'ai écrit est-il
 inutile ?  Je pense  le contraire,  parce que  ces utilitaires  et ces
 modules ne  correspondent peut-être pas aux  fonctionnalités dont j'ai
-besoin.
+besoin.  D'autre part,  cela  m'a  permis de  décrire  la syntaxe  des
+schémas JSON de façon progressive, incrémentale et pédagogique, plutôt
+que de lire le pavé indigeste que constitue la
+[spécification](https://json-schema.org/specification)
+des schémas JSON.
 
 Par  exemple, `JSON::Schema::Tiny`  ne traite  pas les  entrées `$ref`
 pointant vers des fichiers externes. Étant  donné que le nom du module
@@ -2467,7 +2596,9 @@ cela ne correspond pas à mes besoins. Abandonné.
 Éventuellement,  j'installerai  les  autres  modules Perl  et  je  les
 testerai, quand j'aurai  le temps. Pour l'instant, je  continue sur ma
 lancée et  je me contente  des modules JSON  et YAML, sans  chercher à
-utiliser des solutions existantes pour JSON Schema.
+utiliser des  solutions existantes  pour JSON Schema.  Et je  lirai la
+spécification pour  voir si ce  que j'ai  déjà compris est  correct et
+quels sont les points particuliers que j'aurai manqués.
 
 Licence
 =======
