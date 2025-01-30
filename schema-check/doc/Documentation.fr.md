@@ -1125,6 +1125,11 @@ properties:
     type: string
 </pre>
 
+Et comme on le verra
+[plus tard](#user-content-attributs-propertynames-et-additionalproperties),
+c'est le cas également pour le mot-clé `additionalProperties` qui peut
+être soit un attribut, soit une propriété.
+
 Tableaux
 --------
 
@@ -1564,63 +1569,6 @@ elements[*] . type` (donc un `type` métier) n'a pas de champ technique
                     TODO: add Map type
 ```
 
-Et une dernière curiosité, dans le fichier `product_extended.yaml`, le
-champ  métier   `category_properties`,  de  type  `object`,   n'a  pas
-d'attribut  `properties`, ni  `patternProperties`, mais  seulement une
-entrée `additionalProperties`.
-
-```
-  category_properties:
-    type: object
-    additionalProperties:
-      description: those are properties taken from the category taxonomy
-      type: string
-```
-
-Attention, il s'agit bien de `category_properties` avec un « `y` », ne
-regardez pas `categories_properties` avec « `ies` ».
-
-Remarquons  que cette  clé  `additionalProperties` se  trouve au  même
-niveau que  l'attribut `type`, donc  est elle-même un  attribut, alors
-que  dans  l'exemple  `owner_fields` quelques  paragraphes  ci-dessus,
-`additionalProperties` apparaissait en  tant que propriété. Remarquons
-aussi qu'au niveau suivant, nous  avons de nouveau des clés techniques
-`description` et  `type`. Le  programme de  vérification ne  tient pas
-compte  de cet  attribut  `additionalProperties` et  considère que  la
-propriété `category_properties` est un  objet dont les sous-propriétés
-sont inconnues. En fait, dans  les quelques exemples que j'ai extraits
-de la  collection `products`,  la propriété  `category_properties` est
-presque  toujours  un  objet   vide  `{}`  (exceptions,  les  produits
-`"0052833225082"`,  `"0078742054797"`,  `"0078742102047"` et  quelques
-autres dans le fichier `multiligne`).
-
-```
-{
-   "_id" : "0052833225082",
-   "category_properties" : {
-      "ciqual_food_name:en" : "Cheddar cheese, from cow's milk",
-      "ciqual_food_name:fr" : "Fromage -aliment moyen-"
-   }
-}
-{
-   "_id" : "0078742054797",
-   "category_properties" : {
-      "ciqual_food_name:en" : "Sausage -average-",
-      "ciqual_food_name:fr" : "Saucisse -aliment moyen-"
-   }
-}
-{
-   "_id" : "0078742102047",
-   "category_properties" : {
-      "ciqual_food_name:en" : "Cheddar cheese, from cow's milk",
-      "ciqual_food_name:fr" : "Fromage -aliment moyen-"
-   }
-}
-```
-
-En  fait, je  ne  sais  pas comment  interprêter  cette définition  de
-schéma, les exemples ne m'éclairent pas.
-
 Interlude
 ---------
 
@@ -1745,6 +1693,243 @@ comme le tableau `packagings` décrit dans
             another_property: integer
         - type: "string"
 ```
+
+Attributs `propertyNames` et `additionalProperties`
+---------------------------------------------------
+
+Revenons  à  l'exemple des  données  multi-niveaux  et à  la  remarque
+mentionnant la
+[_pull request_ du 2024-10-11](https://github.com/openfoodfacts/openfoodfacts-server/pull/10875).
+Elle   avait  consisté   d'une  part   à  remplacer   la  dénomination
+`language_code`  par  `country_code` et  d'autre  part  à ajouter  une
+propriété `world` en plus de  la propriété générique à deux caractères
+`country_code`. Le fichier `product_ecoscore.yaml` contenait alors :
+
+```
+              transportation_scores:
+                type: object
+                properties:
+                  world:
+                    type: integer
+                patternProperties:
+                  (?<country_code>\w\w):
+                    type: integer
+              transportation_values:
+                type: object
+                properties:
+                  world:
+                    type: integer
+                patternProperties:
+                  (?<country_code>\w\w):
+                    type: integer
+              values:
+                type: object
+                properties:
+                  world:
+                    type: integer
+                patternProperties:
+                  (?<country_code>\w\w):
+                    type: integer
+```
+
+Avec cette  définition, il n'y a  pas de contrôle de  valeur des codes
+pays,  tout  code constitué  de  deux  caractères alphanumériques  est
+correct. Donc, le 2024-10-19, l'équipe OFF a intégré une nouvelle
+[_pull request_](https://github.com/openfoodfacts/openfoodfacts-server/pull/11009)
+pour énumérer les valeurs autorisées pour les codes pays.
+
+Ont-ils écrit quelque chose comme :
+
+```
+              transportation_scores:
+                type: object
+                properties:
+                  world:
+                    type: integer
+                  be:
+                    type: integer
+                  de:
+                    type: integer
+                  fr:
+                    type: integer
+                  # [...]
+              transportation_values:
+                type: object
+                properties:
+                  world:
+                    type: integer
+                  be:
+                    type: integer
+                  de:
+                    type: integer
+                  fr:
+                    type: integer
+                  # [...]
+              values:
+                type: object
+                properties:
+                  world:
+                    type: integer
+                  be:
+                    type: integer
+                  de:
+                    type: integer
+                  fr:
+                    type: integer
+                  # [...]
+```
+
+Non, c'est assez peu commode, il faut écrire deux lignes par code pays
+pour `transportation_scores`, deux lignes par code pays également pour
+`transportation_values` et  deux lignes  par code pays  également pour
+`values`.  Si ces  propriétés avaient  été des  objets plutôt  que des
+scalaires, le  nombre de lignes par  code pays aurait été  encore plus
+élevé, conduisant  à encore  plus de  duplication de  code et  plus de
+redondance.
+
+Ils auraient pu écrire
+
+```
+              transportation_scores:
+                type: object
+                patternProperties:
+                  (?<country_code>world|be|de|fr):
+                    type: integer
+              transportation_values:
+                type: object
+                patternProperties:
+                  (?<country_code>world|be|de|fr):
+                    type: integer
+              values:
+                type: object
+                patternProperties:
+                  (?<country_code>world|be|de|fr):
+                    type: integer
+```
+
+avec  63  possibilités  au  lieu   de  4  dans  les  deux  expressions
+rationnelles. Cela aurait donné deux  lignes de source très longues et
+peu ergonomiques.
+
+La solution consiste à utiliser une nouvelle syntaxe.
+
+```
+              transportation_scores:
+                type: object
+                propertyNames:
+                  type: string
+                  enum:
+                    ['be', 'de', 'fr', ... 'world']
+                additionalProperties:
+                  type: integer
+              transportation_values:
+                type: object
+                propertyNames:
+                  type: string
+                  enum:
+                    ['be', 'de', 'fr', ... 'world']
+                additionalProperties:
+                  type: integer
+              values:
+                type: object
+                propertyNames:
+                  type: string
+                  enum:
+                    ['be', 'de', 'fr', ... 'world']
+                additionalProperties:
+                  type: integer
+```
+
+C'est un raccourci  pour spécifier _n_ propriétés  identiques avec des
+noms différents énumérés dans le tableau `propertyNames`. Le code YAML
+pour le tableau  peut s'écrire avec des  délimiteurs `"["`...`"]"` et,
+au choix, sur une seule ligne  très longue ou sur plusieurs lignes (il
+s'agit du _flow style_ de YAML (ou « style au fil de l'eau »). Mais on
+aurait pu  utiliser le _block style_  (ou « style en blocs »)  avec 63
+lignes constituées d'un tiret et d'un seul code pays.
+
+Pour aller plus loin, la définition du tableau `transportation_scores
+/ propertyNames`, celle du tableau `transportation_values /
+propertyNames` et celle du tableau `values / propertyNames` ont été
+remplacées toutes trois par un appel `$ref` au composant `components /
+schemas / EcoscoreCountryCode` du fichier
+`ecoscore-country-code.yaml`. L'avantage supplémentaire est que l'on
+sait que les valeurs autorisées pour `transportation_scores`, celles
+pour `transportation_values` et celles pour `values` sont exactement
+les mêmes.
+
+Si  vous regardez,  c'est en  fait deux  appels `$ref`  successifs, le
+composant  `components  /  schemas /  EcoscoreCountryValues`  puis  le
+composant  `components /  schemas  /  EcoscoreCountryCode` du  fichier
+`ecoscore-country-code.yaml`.
+
+On trouve également un couple `additionalProperties / propertyNames`
+dans le fichier `product_images.yaml` et dans le fichier
+`product_extended.yaml`, au sein de `nova_groups_markers`.
+
+Dans   la  propriété   `category_properties`   de   ce  même   fichier
+`product_extended.yaml`,     on     voit     apparaître     l'attribut
+`additionalProperties`  sans  qu'il  soit  complété  par  un  attribut
+`propertyNames`.  Attention, il  s'agit bien  de `category_properties`
+avec  un   « `y` »,  ne  regardez  pas   `categories_properties`  avec
+« `ies` ». Puisqu'il  n'y a  pas de `propertyNames`,  faut-il accepter
+toutes les valeurs possibles ?
+
+En regardant  les exemples  de `products-324.json`,  il semble  que ce
+soit le cas. Voici quelques exemples tirés de ce fichier dans lesquels
+l'objet associé à `categories_properties` n'est pas un objet vide. Les
+clés sont  les mêmes, d'un document  à l'autre mais on  peut envisager
+d'autres. Donc oui, il faut accepter toutes les valeurs possibles.
+
+```
+{
+   "_id" : "0052833225082",
+   "category_properties" : {
+      "ciqual_food_name:en" : "Cheddar cheese, from cow's milk",
+      "ciqual_food_name:fr" : "Fromage -aliment moyen-"
+   }
+}
+{
+   "_id" : "0078742054797",
+   "category_properties" : {
+      "ciqual_food_name:en" : "Sausage -average-",
+      "ciqual_food_name:fr" : "Saucisse -aliment moyen-"
+   }
+}
+{
+   "_id" : "0078742102047",
+   "category_properties" : {
+      "ciqual_food_name:en" : "Cheddar cheese, from cow's milk",
+      "ciqual_food_name:fr" : "Fromage -aliment moyen-"
+   }
+}
+```
+
+Et comme on l'a déjà vu pour `type`, le mot-clé `additionalProperties`
+peut  parfois apparaître  comme  une propriété  (c'est-à-dire une  clé
+métier).  C'est   le  cas   dans  la  propriété   `owner_fields`  dans
+`product_extended.yaml`. Il y a même  un commentaire pour souligner le
+fait.
+
+```
+  owner_fields:
+    type: object
+    description: |
+      Those are fields provided by the producer (through producers platform),
+      and the value he provided.
+    properties:
+      additionalProperties: # !!! here "additionalProperties" is the name of the property
+        description: |
+          you can retrieve all kind of properties, the same as on the parent object (the product).
+          It's not processed entries (like tags for example) but raw ones.
+        oneOf:
+          - type: integer
+          - type: string
+          - type: object
+```
+
+C'est le cas également dans le fichier `knowledge_panels/panels.yaml`,
+mais sans commentaire pour souligner ce fait.
 
 Déroulement
 ===========
