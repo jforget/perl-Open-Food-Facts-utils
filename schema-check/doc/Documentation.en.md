@@ -1617,6 +1617,72 @@ allOf:
   - $ref: "../api.yml#/components/schemas/Product-Attribute-Groups"
 ```
 
+`allOf` entries
+---------------
+
+Attribute `allOf` is  no longer restricted to the first  level in file
+`product.yaml`.   We    find   it   at   several    places   in   file
+`product_nutriscore.yaml`. For example:
+
+```
+components:
+  schemas:
+    ProductType:
+      type: object
+      properties:
+        is_beverage:
+          type: integer
+          enum: [0, 1]
+          examples: [0]
+        is_cheese:
+          type: integer
+          enum: [0, 1]
+          examples: [0]
+        is_water:
+          type: integer
+          enum: [0, 1]
+          examples: [0]
+
+    # 2021 Schema
+    Nutriscore2021InnerData:
+      title: Nutriscore2021InnerData
+      allOf:
+        - $ref: "#/components/schemas/ProductType"
+        - properties:
+            is_fat:
+              type: integer
+              enum: [0, 1]
+              examples: [0]
+            # Energy
+            energy:
+              type: integer
+              examples: [1996]
+            # [...]
+
+    # 2023 Schema
+    Nutriscore2023Data:
+      title: Nutriscore2023Data
+      allOf:
+        - $ref: "#/components/schemas/ProductType"
+        - properties:
+            is_fat_oil_nuts_seeds:
+              type: integer
+              enum: [0, 1]
+              examples: [0]
+            is_red_meat_product:
+              type: integer
+              enum: [0, 1]
+              examples: [0]
+            # [...]
+```
+
+The aim  is just to have  a DRY specification (Don't  Repeat Yourself)
+for the  three properties  `is_beverage`, `is_cheese`  and `is_water`,
+which  are  used in  both  group  properties `Nutriscore2021Data`  and
+`Nutriscore2023Data`, while properties `is_fat` and `energy` are found
+only  in `Nutriscore2021Data`  and properties  `is_fat_oil_nuts_seeds`
+and `is_red_meat_product` are found only in `Nutriscore2023Data`.
+
 `oneOf` entries
 ---------------
 

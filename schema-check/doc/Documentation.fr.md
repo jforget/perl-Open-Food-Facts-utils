@@ -1621,6 +1621,74 @@ allOf:
   - $ref: "../api.yml#/components/schemas/Product-Attribute-Groups"
 ```
 
+Attribut `allOf`
+----------------
+
+L'attribut `allOf`  n'est plus  réservé au  premier niveau  du fichier
+`product.yaml`. On le trouve également dans `product_nutriscore.yaml`.
+Par exemple :
+
+```
+components:
+  schemas:
+    ProductType:
+      type: object
+      properties:
+        is_beverage:
+          type: integer
+          enum: [0, 1]
+          examples: [0]
+        is_cheese:
+          type: integer
+          enum: [0, 1]
+          examples: [0]
+        is_water:
+          type: integer
+          enum: [0, 1]
+          examples: [0]
+
+    # 2021 Schema
+    Nutriscore2021InnerData:
+      title: Nutriscore2021InnerData
+      allOf:
+        - $ref: "#/components/schemas/ProductType"
+        - properties:
+            is_fat:
+              type: integer
+              enum: [0, 1]
+              examples: [0]
+            # Energy
+            energy:
+              type: integer
+              examples: [1996]
+            # [...]
+
+    # 2023 Schema
+    Nutriscore2023Data:
+      title: Nutriscore2023Data
+      allOf:
+        - $ref: "#/components/schemas/ProductType"
+        - properties:
+            is_fat_oil_nuts_seeds:
+              type: integer
+              enum: [0, 1]
+              examples: [0]
+            is_red_meat_product:
+              type: integer
+              enum: [0, 1]
+              examples: [0]
+            # [...]
+```
+
+C'est simplement  pour mettre en commun  les propriétés `is_beverage`,
+`is_cheese`  et  `is_water`  qui  apparaissent  à  la  fois  dans  les
+propriétés groupes `Nutriscore2021Data`  et dans `Nutriscore2023Data`,
+et pour prévoir le cas où  une nouvelle propriété serait ajoutées dans
+ces  deux propriétés  groupes, alors  que les  propriétés `is_fat`  et
+`energy`  sont  réservées  à `Nutriscore2021Data`  et  les  propriétés
+`is_fat_oil_nuts_seeds`  et  `is_red_meat_product`  sont  réservées  à
+`Nutriscore2023Data`.
+
 Attribut `oneOf`
 ----------------
 
