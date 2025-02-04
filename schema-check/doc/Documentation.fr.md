@@ -505,15 +505,18 @@ comprendre comment le schéma est défini.
 
 D'autre part, dans  ce chapitre de la documentation,  je n'utilise pas
 la description la plus récente du schéma. Le 21 octobre 2024 a eu lieu
-une refonte des fichiers sources décrivant le schéma de données. Cette
+une
+[refonte des fichiers sources](https://github.com/openfoodfacts/openfoodfacts-server/commit/8cb187340e912f21565c2b752c70e226a6b31ac0)
+décrivant le schéma de données. Cette
 refonte  devait  avoir  pour  but   d'augmenter  la  puissance  et  la
 maintenabilité  du schéma  de données,  aux dépens  de sa  simplicité.
 Donc, pour des raisons pédagogiques,  la description fait référence au
 schéma tel  qu'il était avant le  21 octobre 2024 et  dupliqué dans le
 sous-répertoire  `old-schema`  de  ce  dépôt  Git.  Pour  des  raisons
 pratiques en plus des raisons  pédagogiques, j'ai choisi la version du
-4 octobre, avant l'intégration le  11 octobre d'une _pull request_ que
-j'ai soumise.
+4 octobre, avant l'intégration le  11 octobre d'une
+[_pull request_](https://github.com/openfoodfacts/openfoodfacts-server/pull/10875)
+que j'ai soumise.
 
 Première étape
 --------------
@@ -552,7 +555,8 @@ ou un `require` en Perl.
 Le mot-clé `$ref` est utilisé  12 fois dans le fichier `product.yaml`,
 mais il est  utilisé également dans les autres fichiers.  Au total, il
 est utilisé  52 fois, 49  fois pour  importer un fichier  extérieur, 3
-fois pour un autre mécanisme (décrit ultérieurement).
+fois pour un autre mécanisme (décrit
+[ultérieurement](#user-content-les-clés-ref-restantes)).
 
 Paires clé-valeur
 -----------------
@@ -986,8 +990,9 @@ Une petite  remarque en  passant. Les  clés `"transportation_scores"`,
 subordonnées `"(?<language_code>\w\w)"`.  Néanmoins, on trouve  la clé
 `"world"` qui  n'est pas un  code langue connu et  qui ne colle  pas à
 l'expression  rationnelle.  D'où  un   message  d'erreur  lors  de  la
-vérification. Cette remarque a donné lieu à la _pull request_ intégrée
-le 2024-10-11 dans le dépôt OFF,  donc après la version récupérée dans
+vérification. Cette remarque a donné lieu à la
+[_pull request_ intégrée le 2024-10-11](https://github.com/openfoodfacts/openfoodfacts-server/pull/10875).
+dans le dépôt OFF,  donc après la version récupérée dans
 le sous-répertoire `old-schema` du présent  dépôt. De plus, le fichier
 `product_ecoscore.yaml`  a été  scindé le  19 novembre  pour créer  le
 fichier  `ecoscore-country-code.yaml`  et  l'utilisation  d'expression
@@ -1569,12 +1574,17 @@ elements[*] . type` (donc un `type` métier) n'a pas de champ technique
                     TODO: add Map type
 ```
 
+Finalement, j'avais une interrogation sur l'attribut
+`additionalProperties`, mais j'ai trouvé la
+[réponse](#user-content-attributs-propertynames-et-additionalproperties),
+après le 2024-10-21.
+
 Interlude
 ---------
 
 Même si j'ai encore quelques interrogations, j'arrête là l'exploration
 du schéma  du 2024-10-04.  J'examine maintenant  la version  du schéma
-après le 2024-10-21.
+[après le 2024-10-21](https://github.com/openfoodfacts/openfoodfacts-server/commit/8cb187340e912f21565c2b752c70e226a6b31ac0).
 
 Entrées $ref
 ------------
@@ -2627,7 +2637,9 @@ ensuite les  autres attributs  dans l'ordre  alphabétique. On  y gagne
 beaucoup en  lisibilité. C'est pour  cela que, dans un  premier temps,
 j'ai choisi `YAML.pm`.
 
-Suite  à la  refonte  des  schémas le  2024-10-21,  sont apparues  des
+Suite  à la
+[refonte des schémas le 2024-10-21](https://github.com/openfoodfacts/openfoodfacts-server/commit/8cb187340e912f21565c2b752c70e226a6b31ac0),
+sont apparues  des
 erreurs   de  syntaxe   dans  les   fichiers  YAML.   Cela  concernait
 essentiellement  l'écriture  de  tableaux  en  _flow  style_  (que  je
 traduirai par « style  au fil de l'eau », un style  qui rappelle JSON,

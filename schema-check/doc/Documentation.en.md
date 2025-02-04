@@ -494,13 +494,16 @@ Anyhow, this progression will allow  you, I hope, to understand better
 and easier how we define a data schema.
 
 Also, I do not  use the current description of the  data schema in the
-documentation. On 21 october 2024, there was an overhaul of the schema
-source files. This overhaul aimed at increasing the maintainability or
+documentation. On 21 october 2024, there was an
+[overhaul of the schema source files](https://github.com/openfoodfacts/openfoodfacts-server/commit/8cb187340e912f21565c2b752c70e226a6b31ac0).
+This overhaul aimed at increasing the maintainability or
 the power of the data schema, but it increased its complexity. So, for
 pedagogical reasons, the description below  will refer to the state of
 the schema before  21 October 2024. For practical  reasons in addition
 to pedagogical reasons, I use  the version from 2024-10-04, before the
-application of a pull request I submitted (applied on 2024-10-11). The
+application of a
+[pull request](https://github.com/openfoodfacts/openfoodfacts-server/pull/10875)
+I submitted (applied on 2024-10-11). The
 pedagogical version  of the  schema can be  found in  the `old-schema`
 directory in this repository.
 
@@ -540,7 +543,8 @@ Perl.
 
 The `$ref` keyword is used 12  times in file `product.yaml`, but it is
 used also in the other files. All in all, it appears 52 times, with 49
-file inclusions and 3 times for another mechanism.
+file inclusions and 3 times for
+[another mechanism](#user-content-the-remaining-ref-keys).
 
 Key-Value Pairs
 ---------------
@@ -672,7 +676,7 @@ code `"with_allergens"`, or more accurately `"wi"`. How silly!
 
 So a typical  use of generic keys is multi-linguism.  Yet, if you read
 again the example from the
-[last paragraph](#user-content-Key-Value-Pairs)
+[last paragraph](#user-content-key-value-pairs)
 about specific keys, you will find a specific key `product_name_en` in
 addition   to  key   `product_name`,   which  gives   an  attempt   at
 multi-linguism using specific keys.
@@ -752,7 +756,7 @@ Implicit Fields
 ---------------
 
 Let us take again the document from the
-[paragraph about specific keys](#user-content-Key-Value-Pairs).
+[paragraph about specific keys](#user-content-key-value-pairs).
 Actually, the contents of this document is rather:
 
 ```
@@ -976,7 +980,9 @@ A little remark. keys `"transportation_scores"`,
 `"(?<language_code>\w\w)"`. Yet, we find key  `"world"` which is not a
 known language code  and which does not match  the regular expression.
 This triggers  an error  message when running  the check.  This remark
-gave a  _pull request_,  which was  applied to  the OFF  repository on
+gave a
+[pull request](https://github.com/openfoodfacts/openfoodfacts-server/pull/10875),
+which was  applied to  the OFF  repository on
 2024-10-11, later than the version duplicated onto `old-schema` in the
 current  repository.  In  addition, file  `product_ecoscore.yaml`  was
 split   on   2024-11-19,   which   gave    way   to   the   new   file
@@ -1563,12 +1569,18 @@ field `type`, but a technical field `element_type`.
                     TODO: add Map type
 ```
 
+Lastly, I had a question about the `additionalProperties` attribute,
+but I found the
+[answer](#user-content-attributes-propertynames-and-additionalproperties)
+after 2024-10-21.
+
 Intermission
 ------------
 
 Even  if there  are  still  pending questions,  I  stop exploring  the
 2024-10-04   version  of   the   OFF  schema.   Now   I  examine   the
-post-2024-10-21 version of the schema.
+[post-2024-10-21](https://github.com/openfoodfacts/openfoodfacts-server/commit/8cb187340e912f21565c2b752c70e226a6b31ac0)
+version of the schema.
 
 $ref Keys
 ---------
@@ -1690,7 +1702,7 @@ Attributes `propertyNames` and `additionalProperties`
 
 Let us get back to the example of the multi-level data and the
 remark about the
-[pull request of 2024-10-11](https://github.com/openfoodfacts/openfoodfacts-server/pull/10875).
+[2024-10-11 pull request](https://github.com/openfoodfacts/openfoodfacts-server/pull/10875).
 
 This pull request  aimed first at replacing  the `language_code` label
 with the more appropriate label `country_code` and second at adding an
@@ -2322,7 +2334,9 @@ allows  me to  display the  attributes  of a  property with  attribute
 alphabetically. The readability  is much improved. This  is the reason
 why I chose `YAML.pm` at first.
 
-After the  overhaul of  YAML schema files  on 2024-10-21,  some syntax
+After the
+[overhaul of YAML schema files on 2024-10-21](https://github.com/openfoodfacts/openfoodfacts-server/commit/8cb187340e912f21565c2b752c70e226a6b31ac0),
+some syntax
 errors appeared in  some files, mainly because of the  flow style. The
 "flow style" is  a style very similar to the  JSON syntax which relies
 on brackets and separators, instead  of the "block style" which relies
@@ -2381,7 +2395,7 @@ triggered errors, for example:
 ```
 
 I created a
-[_pull request_](https://github.com/openfoodfacts/openfoodfacts-server/pull/11220)
+[pull request](https://github.com/openfoodfacts/openfoodfacts-server/pull/11220)
 to send these updates to the
 [OFF repository](https://github.com/openfoodfacts/openfoodfacts-server).
 
