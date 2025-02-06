@@ -205,6 +205,11 @@ sub find_ref_rec($schema, $dir, $fname, $level, $local_top) {
   if ($schema->{items}) {
     find_ref_rec( $schema->{items}, $dir, $fname, $level, 0);
   }
+  if ($schema->{allOf}) {
+    for my $entry (@{$schema->{allOf}}) {
+      find_ref_rec($entry, $dir, $fname, $level, 0);
+    }
+  }
 
   my $ref = $schema->{'$ref'} // '';
   if ($ref eq '') {
@@ -268,6 +273,11 @@ sub find_ref_rec($schema, $dir, $fname, $level, $local_top) {
   for my $prop_name (keys %{$subschema->{properties}}) {
     find_ref_rec( $subschema->{properties}{$prop_name}, catdir($dir, $subpath), $fname, $new_level, 0);
   }
+  if ($subschema->{allOf}) {
+    for my $entry (@{$subschema->{allOf}}) {
+      find_ref_rec($entry, catdir($dir, $subpath), $fname, $new_level, 0);
+    }
+  }
   if ($subschema->{items}) {
     find_ref_rec( $subschema->{items}, catdir($dir, $subpath), $fname, $new_level, 0);
   }
@@ -276,6 +286,9 @@ sub find_ref_rec($schema, $dir, $fname, $level, $local_top) {
   }
   if ($subschema->{items}) {
     $schema->{items} = $subschema->{items};
+  }
+  if ($subschema->{allOf}) {
+    $schema->{allOf} = $subschema->{allOf};
   }
   for my $prop_name (keys %{$subschema->{properties}}) {
     #say "adding $prop_name";
@@ -306,6 +319,12 @@ sub tweak_hash($schema) {
   }
   if (exists $schema->{items}) {
     $ynode->{items} = tweak_hash($ynode->{items});
+  }
+  if (exists $schema->{allOf}) {
+    my $last_num = -1 + @{$schema->{allOf}};
+    for my $n (0 .. $last_num) {
+      $ynode->{allOf}[$n] = tweak_hash($ynode->{allOf}[$n]);
+    }
   }
   return $ynode;
 }
