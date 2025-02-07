@@ -202,11 +202,55 @@ sub find_ref_rec($schema, $dir, $fname, $level, $local_top) {
       find_ref_rec( $schema->{properties}{$key}, $dir, $fname, $level, 0);
     }
   }
+  if ($schema->{additionalProperties}) {
+    if ($schema->{additionalProperties}{'$ref'}) {
+      my $ref      = $schema->{additionalProperties}{'$ref'};
+      my $full_ref = '';
+      my $path     = '';
+      my $hier     = '';
+      if (index($ref, '#') >= 0) {
+        ($path, $hier) = $ref =~ / ^ (.*) (\#.*) $/x;
+      }
+      else {
+        $path = $ref;
+        $hier = '#/';
+      }
+      if ($path eq '') {
+        $path = catfile($dir, $fname);
+      }
+      else {
+        my $sub_dir = '';
+        ($sub_dir, $fname) = "./$path" =~ / ^ (.*) \/ (.*) $ /x;
+        $dir  = catdir( $dir, $sub_dir);
+        $path = catfile($dir, $fname);
+      }
+      $full_ref = "$path$hier";
+
+      my $new_level = $level + 1;
+      my $entry = { ref      => $ref
+                  , dir      => $dir
+                  , fname    => $fname
+                  , path     => $path
+                  , full_ref => $full_ref
+                  , level    => $new_level
+      };
+      if ($list_schema) {
+        say "Dynamic inclusion of additional properties (dir $dir, fname $fname, ref $full_ref)";
+      }
+      push @dyn_sch_to_do, $entry;
+      $schema->{additionalProperties}{dyn_sch} = $full_ref;
+    }
+  }
   if ($schema->{items}) {
     find_ref_rec( $schema->{items}, $dir, $fname, $level, 0);
   }
   if ($schema->{allOf}) {
     for my $entry (@{$schema->{allOf}}) {
+      find_ref_rec($entry, $dir, $fname, $level, 0);
+    }
+  }
+  if ($schema->{oneOf}) {
+    for my $entry (@{$schema->{oneOf}}) {
       find_ref_rec($entry, $dir, $fname, $level, 0);
     }
   }
@@ -278,6 +322,11 @@ sub find_ref_rec($schema, $dir, $fname, $level, $local_top) {
       find_ref_rec($entry, catdir($dir, $subpath), $fname, $new_level, 0);
     }
   }
+  if ($subschema->{oneOf}) {
+    for my $entry (@{$subschema->{oneOf}}) {
+      find_ref_rec($entry, catdir($dir, $subpath), $fname, $new_level, 0);
+    }
+  }
   if ($subschema->{items}) {
     find_ref_rec( $subschema->{items}, catdir($dir, $subpath), $fname, $new_level, 0);
   }
@@ -290,9 +339,16 @@ sub find_ref_rec($schema, $dir, $fname, $level, $local_top) {
   if ($subschema->{allOf}) {
     $schema->{allOf} = $subschema->{allOf};
   }
+  if ($subschema->{oneOf}) {
+    $schema->{oneOf} = $subschema->{oneOf};
+  }
   for my $prop_name (keys %{$subschema->{properties}}) {
     #say "adding $prop_name";
     $schema->{properties}{$prop_name} = $subschema->{properties}{$prop_name};
+  }
+  for my $attr_name (keys %{$subschema->{additionalProperties}}) {
+    #say "adding $prop_name";
+    $schema->{additionalProperties}{$attr_name} = $subschema->{additionalProperties}{$attr_name};
   }
   for my $pattern (keys %{$subschema->{patternProperties}}) {
     #say "adding $pattern";
@@ -303,6 +359,10 @@ sub find_ref_rec($schema, $dir, $fname, $level, $local_top) {
 # Ensure that the "type" property is dumped first
 sub tweak_hash($schema) {
   my $ynode = YAML::Node->new($schema);
+  if (ref($schema) ne 'HASH') {
+      say "problème de référence";
+      return;
+  }
   my @keys = keys %$schema;
   if (exists $schema->{type}) {
     ynode($ynode)->keys( [ 'type', sort grep { $_ ne 'type' } @keys ] );
@@ -317,6 +377,9 @@ sub tweak_hash($schema) {
       $ynode->{properties}{$prop} = tweak_hash($ynode->{properties}{$prop});
     }
   }
+  if (exists $schema->{additionalProperties}) {
+    $ynode->{additionalProperties} = tweak_hash($ynode->{additionalProperties});
+  }
   if (exists $schema->{items}) {
     $ynode->{items} = tweak_hash($ynode->{items});
   }
@@ -324,6 +387,12 @@ sub tweak_hash($schema) {
     my $last_num = -1 + @{$schema->{allOf}};
     for my $n (0 .. $last_num) {
       $ynode->{allOf}[$n] = tweak_hash($ynode->{allOf}[$n]);
+    }
+  }
+  if (exists $schema->{oneOf}) {
+    my $last_num = -1 + @{$schema->{oneOf}};
+    for my $n (0 .. $last_num) {
+      $ynode->{oneOf}[$n] = tweak_hash($ynode->{oneOf}[$n]);
     }
   }
   return $ynode;

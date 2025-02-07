@@ -1972,6 +1972,14 @@ imagine other keys. So yes, we must accept any values.
 }
 ```
 
+While  the attributes  `properties` and  `patternProperties` point  to
+key-value pairs where the keys are "business" keys, or properties, the
+attribute `additionalProperties` points to  key-value pairs where both
+keys   and   values   are   attributes  (technical   keys)   and   the
+`propertyNames` attribute points  to key-value pairs where  the key is
+an attribute and the value is,  sometimes, a property such as `world`,
+`be` or `de`.
+
 And  as  we  have  already  seen  with  keyword  `type`,  the  keyword
 `additionalProperties`  can  be  used  as   a  property  (that  is,  a
 "business" key). This  is the case in property  `owner_fields` in file

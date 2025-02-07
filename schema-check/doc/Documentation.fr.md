@@ -1983,6 +1983,14 @@ d'autres. Donc oui, il faut accepter toutes les valeurs possibles.
 }
 ```
 
+Alors   que   les   attributs  `properties`   et   `patternProperties`
+chapeautent des  paires clé-valeur  où les clés  sont des  clés métier
+(c'est-à-dire   des  propriétés),   l'attribut  `additionalProperties`
+chapeaute des paires  clé-valeur où à la fois les  clés et les valeurs
+sont des attributs et  l'attribut `propertyNames` chapeaute des paires
+clé-valeur  où  les clés  sont  des  attributs  et les  valeurs  sont,
+parfois, des propriétés, telles que `world`, `be` ou `de`.
+
 Et comme on l'a déjà vu pour `type`, le mot-clé `additionalProperties`
 peut  parfois apparaître  comme  une propriété  (c'est-à-dire une  clé
 métier).  C'est   le  cas   dans  la  propriété   `owner_fields`  dans
