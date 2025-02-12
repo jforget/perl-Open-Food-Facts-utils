@@ -319,14 +319,11 @@ sub find_ref_rec($schema, $dir, $fname, $level, $local_top) {
   for my $prop_name (keys %{$subschema->{properties}}) {
     find_ref_rec( $subschema->{properties}{$prop_name}, catdir($dir, $subpath), $fname, $new_level, 0);
   }
-  if ($subschema->{allOf}) {
-    for my $entry (@{$subschema->{allOf}}) {
-      find_ref_rec($entry, catdir($dir, $subpath), $fname, $new_level, 0);
-    }
-  }
-  if ($subschema->{oneOf}) {
-    for my $entry (@{$subschema->{oneOf}}) {
-      find_ref_rec($entry, catdir($dir, $subpath), $fname, $new_level, 0);
+  for my $key (qw/allOf oneOf/) {
+    if ($subschema->{$key}) {
+      for my $entry (@{$subschema->{$key}}) {
+        find_ref_rec($entry, catdir($dir, $subpath), $fname, $new_level, 0);
+      }
     }
   }
 
@@ -335,19 +332,7 @@ sub find_ref_rec($schema, $dir, $fname, $level, $local_top) {
       find_ref_rec( $subschema->{$key}, catdir($dir, $subpath), $fname, $new_level, 0);
     }
   }
-  if ($subschema->{type}) {
-    $schema->{type} = $subschema->{type};
-  }
-  if ($subschema->{items}) {
-    $schema->{items} = $subschema->{items};
-  }
-  if ($subschema->{allOf}) {
-    $schema->{allOf} = $subschema->{allOf};
-  }
-  if ($subschema->{oneOf}) {
-    $schema->{oneOf} = $subschema->{oneOf};
-  }
-  for my $attr (qw/enum/) {
+  for my $attr (qw/type items allOf oneOf enum/) {
     if ($subschema->{$attr}) {
       $schema->{$attr} = $subschema->{$attr};
     }
@@ -384,22 +369,20 @@ sub tweak_hash($schema) {
       $ynode->{properties}{$prop} = tweak_hash($ynode->{properties}{$prop});
     }
   }
-  if (exists $schema->{additionalProperties}) {
-    $ynode->{additionalProperties} = tweak_hash($ynode->{additionalProperties});
+  for my $key (qw/additionalProperties propertyNames/) {
+    if (exists $schema->{$key}) {
+      $ynode->{$key} = tweak_hash($ynode->{$key});
+    }
   }
   if (exists $schema->{items}) {
     $ynode->{items} = tweak_hash($ynode->{items});
   }
-  if (exists $schema->{allOf}) {
-    my $last_num = -1 + @{$schema->{allOf}};
-    for my $n (0 .. $last_num) {
-      $ynode->{allOf}[$n] = tweak_hash($ynode->{allOf}[$n]);
-    }
-  }
-  if (exists $schema->{oneOf}) {
-    my $last_num = -1 + @{$schema->{oneOf}};
-    for my $n (0 .. $last_num) {
-      $ynode->{oneOf}[$n] = tweak_hash($ynode->{oneOf}[$n]);
+  for my $key (qw/allOf oneOf/) {
+    if (exists $schema->{$key}) {
+      my $last_num = -1 + @{$schema->{$key}};
+      for my $n (0 .. $last_num) {
+        $ynode->{$key}[$n] = tweak_hash($ynode->{$key}[$n]);
+      }
     }
   }
   return $ynode;
