@@ -202,43 +202,45 @@ sub find_ref_rec($schema, $dir, $fname, $level, $local_top) {
       find_ref_rec( $schema->{properties}{$key}, $dir, $fname, $level, 0);
     }
   }
-  if ($schema->{additionalProperties}) {
-    if ($schema->{additionalProperties}{'$ref'}) {
-      my $ref      = $schema->{additionalProperties}{'$ref'};
-      my $full_ref = '';
-      my $path     = '';
-      my $hier     = '';
-      if (index($ref, '#') >= 0) {
-        ($path, $hier) = $ref =~ / ^ (.*) (\#.*) $/x;
-      }
-      else {
-        $path = $ref;
-        $hier = '#/';
-      }
-      if ($path eq '') {
-        $path = catfile($dir, $fname);
-      }
-      else {
-        my $sub_dir = '';
-        ($sub_dir, $fname) = "./$path" =~ / ^ (.*) \/ (.*) $ /x;
-        $dir  = catdir( $dir, $sub_dir);
-        $path = catfile($dir, $fname);
-      }
-      $full_ref = "$path$hier";
+  for my $key (qw/additionalProperties propertyNames/) {
+    if ($schema->{$key}) {
+      if ($schema->{$key}{'$ref'}) {
+        my $ref      = $schema->{$key}{'$ref'};
+        my $full_ref = '';
+        my $path     = '';
+        my $hier     = '';
+        if (index($ref, '#') >= 0) {
+          ($path, $hier) = $ref =~ / ^ (.*) (\#.*) $/x;
+        }
+        else {
+          $path = $ref;
+          $hier = '#/';
+        }
+        if ($path eq '') {
+          $path = catfile($dir, $fname);
+        }
+        else {
+          my $sub_dir = '';
+          ($sub_dir, $fname) = "./$path" =~ / ^ (.*) \/ (.*) $ /x;
+          $dir  = catdir( $dir, $sub_dir);
+          $path = catfile($dir, $fname);
+        }
+        $full_ref = "$path$hier";
 
-      my $new_level = $level + 1;
-      my $entry = { ref      => $ref
-                  , dir      => $dir
-                  , fname    => $fname
-                  , path     => $path
-                  , full_ref => $full_ref
-                  , level    => $new_level
-      };
-      if ($list_schema) {
-        say "Dynamic inclusion of additional properties (dir $dir, fname $fname, ref $full_ref)";
+        my $new_level = $level + 1;
+        my $entry = { ref      => $ref
+                    , dir      => $dir
+                    , fname    => $fname
+                    , path     => $path
+                    , full_ref => $full_ref
+                    , level    => $new_level
+        };
+        if ($list_schema) {
+          say "Dynamic inclusion of $key (dir $dir, fname $fname, ref $full_ref)";
+        }
+        push @dyn_sch_to_do, $entry;
+        $schema->{$key}{dyn_sch} = $full_ref;
       }
-      push @dyn_sch_to_do, $entry;
-      $schema->{additionalProperties}{dyn_sch} = $full_ref;
     }
   }
   if ($schema->{items}) {
@@ -327,8 +329,11 @@ sub find_ref_rec($schema, $dir, $fname, $level, $local_top) {
       find_ref_rec($entry, catdir($dir, $subpath), $fname, $new_level, 0);
     }
   }
-  if ($subschema->{items}) {
-    find_ref_rec( $subschema->{items}, catdir($dir, $subpath), $fname, $new_level, 0);
+
+  for my $key (qw/items additionalProperties propertyNames/) {
+    if ($subschema->{$key}) {
+      find_ref_rec( $subschema->{$key}, catdir($dir, $subpath), $fname, $new_level, 0);
+    }
   }
   if ($subschema->{type}) {
     $schema->{type} = $subschema->{type};
@@ -342,13 +347,19 @@ sub find_ref_rec($schema, $dir, $fname, $level, $local_top) {
   if ($subschema->{oneOf}) {
     $schema->{oneOf} = $subschema->{oneOf};
   }
+  for my $attr (qw/enum/) {
+    if ($subschema->{$attr}) {
+      $schema->{$attr} = $subschema->{$attr};
+    }
+  }
   for my $prop_name (keys %{$subschema->{properties}}) {
     #say "adding $prop_name";
     $schema->{properties}{$prop_name} = $subschema->{properties}{$prop_name};
   }
-  for my $attr_name (keys %{$subschema->{additionalProperties}}) {
-    #say "adding $prop_name";
-    $schema->{additionalProperties}{$attr_name} = $subschema->{additionalProperties}{$attr_name};
+  for my $key (qw/additionalProperties propertyNames/) {
+    for my $attr_name (keys %{$subschema->{$key}}) {
+      $schema->{$key}{$attr_name} = $subschema->{$key}{$attr_name};
+    }
   }
   for my $pattern (keys %{$subschema->{patternProperties}}) {
     #say "adding $pattern";
@@ -359,10 +370,6 @@ sub find_ref_rec($schema, $dir, $fname, $level, $local_top) {
 # Ensure that the "type" property is dumped first
 sub tweak_hash($schema) {
   my $ynode = YAML::Node->new($schema);
-  if (ref($schema) ne 'HASH') {
-      say "problème de référence";
-      return;
-  }
   my @keys = keys %$schema;
   if (exists $schema->{type}) {
     ynode($ynode)->keys( [ 'type', sort grep { $_ ne 'type' } @keys ] );
