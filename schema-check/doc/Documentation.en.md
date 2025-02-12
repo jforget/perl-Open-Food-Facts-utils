@@ -1763,6 +1763,24 @@ example:
         - type: "string"
 ```
 
+Although there are no such examples  in the OFF database, we can think
+of a  further use of  `oneOf` attributes, allowing the  choice between
+two  object  types  with  different  properties.  For  example,  in  a
+mathematical context, we could describe complex numbers as:
+
+```
+  complex:
+    oneOf:
+      - type: object
+        properties:
+          Re: number
+          Im: number
+      - type: object
+        properties:
+          modulus: number
+          arg: number
+```
+
 Attributes `propertyNames` and `additionalProperties`
 -----------------------------------------------------
 

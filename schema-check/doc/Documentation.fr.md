@@ -1772,6 +1772,25 @@ comme le tableau `packagings` décrit dans
         - type: "string"
 ```
 
+Pour aller  plus loin, pourrait-on  envisager que le  schéma définisse
+deux objets de  structure différente ? En quittant la  base de données
+OFF  pour  aller vers  les  mathématiques,  on pourrait  imaginer  une
+description des nombres complexes  admettant aussi bien la description
+cartésienne que la description polaire :
+
+```
+  complexe:
+    oneOf:
+      - type: object
+        properties:
+          Re: number
+          Im: number
+      - type: object
+        properties:
+          module: number
+          arg: number
+```
+
 Attributs `propertyNames` et `additionalProperties`
 ---------------------------------------------------
 
