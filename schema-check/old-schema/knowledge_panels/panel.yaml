@@ -40,7 +40,7 @@ properties:
     enum:
       - small
     description: |
-      size is either empty (normal display) 
+      size is either empty (normal display)
       or small to indicate a panel that should have a smaller font size
     example: small
   topics:

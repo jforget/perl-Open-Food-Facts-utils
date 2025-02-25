@@ -6,8 +6,8 @@ properties:
   sizes:
     type: object
     description: |
-      The available image sizes for the product (both reduced and full). 
-      The reduced images are the ones with numbers as the key( 100, 200 etc) 
+      The available image sizes for the product (both reduced and full).
+      The reduced images are the ones with numbers as the key( 100, 200 etc)
       while the full images have `full` as the key.
     properties:
       full:

@@ -321,7 +321,7 @@ properties:
     type: integer
   nutrition_score_warning_fruits_vegetables_nuts_estimate_from_ingredients:
     type: integer
-  nutrition_score_warning_fruits_vegetables_nuts_estimate_from_ingredients_value: 
+  nutrition_score_warning_fruits_vegetables_nuts_estimate_from_ingredients_value:
     type: integer
   nutrition_score_warning_no_fiber:
     type: integer
