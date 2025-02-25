@@ -428,7 +428,7 @@ sub check_hash($data, $stack, $schema) {
     say "invalid data, should be a hash ref ($stack)";
     return;
   }
-  unless ($schema->{patternProperties} or $schema->{properties}) {
+  unless ($schema->{patternProperties} or $schema->{properties} or $schema->{allOf}) {
     say "Invalid schema, no properties defined for $stack";
     return;
   }
@@ -436,8 +436,17 @@ sub check_hash($data, $stack, $schema) {
     #say "checking $key";
     my $found_in_prop = 0;
     my $found_in_patt = 0;
+    my $prop_schema;
     if ($schema->{properties}{$key}) {
       $found_in_prop = 1;
+      $prop_schema   = $schema->{properties}{$key};
+    }
+    elsif ($schema->{allOf}) {
+      $prop_schema   = check_all_of($key, $schema->{allOf});
+      if ($prop_schema) {
+        $found_in_prop = 1;
+      }
+      #say YAML::Dump($prop_schema);
     }
     else {
       for my $patt (keys %{$schema->{patternProperties}}) {
@@ -449,16 +458,30 @@ sub check_hash($data, $stack, $schema) {
       }
     }
     if ($found_in_patt == 1) {
-      # All pattern properties are strings, no need to check more
+      # All pattern properties are scalars, no need to check more
       next;
     }
     if ($found_in_prop == 0) {
       say "invalid property $key ($stack)";
       next;
     }
-    if ($schema->{properties}{$key}{dyn_sch}) {
-      my $dyn_sch = $schema->{properties}{$key}{dyn_sch};
+    if ($prop_schema->{dyn_sch}) {
+      my $dyn_sch = $prop_schema->{dyn_sch};
       my $dynamic_schema = $dyn_schema{$dyn_sch}{schema};
+      unless ($dynamic_schema) {
+        say "Invalid schema, dynamic sub-schema $dyn_sch unknown for $stack";
+        next;
+      }
+      if (   not exists $dynamic_schema->{type}
+         and not exists $dynamic_schema->{allOf}) {
+        say "Invalid dynamic sub-schema $dyn_sch, no item type for $stack";
+        next;
+      }
+      if ($dynamic_schema->{allOf}) {
+        #say YAML::Dump($dynamic_schema);
+        check_hash($data->{$key}, "$stack $key", $dynamic_schema);
+        next;
+      }
       if ($dynamic_schema->{type} eq 'object') {
         check_hash($data->{$key}, "$stack $key", $dynamic_schema);
         next;
@@ -467,22 +490,53 @@ sub check_hash($data, $stack, $schema) {
         check_array($data->{$key}, "$stack $key", $dynamic_schema);
         next;
       }
-      if (not exists $dynamic_schema->{type}) {
-        say "Invalid dynamic sub-schema $dyn_sch, no item type for $stack";
-      }
       next;
     }
-    if (not exists $schema->{properties}{$key}{type}) {
+    if ($prop_schema->{allOf}) {
+      #say YAML::Dump($prop_schema);
+      check_hash($data->{$key}, "$stack $key", $prop_schema);
+      next;
+    }
+    if (not exists $prop_schema->{type}) {
+      #say YAML::Dump($prop_schema);
       say "Invalid schema, no type defined for property $key ($stack)";
       next;
     }
-    if ($schema->{properties}{$key}{type} eq 'object') {
-      check_hash($data->{$key}, "$stack $key", $schema->{properties}{$key});
+    if ($prop_schema->{type} eq 'object') {
+      check_hash($data->{$key}, "$stack $key", $prop_schema);
     }
-    if ($schema->{properties}{$key}{type} eq 'array') {
-      check_array($data->{$key}, "$stack $key", $schema->{properties}{$key});
+    if ($prop_schema->{type} eq 'array') {
+      check_array($data->{$key}, "$stack $key", $prop_schema);
     }
 
+  }
+}
+
+sub check_all_of($key, $schema) {
+  for my $entry (@$schema) {
+    if ($entry->{properties}{$key}) {
+      return $entry->{properties}{$key};
+    }
+    if ($entry->{dyn_sch}) {
+      my $dyn = $dyn_schema{$entry->{dyn_sch}}{schema};
+      if ($dyn->{properties}{$key}) {
+        return $dyn->{properties}{$key};
+      }
+      elsif ($dyn->{allOf}) {
+        my $dynrec = check_all_of($key, $dyn->{allOf});
+        if ($dynrec) {
+          return $dynrec;
+        }
+      }
+    }
+  }
+  for my $entry (@$schema) {
+    if ($entry->{allOf}) {
+      my $prop_schema = check_all_of($key, $entry->{allOf});
+      if ($prop_schema) {
+        return $prop_schema;
+      }
+    }
   }
 }
 

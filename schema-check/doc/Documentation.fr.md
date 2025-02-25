@@ -2652,6 +2652,15 @@ est plus appropriée.  Il faut donc tester avec
 en balisant avec le début et la fin de la chaîne de caractères et on a
 bien le `language_code` capturé égal à `en`.
 
+### Balises `allOf`
+
+Dans les éléments  d'un tableau `allOf` ne faisant pas  référence à un
+sous-schéma dynamique,  on trouve  toujours un  attribut `properties`,
+mais pas toujours  un attribut `type`. Le programme  passe outre cette
+absence  du  type et  il  appelle  la  fonction de  vérification  d'un
+hachage, comme si  l'attribut `type` était présent et  avait la valeur
+`object`.
+
 ### JSON ou JSON5 ? Quel module Perl ?
 
 Ainsi qu'il a été écrit dans le

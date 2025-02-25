@@ -2412,6 +2412,14 @@ Comments After Implementation
 
 (to do)
 
+### Attributes `allOf`
+
+When using `allOf` arrays, all elements that do not point to a dynamic
+sub-schema contain a  `properties` attribute, but some of  them do not
+contain a  `type` attribute.  The program  disregard this  problem and
+calls the `check_hash`  function, as if the `type`  attribute had been
+present with value `object`.
+
 ### JSON or JSON5? Which Perl module?
 
 (to do)
