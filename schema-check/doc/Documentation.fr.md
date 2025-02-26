@@ -2002,6 +2002,23 @@ d'autres. Donc oui, il faut accepter toutes les valeurs possibles.
 }
 ```
 
+Le fichier `product_images.yaml` pose un problème. Il contient
+
+```
+    additionalProperties:
+      $ref: "./image.yaml#/components/schemas/Image"
+    propertyNames:
+      type: integer
+
+    patternProperties:
+      '(?<imgid>\d+)':
+        type: string
+```
+
+Si l'on  trouve une  propriété constituée  d'un simple  nombre entier,
+relève-t-elle de la déclaration `additionalProperties / propertyNames`
+ou de la déclaration `patternProperties` ?
+
 Alors   que   les   attributs  `properties`   et   `patternProperties`
 chapeautent des  paires clé-valeur  où les clés  sont des  clés métier
 (c'est-à-dire   des  propriétés),   l'attribut  `additionalProperties`
@@ -2547,9 +2564,10 @@ arrières :
                   w: *23
 ```
 
-L'absence de la  clé technique `type` pour les clés  métier `h` et `w`
-me  gêne  un  peu.  J'ai  donc désactivé  l'utilisation  du  cache  et
-maintenant, on obtient bien :
+L'absence de la clé technique `type` pour les clés métier `h` et `w` à
+l'intérieur  des  propriétés englobantes  `100`,  `200`,  `400` et  le
+deuxième `full` me  gêne un peu. J'ai donc  désactivé l'utilisation du
+cache et maintenant, on obtient bien :
 
 ```
             properties:
@@ -2636,8 +2654,8 @@ et l'expression régulière
 ingredients_text_(?<language_code>\w\w)
 ```
 
-et  en capturant  le `language_code`  à `wi`,  alors que  l'expression
-régulière
+et en capturant  le `language_code` à `wi` et en  ignorant le reliquat
+`th_allergens_en`, alors que l'expression régulière
 
 ```
 ingredients_text_with_allergens_(?<language_code>\w\w)

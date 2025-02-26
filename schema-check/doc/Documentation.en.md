@@ -1990,6 +1990,23 @@ imagine other keys. So yes, we must accept any values.
 }
 ```
 
+There is a problem in file `product_images.yaml`. This file contains:
+
+```
+    additionalProperties:
+      $ref: "./image.yaml#/components/schemas/Image"
+    propertyNames:
+      type: integer
+
+    patternProperties:
+      '(?<imgid>\d+)':
+        type: string
+```
+
+If the  JSON document contains  a property  with an integer  value, is
+this property  defined by  the `additionalProperties  / propertyNames`
+couple or by the `patternProperties` declaration?
+
 While  the attributes  `properties` and  `patternProperties` point  to
 key-value pairs where the keys are "business" keys, or properties, the
 attribute `additionalProperties` points to  key-value pairs where both
@@ -2406,11 +2423,221 @@ Comments After Implementation
 
 ### Function `find_ref_rec`
 
-(to do)
+The purpose of the `find_ref_rec` function is the recursive search for
+`$ref` attributes. At first, the recursive call was coded this way:
+
+```
+  for my $key (keys %{$schema->{properties}}) {
+    find_ref_rec( $schema->{properties}{$key}, $dir );
+  }
+```
+
+With these lines, the in-memory  schema would include empty hashtables
+for each property with a type `string`, `integer` or `number` and even
+for each property with a type `array`. For example:
+
+```
+properties:
+  abbreviated_product_name:
+    description: Abbreviated name in requested language
+    properties: {}
+    type: string
+  added_countries_tags:
+    items:
+      type: object
+    properties: {}
+    type: array
+  additives_n:
+    description: "Number of food additives.\n"
+    properties: {}
+    type: integer
+```
+
+The  reason is  that even  if the  loop has  no iterations,  it has  a
+side-effect,   autovivifying   the   hash   table   to   which   value
+`$schema->{properties}`  refers. To  prevent this  autovivification, I
+had to write:
+
+```
+  if ($schema->{properties}) {
+    for my $key (keys %{$schema->{properties}}) {
+      find_ref_rec( $schema->{properties}{$key}, $dir );
+    }
+  }
+```
+
+Another point is  that function `find_ref_rec` needs  a directory name
+parameter. If you read the schema files, you find that:
+
+* `product.yaml` includes `./product_knowledge_panels.yaml`,
+
+* `product_knowledge_panels.yaml` includes `./knowledge_panels/panels.yaml`
+
+* `panels.yaml` includes `./panel.yaml`
+
+In  the last  case,  the  referred-to file  must  be  within the  same
+directory   as    the   referring   file,   that    is   sub-directory
+`knowledge_panels`  of  directory   `$dir_sch`,  not  directly  within
+`$dir_sch`.
+
+A last point is the  possibility of caching and retrieving sub-schemas
+called with `$ref`. An early version included the following code:
+
+```
+    if ($ref_cache{$schema->{'$ref'}}) {
+      $subschema = $ref_cache{$schema->{'$ref'}};
+    }
+    else {
+```
+
+Next,   when  the   schema   was  printed   to   stdout,  there   were
+backreferences:
+
+```
+    [...]
+            properties:
+              full:
+                $ref: ./image_size.yaml
+                description: |
+                  properties of fullsize image
+                  **TODO** explain how to compute name
+                properties:
+                  h: &22
+                    description: "The height of the reduced/full image in pixels.\n"
+                    example: 400
+                    type: integer
+                  w: &23
+                    description: "The width of the reduced/full image in pixels.\n"
+                    example: 255
+                    type: integer
+    [...]
+            properties:
+              100:
+                $ref: ./image_size.yaml
+                properties:
+                  h: *22
+                  w: *23
+              200:
+                $ref: ./image_size.yaml
+                properties:
+                  h: *22
+                  w: *23
+              400:
+                $ref: ./image_size.yaml
+                properties:
+                  h: *22
+                  w: *23
+              full:
+                $ref: ./image_size.yaml
+                properties:
+                  h: *22
+                  w: *23
+```
+
+The lack of attribute `type` for  the business keys `h` and `w` within
+major properties `100`, `200`, `400` and (second) `full` bothers me. I
+deactivated the cache and now, we have:
+
+```
+            properties:
+              full:
+                $ref: ./image_size.yaml
+                description: |
+                  properties of fullsize image
+                  **TODO** explain how to compute name
+                properties:
+                  h:
+                    description: "The height of the reduced/full image in pixels.\n"
+                    example: 400
+                    type: integer
+                  w:
+                    description: "The width of the reduced/full image in pixels.\n"
+                    example: 255
+                    type: integer
+   [...]
+            properties:
+              100:
+                $ref: ./image_size.yaml
+                properties:
+                  h:
+                    description: "The height of the reduced/full image in pixels.\n"
+                    example: 400
+                    type: integer
+                  w:
+                    description: "The width of the reduced/full image in pixels.\n"
+                    example: 255
+                    type: integer
+              200:
+                $ref: ./image_size.yaml
+                properties:
+                  h:
+                    description: "The height of the reduced/full image in pixels.\n"
+                    example: 400
+                    type: integer
+                  w:
+                    description: "The width of the reduced/full image in pixels.\n"
+                    example: 255
+                    type: integer
+              400:
+                $ref: ./image_size.yaml
+                properties:
+                  h:
+                    description: "The height of the reduced/full image in pixels.\n"
+                    example: 400
+                    type: integer
+                  w:
+                    description: "The width of the reduced/full image in pixels.\n"
+                    example: 255
+                    type: integer
+              full:
+                $ref: ./image_size.yaml
+                properties:
+                  h:
+                    description: "The height of the reduced/full image in pixels.\n"
+                    example: 400
+                    type: integer
+                  w:
+                    description: "The width of the reduced/full image in pixels.\n"
+                    example: 255
+                    type: integer
+```
 
 ### Function `check_hash`
 
-(to do)
+When checking a data with a regular expression from `patternProperties`,
+the wrong way to check the value is:
+
+```
+        if ($key =~ $patt) {
+```
+
+because we could have a match between string
+
+```
+ingredients_text_with_allergens_en
+```
+
+and regular expression
+
+```
+ingredients_text_(?<language_code>\w\w)
+```
+
+capturing  a `language_code`  as `"wi"`  and discarding  the remainder
+`th_allergens_en`, while the regular expression
+
+```
+ingredients_text_with_allergens_(?<language_code>\w\w)
+```
+
+fits better. Therefore, the match should be coded as
+
+```
+        if ($key =~ /^ $patt $/x) {
+```
+
+with begin and end anchors, so  we obtain the correct value `"en"` for
+the `language_code` capture.
 
 ### Attributes `allOf`
 
@@ -2422,7 +2649,66 @@ present with value `object`.
 
 ### JSON or JSON5? Which Perl module?
 
-(to do)
+As is written in the paragraph about
+[finding test data](#wuser-content-here-to-find-test-data)
+the CLI program  `mongosh` formats the JSON data with  some rules from
+JSON5:  no  quotes   for  keys  in  key-value   pairs,  single  quotes
+(sometimes) for values  in key-value pairs. Should we get  rid of JSON
+version 4 and adopt
+[JSON5](https://json5.org/)?
+
+I installed and tried the
+[Perl module JSON5](https://metacpan.org/pod/JSON5).
+The result is many error messages.
+
+```
+Deep recursion on subroutine "JSON5::Parser::_parse_object_kv" at /home/jf/perl5/lib/perl5/JSON5/Parser.pm line 189.
+```
+
+When  reading the  Perl  code for  the  module and  when  doing a  few
+additional tests,  I found that  this happens  when a JSON  object has
+about a  hundred key-value pairs. I  did not even check  with embedded
+data. I submitted a
+[bug report](https://github.com/karupanerura/p5-JSON5/issues/2).
+While waiting for `JSON5.pm` to be fixed, I have to find another solution.
+
+Among the Perl modules parsing JSON data, I tried
+[`JSON::PP`](https://metacpan.org/pod/JSON::PP).
+
+The first reason is that installing a pure-Perl module is simpler than
+installing an XS module and that I have no strict performance issues.
+
+When I had  to deal with extractions from `mongosh`,  with their JSON5
+idiosyncracises, I read again the `JSON::PP` documentation and I found
+[option `allow_barekey`](https://metacpan.org/pod/JSON::PP#allow_barekey)
+which allows keys without quotes, and also
+[option `allow_singlequote`](https://metacpan.org/pod/JSON::PP#allow_singlequote)
+which deals with  values delimited with single quotes.  Yet, even with
+both  options, module  `JSON::PP` would  trigger an  error on  strings
+including double quotes, such as:
+
+```
+    ingredients_text_with_allergens: 'Cheddar cheese (<span class="allergen">milk</span>), potato starch.',
+                                     .............................*........*..............................
+```
+
+I submitted an
+[issue](https://github.com/makamaka/JSON-PP/issues/90).
+The module author rejected it and explained me that I could use
+[option `loose`](https://metacpan.org/pod/JSON::PP#loose)
+or, preferably, a  real JSON5 parser. The reason he  gave for avoiding
+`loose`  is  that  it  could  accept  invalid  JSON  data  instead  of
+triggering a syntax error. For the reasons shown above, and because my
+purpose is not checking JSON syntax, I used option `loose` rather than
+module `JSON5`.
+
+If you allow me some ranting, I  will remind that the purpose of JSON5
+is to increase ergonomy for humans  typing JSON documents. This is the
+case  when installing  software that  relies on  a JSON  configuration
+file. On the  other hand, when a program outputs  JSON data, it should
+use the  stricter JSON version (v4?).  Up to now, I  agree wholefully.
+But in this case, why does `mongosh` generate JSON5 instead of cleaner
+JSON V4?
 
 ### YAML or YAML::XS? Which Perl module?
 
