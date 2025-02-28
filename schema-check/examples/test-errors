@@ -306,6 +306,7 @@
 				"transportation_values" : {
 					"no" : 0,
 					"ad" : 0,
+                                        "err" : "deliberate error",
 					"se" : 0
 				},
 				"transportation_scores" : {
@@ -825,4 +826,12 @@
 	"last_editor" : "kiliweb",
 	"states" : "en:to-be-completed, en:nutrition-facts-completed, en:ingredients-completed, en:expiration-date-to-be-completed, en:packaging-code-to-be-completed, en:characteristics-to-be-completed, en:origins-to-be-completed, en:categories-to-be-completed, en:brands-completed, en:packaging-completed, en:quantity-completed, en:product-name-completed, en:photos-to-be-validated, en:packaging-photo-to-be-selected, en:nutrition-photo-selected, en:ingredients-photo-to-be-selected, en:front-photo-selected, en:photos-uploaded",
 	"ingredients_with_specified_percent_n" : 0
+}
+
+{
+        "_id" : "00187252",
+        "nova_groups_markers" : {
+                "3" : "deliberate error",
+                "4" : { "error": "deliberate" }
+        }
 }

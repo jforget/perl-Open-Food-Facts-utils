@@ -428,7 +428,7 @@ sub check_hash($data, $stack, $schema) {
     say "invalid data, should be a hash ref ($stack)";
     return;
   }
-  unless ($schema->{patternProperties} or $schema->{properties} or $schema->{allOf}) {
+  unless ($schema->{patternProperties} or $schema->{properties} or $schema->{allOf} or $schema->{additionalProperties}) {
     say "Invalid schema, no properties defined for $stack";
     return;
   }
@@ -436,6 +436,7 @@ sub check_hash($data, $stack, $schema) {
     #say "checking $key";
     my $found_in_prop = 0;
     my $found_in_patt = 0;
+    my $found_in_addp = 0;
     my $prop_schema;
     if ($schema->{properties}{$key}) {
       $found_in_prop = 1;
@@ -457,11 +458,56 @@ sub check_hash($data, $stack, $schema) {
         }
       }
     }
+    if ($found_in_prop == 0 && $found_in_patt == 0) {
+      if ($schema->{propertyNames}) {
+        my @names;
+        if ($schema->{propertyNames}{dyn_sch}) {
+          my $dyn = $schema->{propertyNames}{dyn_sch};
+          my $dyn_sch =  $dyn_schema{$dyn}{schema};
+          if ($dyn_sch->{enum}) {
+            @names = @{$dyn_sch->{enum}};
+          }
+        }
+        elsif ($schema->{propertyNames}{enum}) {
+          @names = @{$schema->{propertyNames}{enum}};
+        }
+        if (@names) {
+          # say @names;
+          for my $name (@names) {
+            if ($key eq $name) {
+              $found_in_addp = 1;
+              $prop_schema   = $schema->{additionalProperties};
+              last;
+            }
+          }
+        }
+        elsif ($schema->{propertyNames}{type} eq 'integer') {
+          # for property 'top/images', the attribute 'propertyNames' has an inner attribute 'type: integer'
+          # and no 'enum', so we should check that the value is compatible with an integer
+          if ($key =~ /^\d+$/) {
+            $found_in_addp = 1;
+            $prop_schema   = $schema->{additionalProperties};
+          }
+        }
+        else {
+          # in case the 'propertyNames' attribute has an inner attribute 'type: string' or 'type: number' (meaning float)
+          # or even no inner 'type' attribute: we accept the value without checking it.
+          # no example yet in the OFF schema
+          $found_in_addp = 1;
+          $prop_schema   = $schema->{additionalProperties};
+        }
+      }
+      elsif ($schema->{additionalProperties}) {
+        # for property 'top/category_properties', no attribute 'propertyNames' is defined, so any value is fair game
+        $found_in_addp = 1;
+        $prop_schema   = $schema->{additionalProperties};
+      }
+    }
     if ($found_in_patt == 1) {
       # All pattern properties are scalars, no need to check more
       next;
     }
-    if ($found_in_prop == 0) {
+    if ($found_in_prop == 0 && $found_in_addp == 0) {
       say "invalid property $key ($stack)";
       next;
     }
@@ -564,7 +610,9 @@ sub check_array($data, $stack, $schema) {
       }
       return;
     }
-    say "Invalid dynamic sub-schema $dyn_sch, no item type for $stack";
+    unless ($dynamic_schema->{type}) {
+      say "Invalid dynamic sub-schema $dyn_sch, no item type for $stack";
+    }
     return;
   }
   if (not exists $schema->{items}{type}) {
