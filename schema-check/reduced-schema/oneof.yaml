@@ -1,0 +1,62 @@
+type: object
+properties:
+  _id:
+    type: string
+  str_or_int:
+    oneOf:
+      - type: string
+      - type: integer
+  str_or_arr:
+    oneOf:
+      - type: string
+      - type: array
+        items:
+          type: string
+  str_or_obj:
+    oneOf:
+      - type: string
+      - type: object
+  obj_or_arr:
+    oneOf:
+      - type: object
+      - type: array
+        items:
+          type: string
+  l_str_or_obj:
+    type: array
+    items:
+      oneOf:
+        - type: string
+        - type: object
+          properties:
+            pr1:
+              type: string
+            pr2:
+              type: string
+  l_arr_or_obj:
+    type: array
+    items:
+      oneOf:
+        - type: array
+          items:
+            type: string
+        - type: object
+          properties:
+            pr1:
+              type: string
+            pr2:
+              type: string
+  l_arr_or_str:
+    type: array
+    items:
+      oneOf:
+        - type: array
+          items:
+            type: string
+        - type: string
+  l_str_or_int:
+    type: array
+    items:
+      oneOf:
+        - type: integer
+        - type: string

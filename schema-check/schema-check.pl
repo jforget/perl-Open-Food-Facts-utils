@@ -543,16 +543,62 @@ sub check_hash($data, $stack, $schema) {
       check_hash($data->{$key}, "$stack $key", $prop_schema);
       next;
     }
-    if (not exists $prop_schema->{type}) {
+    if (exists $prop_schema->{oneOf}) {
+      if (ref($data->{$key}) eq 'HASH') {
+        my $obj_schema = undef;
+        for my $entry (@{$prop_schema->{oneOf}}) {
+          if ($entry->{type} eq 'object') {
+            $obj_schema = $entry;
+            last;
+          }
+        }
+        if ($obj_schema) {
+          check_hash($data->{$key}, "$stack $key", $obj_schema);
+        }
+        else {
+          say "invalid data, should not be a hash ref ($stack $key)";
+        }
+      }
+      elsif (ref($data->{$key}) eq 'ARRAY') {
+        my $arr_schema = undef;
+        for my $entry (@{$prop_schema->{oneOf}}) {
+          if ($entry->{type} eq 'array') {
+            $arr_schema = $entry;
+            last;
+          }
+        }
+        if ($arr_schema) {
+          check_array($data->{$key}, "$stack $key", $arr_schema);
+        }
+        else {
+          say "invalid data, should not be a array ref ($stack $key)";
+        }
+      }
+      else {
+        my $scl_schema = undef;
+        for my $entry (@{$prop_schema->{oneOf}}) {
+          if ($entry->{type} ne 'array' and $entry->{type} ne 'object') {
+            $scl_schema = $entry;
+            last;
+          }
+        }
+        unless ($scl_schema) {
+          say "invalid data, should not be a scalar ($stack $key)";
+        }
+      }
+    }
+    elsif (not exists $prop_schema->{type}) {
       #say YAML::Dump($prop_schema);
       say "Invalid schema, no type defined for property $key ($stack)";
       next;
     }
-    if ($prop_schema->{type} eq 'object') {
-      check_hash($data->{$key}, "$stack $key", $prop_schema);
-    }
-    if ($prop_schema->{type} eq 'array') {
-      check_array($data->{$key}, "$stack $key", $prop_schema);
+    else {
+      if ($prop_schema->{type} eq 'object') {
+        check_hash($data->{$key}, "$stack $key", $prop_schema);
+      }
+      if ($prop_schema->{type} eq 'array') {
+        check_array($data->{$key}, "$stack $key", $prop_schema);
+      }
     }
 
   }
@@ -615,7 +661,49 @@ sub check_array($data, $stack, $schema) {
     }
     return;
   }
-  if (not exists $schema->{items}{type}) {
+  if (exists $schema->{items}{oneOf}) {
+    my $obj_allowed = 0;
+    my $arr_allowed = 0;
+    my $scl_allowed = 0;
+    my $sch_obj = undef;
+    my $sch_arr = undef;
+    for my $entry (@{$schema->{items}{oneOf}}) {
+      if ($entry->{type} eq 'object') {
+        $obj_allowed = 1;
+        $sch_obj     = $entry;
+      }
+      if ($entry->{type} eq 'array') {
+        $arr_allowed = 1;
+        $sch_arr     = $entry;
+      }
+      if (    $entry->{type} eq 'string'
+           or $entry->{type} eq 'integer'
+           or $entry->{type} eq 'number'
+           or $entry->{type} eq 'boolean') {
+        $scl_allowed = 1;
+      }
+    }
+    my $n = 0;
+    for my $datum (@$data) {
+      if ($obj_allowed == 0 && ref($datum) eq 'HASH') {
+        say "invalid data, should not be a hash ref ($stack [$n])";
+      }
+      elsif (ref($datum) eq 'HASH') {
+        check_hash($datum, "$stack [$n]", $sch_obj);
+      }
+      elsif ($arr_allowed == 0 && ref($datum) eq 'ARRAY') {
+        say "invalid data, should not be a array ref ($stack [$n])";
+      }
+      elsif (ref($datum) eq 'ARRAY') {
+        check_array($datum, "$stack [$n]", $sch_arr);
+      }
+      elsif ($scl_allowed == 0) {
+        say "invalid data, should not be a scalar ($stack [$n])";
+      }
+      $n++;
+    }
+  }
+  elsif (not exists $schema->{items}{type}) {
     say "Invalid schema, no item type for $stack";
   }
   elsif ($schema->{items}{type} eq 'object') {

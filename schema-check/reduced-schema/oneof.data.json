@@ -1,0 +1,37 @@
+{
+    _id: 'ok1'
+  , str_or_obj: 'ok2'
+  , str_or_arr: 'ok3'
+  , obj_or_arr: [ 'ok3', 1, 'ok4', 2, 'ok5' ]
+  , l_arr_or_obj: [ [ 'ok3', 'ok4'], { pr1: 'ok4', pr2: 'ok5' } ]
+  , l_arr_or_str: [ [ 'ok3', 'ok4'], 'ok4', 'ok5'  ]
+  , l_str_or_int: [ 'ok3', 1, 'ok4', 2, 'ok5' ]
+  , l_str_or_obj: [ 'ok3', { pr1: 'ok4', pr2: 'ok5' } ]
+}
+{
+    _id: 'ok2'
+  , str_or_int: 18
+  , str_or_obj: 'ok2'
+  , str_or_arr: [ 'ok1', 'ok2', 'ok3' ]
+  , obj_or_arr: { 'pr1': 1, 'pr2': 2 }
+}
+{
+    _id: 'err1'
+  , str_or_arr: { 'err1': 'err2', 'err3': 'err4' }
+  , str_or_int: [ 'err2' ]
+  , str_or_obj: [ 'err2' ]
+  , obj_or_arr: 'err1'
+  , l_arr_or_obj: [ [ 'ok3', 'ok4'], { err1: 'err4', err2: 'err5' } ]
+  , l_str_or_obj:  { pr1: 'err4', pr2: 'err5' }
+}
+{
+    _id: 'err2'
+  , str_or_arr: 'err1'
+  , str_or_int: { 'err2' : 'err3' }
+  , str_or_obj: [ 'err2' ]
+  , obj_or_arr: 18
+  , l_arr_or_obj: [ 'ok3', 'ok4', { pr1: 'ok4', pr2: 'ok5' } ]
+  , l_arr_or_str: [ [ 'ok3', 'ok4'], { pr1: 'ok4', pr2: 'ok5' } ]
+  , l_str_or_int:  [ [1, 2], 3, [4, 5], { pr1: 'ok4', pr2: 'ok5' } ]
+  , l_str_or_obj:  [ [1, 2], 3, [4, 5], { err1: 2, err2: 4 } ]
+}

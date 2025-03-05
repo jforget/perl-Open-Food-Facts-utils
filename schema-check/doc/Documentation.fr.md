@@ -2679,6 +2679,73 @@ absence  du  type et  il  appelle  la  fonction de  vérification  d'un
 hachage, comme si  l'attribut `type` était présent et  avait la valeur
 `object`.
 
+### Balises `oneOf`
+
+Lorsqu'il traite  les balises `oneOf`,  le programme ne cherche  pas à
+faire  la fine  bouche, il  prend le  sous-schéma du  premier scalaire
+trouvé  dans la  liste `oneOf`,  ou  le sous-schéma  du premier  objet
+trouvé ou  le sous-schéma du  premier tableau  trouvé. Tant pis  si la
+donnée est  une chaîne  alors qu'elle est  définie comme  `integer` ou
+`number`, elle sera acceptée.
+
+De même, si la donnée a deux définitions d'objet, c'est la première
+qui sera utilisée. Par exemple, on teste
+
+```
+complexe: { module: 1, arg: 3.141592 }
+```
+
+avec le schéma
+
+```
+  complexe:
+    oneOf:
+      - type: object
+        properties:
+          Re: number
+          Im: number
+      - type: object
+        properties:
+          module: number
+          arg: number
+```
+
+Alors  le   programme  appelera   la  vérification  d'objet   avec  le
+sous-schéma du  nombre complexe  en _coordonnées cartésiennes_  et, du
+coup, il déclenchera une erreur sur la propriété `module` et une autre
+sur la propriété `arg`.
+
+Lorsque  l'on  teste les  éléments  d'un  tableau, c'est  la  dernière
+déclaration qui compte. Ainsi, si l'on teste
+
+```
+[ { Re: 0, Im: 1}, { module: 1, arg: 3.141592 }, { Re: -1, Im: 0 } ]
+```
+
+avec le schéma
+
+```
+  type: array
+  items:
+    oneOf:
+      - type: object
+        properties:
+          Re: number
+          Im: number
+      - type: object
+        properties:
+          module: number
+          arg: number
+```
+
+alors le nombre  complexe en coordonnées polaires  sera accepté tandis
+que  les deux  nombres  complexes en  coordonnées cartésiennes  seront
+refusés.
+
+Remarque :  le cas  « cartésien ou  polaire » n'apparaît  pas dans  le
+schéma Open  Food Facts.  En revanche,  le cas  « entier ou  réel » se
+produit, mais cela a peu d'importance.
+
 ### JSON ou JSON5 ? Quel module Perl ?
 
 Ainsi qu'il a été écrit dans le

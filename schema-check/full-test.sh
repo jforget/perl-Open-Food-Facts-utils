@@ -25,6 +25,7 @@ perl schema-check.pl -s reduced-schema/product_meta.yaml    reduced-schema/produ
 perl schema-check.pl -s reduced-schema/parallel-refs.yaml   reduced-schema/parallel-refs.data.json   > $dir_res/$base-parallel
 perl schema-check.pl -s reduced-schema/parallel-refs-1.yaml reduced-schema/parallel-refs.data.json   > $dir_res/$base-parallel-1
 perl schema-check.pl -s reduced-schema/parallel-refs-2.yaml reduced-schema/parallel-refs.data.json   > $dir_res/$base-parallel-2
+perl schema-check.pl -s reduced-schema/oneof.yaml           reduced-schema/oneof.data.json           > $dir_res/$base-oneof
 
 perl -n -e 'print if (/^Main schema/ .. eof)' < $dir_res/$base-listing > $dir_res/$base-list-short
 perl -n -e 'print if (/^Main schema/ .. eof)' < $dir_res/$base-dyn     > $dir_res/$base-dyn-short

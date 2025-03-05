@@ -15,7 +15,7 @@ echo $ref $base
 
 cd results
 
-for i in 324 basic dyn-short egg list-short meta multi other parallel parallel-1 parallel-2
+for i in 324 basic dyn-short egg list-short meta multi other parallel parallel-1 parallel-2 oneof
 do
     echo -------------
     echo $i

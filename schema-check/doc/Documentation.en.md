@@ -2647,6 +2647,71 @@ contain a  `type` attribute.  The program  disregard this  problem and
 calls the `check_hash`  function, as if the `type`  attribute had been
 present with value `object`.
 
+### Attributes `oneOf`
+
+When processing  an attribute  `oneOf`, the  program executes  a broad
+check, it uses the sub-schema of the first scalar in the `oneOf` list,
+or the sub-schema of the first object found in the `oneOf` list or the
+sub-schema of the first array found. If the data is a string while its
+sub-schema is `integer` or `number`, it will pass the check.
+
+In the same manner, if the `oneOf` definition of the data contains two
+object schemas, the first one will be used. For example, we check
+
+```
+complex: { module: 1, arg: 3.141592 }
+```
+
+with the schema
+
+```
+  complex:
+    oneOf:
+      - type: object
+        properties:
+          Re: number
+          Im: number
+      - type: object
+        properties:
+          module: number
+          arg: number
+```
+
+In  this case,  the  program will  recursively  call the  `check_hash`
+subroutine with the subschema with _cartesian_ properties and an error
+will be triggered first with property `module` then a second time with
+property `arg`.
+
+When we check the elements of an array, this time the _last_ subschema
+is used. For example if we check
+
+```
+[ { Re: 0, Im: 1}, { module: 1, arg: 3.141592 }, { Re: -1, Im: 0 } ]
+```
+
+with the schema
+
+```
+  type: array
+  items:
+    oneOf:
+      - type: object
+        properties:
+          Re: number
+          Im: number
+      - type: object
+        properties:
+          module: number
+          arg: number
+```
+
+Then the complex  number with polar values will pass  the check, while
+the two complex numbers with cartesian values will fail.
+
+Note: the  "cartesian or polar" case  does not occur in  the Open Food
+Facts schema. But  the "integer or number" occurs, but  it has limited
+effects.
+
 ### JSON or JSON5? Which Perl module?
 
 As is written in the paragraph about
