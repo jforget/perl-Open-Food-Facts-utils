@@ -2669,12 +2669,16 @@ with the schema
     oneOf:
       - type: object
         properties:
-          Re: number
-          Im: number
+          Re:
+            type: number
+          Im:
+            type: number
       - type: object
         properties:
-          module: number
-          arg: number
+          module:
+            type: number
+          arg:
+            type: number
 ```
 
 In  this case,  the  program will  recursively  call the  `check_hash`
@@ -2697,12 +2701,16 @@ with the schema
     oneOf:
       - type: object
         properties:
-          Re: number
-          Im: number
+          Re:
+            type: number
+          Im:
+            type: number
       - type: object
         properties:
-          module: number
-          arg: number
+          module:
+            type: number
+          arg:
+            type: number
 ```
 
 Then the complex  number with polar values will pass  the check, while

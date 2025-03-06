@@ -60,3 +60,37 @@ properties:
       oneOf:
         - type: integer
         - type: string
+  l_complex_1:
+    type: array
+    items:
+      oneOf:
+        - type: object
+          properties:
+            Re:
+              type: number
+            Im:
+              type: number
+        - type: object
+          properties:
+            module:
+              type: number
+            arg:
+              type: number
+  l_complex_2:
+    oneOf:
+      - type: array
+        items:
+          type: object
+          properties:
+            Re:
+              type: number
+            Im:
+              type: number
+      - type: array
+        items:
+          type: object
+          properties:
+            module:
+              type: number
+            arg:
+              type: number

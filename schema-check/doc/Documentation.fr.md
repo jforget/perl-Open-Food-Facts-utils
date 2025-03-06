@@ -2702,12 +2702,16 @@ avec le schéma
     oneOf:
       - type: object
         properties:
-          Re: number
-          Im: number
+          Re:
+            type: number
+          Im:
+            type: number
       - type: object
         properties:
-          module: number
-          arg: number
+          module:
+            type: number
+          arg:
+            type: number
 ```
 
 Alors  le   programme  appelera   la  vérification  d'objet   avec  le
@@ -2730,12 +2734,16 @@ avec le schéma
     oneOf:
       - type: object
         properties:
-          Re: number
-          Im: number
+          Re:
+            type: number
+          Im:
+            type: number
       - type: object
         properties:
-          module: number
-          arg: number
+          module:
+            type: number
+          arg:
+            type: number
 ```
 
 alors le nombre  complexe en coordonnées polaires  sera accepté tandis

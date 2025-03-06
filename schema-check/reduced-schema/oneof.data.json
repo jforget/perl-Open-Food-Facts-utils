@@ -7,6 +7,8 @@
   , l_arr_or_str: [ [ 'ok3', 'ok4'], 'ok4', 'ok5'  ]
   , l_str_or_int: [ 'ok3', 1, 'ok4', 2, 'ok5' ]
   , l_str_or_obj: [ 'ok3', { pr1: 'ok4', pr2: 'ok5' } ]
+  , l_complex_1: [ { module: 1, arg: 1.570741 }, { module: 2, arg: 0 } ]
+  , l_complex_2: [ { Re: 0, Im: 1}, { Re: 2, Im: 0} ]
 }
 {
     _id: 'ok2'
@@ -23,6 +25,8 @@
   , obj_or_arr: 'err1'
   , l_arr_or_obj: [ [ 'ok3', 'ok4'], { err1: 'err4', err2: 'err5' } ]
   , l_str_or_obj:  { pr1: 'err4', pr2: 'err5' }
+  , l_complex_1: [ { Re: 0, Im: 1}, { Re: 2, Im: 0} ]
+  , l_complex_2: [ { module: 1, arg: 1.570741 }, { module: 2, arg: 0 } ]
 }
 {
     _id: 'err2'
