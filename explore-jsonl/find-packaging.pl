@@ -1,8 +1,8 @@
-#!/usr/bin/env perl
+#!/usr/bin/perl
 # -*- encoding: utf-8; indent-tabs-mode: nil -*-
 #
-# Compte les documents avec un attribut 'last_updated_t' et ceux avec un attribut 'last_modified_t'
-# Count how many documents have a 'last_updated_t' attribute and how many have 'last_modified_t'
+# Compte les documents contenant une propriété 'packaging_material_tags' ou approchant
+# Count the OFF documents which contain a 'packaging_material_tags' property or similar
 #
 # Copyright (c) 2025 Jean Forget
 #
@@ -19,22 +19,25 @@ use Getopt::Long;
 my $full  = "$ENV{HOME}/Téléchargements/openfoodfacts-products.jsonl";
 my $f324  = "$ENV{HOME}/Documents/prog/perl/perl-Open-Food-Facts-utils/schema-check/examples/products-324.json";
 my $select_full = 0;
+my $detail      = 1; # to print each product ID with some data within the properties
 GetOptions("full" => \$select_full)
     or die "Problem in the options";
 my $fname;
 if ($select_full) {
   $fname  = $full;
+  $detail = 0;
 }
 else {
   $fname  = $f324;
+  $detail = 1;
 }
 
-my $json_parser = JSON::XS->new;
 
-my $nb_mod  = 0;
-my $nb_upd  = 0;
-my $nb_both = 0;
-my $nb_diff = 0;
+my @prop = qw /packaging_materials_tags packaging_recycling_tags packaging_shapes_tags packagings_materials/;
+my %ctr;
+my %ctr1;
+
+my $json_parser = JSON::XS->new;
 
 say "# ", DateTime->now,  ", starting";
 my $nb = 0;
@@ -51,35 +54,37 @@ while (my $l = <$fh>) {
 close $fh
   or die "closing $fname $!";
 say "# ", DateTime->now,  ", lines read: $nb ";
+for my $prop (@prop) {
+  printf("%8d %8d %s\n", $ctr{$prop}, $ctr1{$prop}, $prop);
+}
 
 sub check {
   my ($l) = @_;
+  my @prop_with_data = ();
   my $rec = $json_parser->decode($l);
-  if ($rec->{last_updated_t}) {
-    if ($rec->{last_modified_t}) {
-      ++$nb_both;
-      if ($rec->{last_updated_t} ne $rec->{last_modified_t}) {
-        ++$nb_diff;
+  for my $prop (@prop) {
+    if ($rec->{$prop}) {
+       ++$ctr{$prop};
+      if (ref($rec->{$prop}) eq 'ARRAY' && 0 != @{$rec->{$prop}}) {
+         ++$ctr1{$prop};
+         push @prop_with_data, $prop;
+      }
+      if (ref($rec->{$prop}) eq 'HASH' && 0 != keys %{$rec->{$prop}}) {
+         ++$ctr1{$prop};
+         push @prop_with_data, $prop;
       }
     }
-    else {
-      ++$nb_upd;
-    }
   }
-  elsif ($rec->{last_modified_t}) {
-     ++$nb_mod;
+  if ($detail && @prop_with_data) {
+    say join ' ', sprintf("%-20s", $rec->{_id}), @prop_with_data;
   }
 }
-say "$nb_mod with 'last_modified_t' only";
-say "$nb_upd with 'last_updated_t' only";
-say "$nb_both with both of them";
-say "including $nb_diff with different values";
 
 =encoding utf8
 
 =head1 NAME
 
-updated-or-modified.pl -- count the 'last_updated_t' and 'last_modified_t' properties
+find-packaging.pl -- count documents which contain a 'packaging_.*' property
 
 =head1 VERSION
 
@@ -87,7 +92,7 @@ Version 0.01
 
 =head1 USAGE
 
-  perl updated-or-modified.pl
+  perl find-packaging.pl
 
 =head1 ARGUMENTS
 
@@ -100,32 +105,45 @@ instead of the shorter 324-line file.
 
 =head1 DESCRIPTION
 
-According   to   the   data   schema,   each   document   contains   a
-C<last_modified_t>   property.   Yet,   some   documents   contain   a
-C<last_updated_t> property. The program counts how many documents have
-each of these two properties.
+The program reads  a JSONL file containing Open  Food Facts documents,
+one  per line.  For  each  document, the  program  checks whether  the
+following properties exist:
+
+=over 4
+
+=item * packaging_materials_tags
+
+=item * packaging_recycling_tags
+
+=item * packaging_shapes_tags
+
+=item * packagings_materials
+
+=back
 
 The UTC time and the line counter are displayed every 100_000 lines.
 
 =head2 Results
 
-On 2025-03-11:
+The first  number is the number  of lines where the  property appears,
+either as an empty array or as an array with values. The second number
+is the number of lines where the  property appears as an array with at
+least one value.
 
-  Input  3_742_774 lines, 58_835_864_432 bytes
-  result
-      78 with 'last_modified_t' only
-      0 with 'last_updated_t' only
-      3742695 with both of them
-  duration   about 16 minutes
+On 2025-03-20 (file from 2025-03-11):
 
-Actually, this is a feature referenced in
-L<CHANGELOG.md|https://github.com/openfoodfacts/openfoodfacts-server/blob/main/CHANGELOG.md>,
-L<tag 2.26.0|https://github.com/openfoodfacts/openfoodfacts-server/compare/v2.25.0...v2.26.0>,
-L<pull request 9846|https://github.com/openfoodfacts/openfoodfacts-server/pull/9646>,
+Input  3_742_774 lines, 58_835_864_432 bytes
+
+  3718837   323828 packaging_materials_tags
+  3718837    59083 packaging_recycling_tags
+  3718837   277337 packaging_shapes_tags
+  3718656   381352 packagings_materials
+
+duration   about 14 minutes
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-The input filename is hard-coded in the program source file.
+The input filenames are hard-coded in the program source file.
 
 =head1 DEPENDENCIES
 
@@ -143,7 +161,7 @@ Modules used (outside the core):
 
 =head1 BUGS AND LIMITATIONS
 
-The input filename is hard-coded in the program source file.
+The input filenames are hard-coded in the program source file.
 
 =head1 AUTHOR
 
