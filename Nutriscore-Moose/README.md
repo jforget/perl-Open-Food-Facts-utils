@@ -1,37 +1,23 @@
 -*- encoding: utf-8; indent-tabs-mode: nil -*-
 
-This repository  gives a few utilities  for Open Food Facts.  They are
-not part of the programmes needed for the day-to-day operation of OFF.
-
-schema-check
-============
-
-Compares the  contents of the  MongoDB collection `Products`  with the
-description stored in the Github repository.
-
-yaml-check
-==========
-
-Utility to check the syntax in a YAML file or in all YAML files from a
-directory.
-
 Nutriscore-Moose
 ================
 
 During the  24th May 2025 hackathon,  I examined how we  can use Moose
-for the computation of Nutriscore.
+for the computation of Nutriscore. This directory presents the results
+of my experiments.
 
 COPYRIGHT AND LICENSE
 =====================
 
-Copyright (c) 2024, 2025 Jean Forget
+Copyright (c) 2025 Jean Forget
 
 This  repository contains  free  software; you  can redistribute  this
 software and  modify it  under the GNU  Affero General  Public License
 version 3 or  later (the same as the Open  Food Fact main repository).
 See the
 [FSF website](https://www.gnu.org/licenses/agpl-3.0.en.html)
-or the `LICENSE` file in this repository.
+or the `LICENSE` file in the root directory of this repository.
 
 This repository  contains also some documentation.  This documentation
 is licensed under the  Creative Commons License CC-BY-SA (Attribution,
