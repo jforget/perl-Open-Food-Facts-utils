@@ -11,6 +11,14 @@ The first target for this work is
 variable `$nutriscore_data_ref` in
 [`ProductOpener::Nutriscore`](https://github.com/jforget/openfoodfacts-server/blob/main/lib/ProductOpener/Nutriscore.pm).
 
+Please note that the experiment is not the comparison of
+[`bless`](https://perldoc.perl.org/functions/bless)
+with [`Moo`](https://metacpan.org/pod/Moo)
+and [Corinna](https://curtispoe.org/articles/corinna-in-the-perl-core.html)
+and other object-oriented Perl solutions.  The choice has already been
+made, and it is Moose. The experiment  is about how to use Moose in an
+actual OFF function.
+
 Installing Moose
 ================
 
@@ -36,15 +44,98 @@ correctly, these were:
 
 * [Params::Validate](https://metacpan.org/pod/Params::Validate)
 
-* a third module, the name of which I have forgotten.
+* [Log::Any](https://metacpan.org/pod/Log::Any)
 
 On the following  days, I tried to install Moose  on a virtual machine
 running  xubuntu-25.04 and  Perl  5.40.1, on  another virtual  machine
 running  Fedora-41 and  Perl 5.40.2  and on  my main  computer running
 Devuan  and   Perl  5.38.2  through  `perlbrew`   (or  5.32.1  without
-`perlbrew`). I did not reproduce the problem in these three cases. For
-example, the absence of `DateTime` causes a `SKIP` in the tests, not a
-test failure which prevents the installation of `Moose`.
+`perlbrew`).  I did  not reproduce  the whole  problem in  these three
+cases. For example,  the absence of `DateTime` causes a  `SKIP` in the
+tests, not a test failure  which prevents the installation of `Moose`.
+On  the  other hand,  when  I  tried to  run  the  example script  for
+`Nutriscore.pm`, there was an error because `Log::Any` was missing.
+
+Modus Operandi
+==============
+
+On 24th May,  I did some research  in an intuitive and  fast way. When
+working later on  the subject, June and after, my  research was slower
+and more thourough.  I keep all versions in the  directory, because it
+will be easier to compare these versions in this way, it would be more
+difficult  if the  reader has  to juggle  between versions  using `git
+checkout`.
+
+On 24th May, I used a test script based on the POD documentation of `Nutriscore.pm`:
+
+```
+    use ProductOpener::Nutriscore qw/:all/;
+
+        my $nutriscore_data_ref = {
+                # Nutrients
+                energy =>  518, # in kJ
+                sugars => 3,
+                saturated_fat => 0.7,
+                saturated_fat_ratio => 0.7 / 3 * 100,
+                sodium => 0.61 / 2.5 * 1000,    # in mg, sodium = salt divided by 2.5
+                fruits_vegetables_nuts_colza_walnut_olive_oils => 20,   # in %
+                fiber => 2.2,
+                proteins => 6.7,
+
+                # The Nutri-Score computation is different for beverages, waters, cheeses and fats
+                is_beverage => 1,
+                is_water => 0,
+                is_cheese => 0,
+                is_fat => 1, # for 2021 version
+                is_fat_oil_nuts_seed => 1, # for 2023 version
+        }
+
+        my ($nutriscore_score, $nutriscore_grade) = compute_nutriscore_score_and_grade(
+                $nutriscore_data_ref
+        );
+
+        print "Rounded value for sugars: " . $nutriscore_data_ref->{sugars_value} . "\n";
+        print "Points for sugars: " . $nutriscore_data_ref->{sugars_points}. "\n";
+```
+
+In June 2025, I tried to add the unit test script for the Nutriscore formula,
+[`nutriscore.t`](https://github.com/openfoodfacts/openfoodfacts-server/blob/main/tests/unit/nutriscore.t).
+When doing so, I had to create a new module `ProductOpener::Config`  by copying file
+[`Config2_sample.pm`](https://github.com/openfoodfacts/openfoodfacts-server/blob/main/lib/ProductOpener/Config2_sample.pm)
+into the local directory,
+Also, I had to initialise an environment variable
+
+```
+export  PRODUCT_OPENER_FLAVOR_SHORT=off
+```
+
+Lastly, I had to install a few additional modules:
+
+* [`Log::Any::Adapter::TAP`](https://metacpan.org/pod/Log::Any::Adapter::TAP)
+
+* [`Modern::Perl`](https://metacpan.org/pod/Modern::Perl)
+
+* [`JSON::MaybeXS`](https://metacpan.org/pod/JSON::MaybeXS)
+
+* [`URI::Escape::XS`](https://metacpan.org/pod/URI::Escape::XS)
+
+* [`JSON::Create`](https://metacpan.org/pod/JSON::Create)
+
+* [`File::Find::Rule`](https://metacpan.org/pod/File::Find::Rule)
+
+* [`Locale::Maketext::Lexicon`](https://metacpan.org/pod/Locale::Maketext::Lexicon)
+
+* [`Locale::Maketext::Lexicon::Getcontext`](https://metacpan.org/pod/Locale::Maketext::Lexicon::Getcontext)
+
+* [`CLDR::Number`](https://metacpan.org/pod/CLDR::Number)
+
+* [`CGI`](https://metacpan.org/pod/CGI)
+
+And now I had to install
+[`Image::Magick`](https://metacpan.org/pod/Image::Magick).
+I canceled this  step. Why do the *unit* tests  for Nutriscore need to
+do some graphical file processing? So  I will use only the script from
+the POD example.
 
 License
 =======
