@@ -163,6 +163,25 @@ the   results  for   `example1.pl`  are   different  from   those  for
 `NutriscoreData1` class includes this  property, the computation gives
 the proper result.
 
+Which improvements, when compared with plain hashmaps?
+
+* checking the values for strings, integers (including the special case
+of integers used as booleans) and reals.
+
+What needs to be done to reach an ideal situation?
+
+* using accessors to get a property and to modify it,
+
+* stricter checks on  property `grade`, which should  be "`a`", "`b`",
+"`c`", "`d`" or "`e`" and nothing else,
+
+* reject any key  which is not declared in the  class (for the moment,
+the class  accepts property `saturated_fat_ratio_points`  and property
+`saturated_fat_ratio_value`),
+
+* define  the inner  structure  of property  `components`, instead  of
+accepting any hashref.
+
 License
 =======
 

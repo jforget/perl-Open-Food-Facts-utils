@@ -168,6 +168,29 @@ ceux de la  référence `example0.pl`, il y avait 14  points négatifs là
 on en attendait 17. La classe `NutriscoreData1` comporte donc le champ
 `saturated_fat_ratio` et le calcul se fait bien.
 
+Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
+
+* le contrôle  de valeur des  chaînes, des  entiers (y compris  le cas
+particulier des entiers servant de booléens) et des réels.
+
+Que reste-t-il à faire pour avoir une situation idéale ?
+
+* utiliser des accesseurs pour lire une propriété et la modifier,
+
+* contrôle plus fin sur la  propriété `grade`, qui devrait prendre les
+valeurs « `a` »,  « `b` », « `c` », « `d` » et  « `e` », à l'exclusion
+de toute autre valeur,
+
+* interdire  toute propriété  qui n'est  pas déclarée  dans la  classe
+(comme  la  propriété  `saturated_fat_ratio_points`  et  la  propriété
+`saturated_fat_ratio_value`  qui ont  été ajoutées  lors du  calcul du
+nutriscore),
+
+* définir  la   structure  de  la  propriété   `components`,  au  lieu
+d'admettre n'importe quel _hashref_,
+
+
+
 Licence
 =======
 
