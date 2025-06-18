@@ -101,6 +101,9 @@ POD de `Nutriscrore.pm` :
         print "Points for sugars: " . $nutriscore_data_ref->{sugars_points}. "\n";
 ```
 
+Script de test `nutriscore.t` ?
+-------------------------------
+
 Au mois de juin, j'y ai tenté d'ajouter le script de tests unitaires pour le nutriscrore,
 [`nutriscore.t`](https://github.com/openfoodfacts/openfoodfacts-server/blob/main/tests/unit/nutriscore.t).
 Pour ce faire, j'ai dû créer un module `ProductOpener::Config` en local en recopiant le fichier
@@ -139,6 +142,31 @@ Et je devais alors installer
 C'est là que j'ai arrêté. Pourquoi les tests *unitaires* du nutriscore
 ont-ils besoin de  faire du traitement d'image ? Je  me contenterai du
 script inspiré de l'exemple POD.
+
+Version 1, objet basique
+========================
+
+Lorsque l'on lit  le programme de test `example0.pl`,  on constate que
+la variable  `$nutriscore_data_ref` contient des clés  qui sont citées
+dans le fichier
+[`product-nutriscore.yaml`](https://openfoodfacts.github.io/openfoodfacts-server/api/ref-v2/#cmp--schemas-product-nutriscore),
+à la fois dans le groupe `nutriscore  / 2021 / data` et dans le groupe
+`nutriscore_data`.    Les    seules    exceptions    sont    la    clé
+`saturated_fat_ratio`  qui  n'apparaît  nulle  part  dans  le  fichier
+décrivant le schéma et la clé `is_fat_oil_nuts_seed` qui apparaît dans
+le  groupe  `nutriscore /  2023  /  data`,  ainsi  que le  suggère  le
+commentaire associé.
+
+La version 1 crée donc une classe avec toutes les propriétés scalaires
+des groupes `nutriscore / 2021 /  data`, `nutriscore / 2023 / data` et
+`nutriscore_data`, en  faisant l'impasse  sur la  propriété structurée
+`components` et sur le champ supplémentaire `saturated_fat_ratio`.
+
+Après   coup,    j'ai   constaté    qu'en   faisant    l'impasse   sur
+`saturated_fat_ratio`,  les résultats  n'étaient pas  compatibles avec
+ceux de la  référence `example0.pl`, il y avait 14  points négatifs là
+on en attendait 17. La classe `NutriscoreData1` comporte donc le champ
+`saturated_fat_ratio` et le calcul se fait bien.
 
 Licence
 =======

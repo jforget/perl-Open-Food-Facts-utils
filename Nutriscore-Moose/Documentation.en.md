@@ -60,10 +60,10 @@ Modus Operandi
 ==============
 
 On 24th May,  I did some research  in an intuitive and  fast way. When
-working later on  the subject, June and after, my  research was slower
+working later  on the subject, June  and after, my research  is slower
 and more thourough.  I keep all versions in the  directory, because it
 will be easier to compare these versions in this way, it would be more
-difficult  if the  reader has  to juggle  between versions  using `git
+difficult  if the  reader had  to juggle  between versions  using `git
 checkout`.
 
 On 24th May, I used a test script based on the POD documentation of `Nutriscore.pm`:
@@ -97,6 +97,9 @@ On 24th May, I used a test script based on the POD documentation of `Nutriscore.
         print "Rounded value for sugars: " . $nutriscore_data_ref->{sugars_value} . "\n";
         print "Points for sugars: " . $nutriscore_data_ref->{sugars_points}. "\n";
 ```
+
+Test script `nutriscore.t`?
+---------------------------
 
 In June 2025, I tried to add the unit test script for the Nutriscore formula,
 [`nutriscore.t`](https://github.com/openfoodfacts/openfoodfacts-server/blob/main/tests/unit/nutriscore.t).
@@ -136,6 +139,29 @@ And now I had to install
 I canceled this  step. Why do the *unit* tests  for Nutriscore need to
 do some graphical file processing? So  I will use only the script from
 the POD example.
+
+Version 1, barebones class
+==========================
+
+When  we  read  test  program  `example0.pl`,  we  see  that  variable
+`$nutriscore_data_ref` contains keys that appear in documentation file
+[`product-nutriscore.yaml`](https://openfoodfacts.github.io/openfoodfacts-server/api/ref-v2/#cmp--schemas-product-nutriscore),
+both   in  group   `nutriscore   /   2021  /   data`   and  in   group
+`nutriscore_data`. The  only exceptions are  key `saturated_fat_ratio`
+which   appears   nowhere  in   this   documentation   file  and   key
+`is_fat_oil_nuts_seed`  which appears  in group  `nutriscore /  2023 /
+data`, as the comment hints.
+
+Version  1 creates  a class  with  all scalar  properties from  groups
+`nutriscore  /  2021   /  data`,  `nutriscore  /  2023   /  data`  and
+`nutriscore_data`, while ignoring the structured property `components`
+and the additional key `saturated_fat_ratio`.
+
+The tests have shown that  if I ignore property `saturated_fat_ratio`,
+the   results  for   `example1.pl`  are   different  from   those  for
+`exampl0.pl`:   14   negative   points   instead   of   17.   If   the
+`NutriscoreData1` class includes this  property, the computation gives
+the proper result.
 
 License
 =======
