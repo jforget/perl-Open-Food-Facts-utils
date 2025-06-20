@@ -1,3 +1,13 @@
+# -*- encoding: utf-8; indent-tabs-mode: nil -*-
+#
+# Tentative pour déclarer une classe pour la variable $nutriscore_data_ref
+# Attempt to define a Moose class for variable $nutriscore_data_ref
+#
+# Copyright (c) 2025 Jean Forget and Association Open Food Facts
+#
+# See the license in the embedded documentation below
+#
+
 package  ProductOpener::NutriscoreData1;
 use Moose;
 
@@ -44,3 +54,44 @@ has grade                 => ( is => 'rw' , isa => 'Str' , required => 0 );
 has score                 => ( is => 'rw' , isa => 'Int' , required => 0 );
 
 8_000_000;
+
+
+=encoding utf8
+
+=head1 NAME
+
+
+=head1 SYNOPSIS
+
+
+=head1 DESCRIPTION
+
+
+=head1 METHODS
+
+
+=head1 DEPENDENCIES
+
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 AUTHOR
+
+Jean Forget (jforget on Github).
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2025 Jean Forget and Association Open Food Facts
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
