@@ -177,19 +177,23 @@ Que reste-t-il à faire pour avoir une situation idéale ?
 
 * utiliser des accesseurs pour lire une propriété et la modifier,
 
+* encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
+propriétés, seuls les accesseurs sont autorisés,
+
 * contrôle plus fin sur la  propriété `grade`, qui devrait prendre les
 valeurs « `a` »,  « `b` », « `c` », « `d` » et  « `e` », à l'exclusion
 de toute autre valeur,
 
 * interdire  toute propriété  qui n'est  pas déclarée  dans la  classe
 (comme  la  propriété  `saturated_fat_ratio_points`  et  la  propriété
-`saturated_fat_ratio_value`  qui ont  été ajoutées  lors du  calcul du
+`saturated_fat_ratio_value`  qui  sont  ajoutées  lors  du  calcul  du
 nutriscore),
 
 * définir  la   structure  de  la  propriété   `components`,  au  lieu
 d'admettre n'importe quel _hashref_,
 
-
+Remarquons que  le module `Nutriscore1.pm` est  quasiment identique au
+module `Nutriscore0.pm`.
 
 Licence
 =======

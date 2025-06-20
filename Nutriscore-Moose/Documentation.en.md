@@ -172,6 +172,9 @@ What needs to be done to reach an ideal situation?
 
 * using accessors to get a property and to modify it,
 
+* encapsulation:  forbid  accesses  to properties  using  the  hashmap
+syntax, now only accessors are allowed,
+
 * stricter checks on  property `grade`, which should  be "`a`", "`b`",
 "`c`", "`d`" or "`e`" and nothing else,
 
@@ -181,6 +184,9 @@ the class  accepts property `saturated_fat_ratio_points`  and property
 
 * define  the inner  structure  of property  `components`, instead  of
 accepting any hashref.
+
+We  can  notice that  module  `Nutriscore1.pm`  is nearly  similar  to
+`Nutriscore0.pm`.
 
 License
 =======
