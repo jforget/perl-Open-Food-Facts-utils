@@ -195,6 +195,55 @@ d'admettre n'importe quel _hashref_,
 Remarquons que  le module `Nutriscore1.pm` est  quasiment identique au
 module `Nutriscore0.pm`.
 
+Version 2, avec accesseurs
+==========================
+
+La   classe   `NutritionData2.pm`   est    identique   à   la   classe
+`NutritionData1.pm`,  à part  son numéro.  L'utilisation de  la classe
+`NutritionData2.pm` dans `Nutrition2.pm`  est différente, elle utilise
+les accesseurs  plutôt que la  syntaxe des _hashmaps_. Cela  dit, pour
+l'instant, cela ne  fonctionne que pour la lecture  d'une propriété ou
+pour la  mise à jour  de cette  propriété par l'opérateur  « `=` ». En
+revanche, pour l'instant, les  opérateurs du genre « `+=` » continuent
+à utiliser la syntaxe des _hashmaps_.  Cela ne fonctionne pas non plus
+lorsque  le nom  de la  propriété est  calculé, par  exemple, avec  la
+variable `$nutrient` concaténée avec la chaîne `_value`.
+
+Problème :  le  script  de  test `example2.pl`  est  très  loin  d'une
+couverture de code complète pour `NutritionData2.pm`. Il y a des accès
+que j'ai modifiés mais qui n'ont pas été testés.
+
+Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
+
+* le contrôle  de valeur des  chaînes, des  entiers (y compris  le cas
+particulier des entiers servant de booléens) et des réels.
+
+* utiliser des accesseurs pour lire une propriété dont le nom est fixe
+et pour remplacer sa valeur,
+
+Que reste-t-il à faire pour avoir une situation idéale ?
+
+* utiliser  des accesseurs  pour lire  une propriété  dont le  nom est
+calculé et pour remplacer sa valeur,
+
+* utiliser des accesseurs pour modifier  de façon incrémentale (p. ex.
+`+=`) une propriété,
+
+* encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
+propriétés, seuls les accesseurs sont autorisés,
+
+* contrôle plus fin sur la  propriété `grade`, qui devrait prendre les
+valeurs « `a` »,  « `b` », « `c` », « `d` » et  « `e` », à l'exclusion
+de toute autre valeur,
+
+* interdire  toute propriété  qui n'est  pas déclarée  dans la  classe
+(comme  la  propriété  `saturated_fat_ratio_points`  et  la  propriété
+`saturated_fat_ratio_value`  qui  sont  ajoutées  lors  du  calcul  du
+nutriscore),
+
+* définir  la   structure  de  la  propriété   `components`,  au  lieu
+d'admettre n'importe quel _hashref_,
+
 Licence
 =======
 

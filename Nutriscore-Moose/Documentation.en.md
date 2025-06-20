@@ -188,6 +188,52 @@ accepting any hashref.
 We  can  notice that  module  `Nutriscore1.pm`  is nearly  similar  to
 `Nutriscore0.pm`.
 
+Version 2, with accessors
+=========================
+
+Class  `NutritionData2.pm` is  nearly similar  to `NutritionData1.pm`,
+the only  difference being the  number within  its name. On  the other
+hand, the usage of class `NutritionData2.pm` by module `Nutrition2.pm`
+is much  different, it uses  accessors instead of the  hashmap syntax.
+Yet, for  the moment, accessors are  limited to reading a  property or
+updating it with operator "`=`". Updating a property with "`+=`" still
+uses the hashmap  syntax. Also, if the property name  is computed, for
+example  concatenating variable  `$nutrient`  with string  `'_value'`,
+module `Nutrution2.pm` still uses the hashmap syntax.
+
+Problem:  test  script `example2.pl`  does  not  ensure complete  code
+coverage, far from it. I have modified many property accesses that are
+not checked in this test script.
+
+Which improvements, when compared with plain hashmaps?
+
+* checking  the values  for strings,  integers (including  the special
+case of integers used as booleans) and reals.
+
+* using accessors  to read a  property with  a hard-coded name  and to
+replace its value,
+
+What needs to be done to reach an ideal situation?
+
+* using  accessors to  read a  property with  a variable  name and  to
+replace its value,
+
+* using accessors to modifiy a property in an incremental way (such as
+`+=`)
+
+* encapsulation:  forbid  accesses  to properties  using  the  hashmap
+syntax, now only accessors are allowed,
+
+* stricter checks on  property `grade`, which should  be "`a`", "`b`",
+"`c`", "`d`" or "`e`" and nothing else,
+
+* reject any key  which is not declared in the  class (for the moment,
+the class  accepts property `saturated_fat_ratio_points`  and property
+`saturated_fat_ratio_value`),
+
+* define  the inner  structure  of property  `components`, instead  of
+accepting any hashref.
+
 License
 =======
 

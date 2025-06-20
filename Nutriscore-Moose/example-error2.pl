@@ -14,12 +14,12 @@ use utf8;
 use strict;
 use warnings;
 use lib qw{ . ../../openfoodfacts-server/lib/ };
-use ProductOpener::Nutriscore1 qw/:all/;
+use ProductOpener::Nutriscore2 qw/:all/;
 use YAML::XS;
 
 say "deliberate error on missing properties 'energy' and 'fiber'";
 eval {
-  my $nutriscore_data_ref = ProductOpener::NutriscoreData1->new(
+  my $nutriscore_data_ref = ProductOpener::NutriscoreData2->new(
     proteins            => 6.7,
     saturated_fat       => 0.7,
     sodium              => 0.61 / 2.5 * 1000,               # in mg, sodium = salt divided by 2.5
@@ -32,7 +32,7 @@ say $@ if $@;
 
 say "deliberate value error on 'energy' property";
 eval {
-  my $nutriscore_data_ref = ProductOpener::NutriscoreData1->new(
+  my $nutriscore_data_ref = ProductOpener::NutriscoreData2->new(
     energy              =>  518.1,     # in kJ, should be integer
     fiber               => 2.2,
     proteins            => 6.7,
@@ -47,7 +47,7 @@ say $@ if $@;
 
 say "deliberate value error on 'is_beverage' property";
 eval {
-  my $nutriscore_data_ref = ProductOpener::NutriscoreData1->new(
+  my $nutriscore_data_ref = ProductOpener::NutriscoreData2->new(
     energy              =>  518,     # in kJ
     fiber               => 2.2,
     proteins            => 6.7,
@@ -63,7 +63,7 @@ say $@ if $@;
 
 say "no error in this version on property 'grade'";
 eval {
-  my $nutriscore_data_ref = ProductOpener::NutriscoreData1->new(
+  my $nutriscore_data_ref = ProductOpener::NutriscoreData2->new(
     energy              =>  518,     # in kJ
     fiber               => 2.2,
     proteins            => 6.7,
@@ -82,11 +82,11 @@ say $@ if $@;
 
 =head1 NAME
 
-example-error1.pl -- Unit test for NutriscoreData class
+example-error2.pl -- Unit test for NutriscoreData class
 
 =head1 USAGE
 
-  perl example-error1.pl
+  perl example-error2.pl
 
 =back
 
