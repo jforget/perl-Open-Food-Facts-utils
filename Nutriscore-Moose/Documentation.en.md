@@ -140,6 +140,35 @@ I canceled this  step. Why do the *unit* tests  for Nutriscore need to
 do some graphical file processing? So  I will use only the script from
 the POD example.
 
+Successive Versions
+-------------------
+
+Replacing  hashmaps by  `Moose` is  not a  "all-or-nothing" operation,
+especially during  the exploratory phase, but  a step-by-step process.
+To allow  a better comparison of  these steps, I have  decided to keep
+all versions together as permanent  files, instead of relying on Git's
+history mechanism.
+
+Reference version is version 0, which contains:
+
+* module `ProductOpener/Nutriscore0.pm`
+
+* test script `example0.pl`
+
+The first exploratory version contains;
+
+* class `ProductOpener/NutriscoreData1.pm`
+
+* module `ProductOpener/Nutriscore1.pm`
+
+* script `example1.pl`, which  is a test script  for integrating class
+PO/ND1.pm with module PO/N1.pm
+
+* scripts `t1/*.t`, which are unit tests for class PO/ND1.pm and which
+ignore completely module PO/N1.pm
+
+and similar for the following versions.
+
 Version 1, barebones class
 ==========================
 

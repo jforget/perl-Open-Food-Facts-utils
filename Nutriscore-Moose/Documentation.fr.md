@@ -143,6 +143,36 @@ C'est là que j'ai arrêté. Pourquoi les tests *unitaires* du nutriscore
 ont-ils besoin de  faire du traitement d'image ? Je  me contenterai du
 script inspiré de l'exemple POD.
 
+Versions successives
+--------------------
+
+Le remplacement des _hashmaps_ par `Moose` n'est pas une action « tout
+ou rien ». Au moins dans  l'étude exploratoire, on progresse étape par
+étape. Pour permettre une meilleure  visualisation de ces étapes, j'ai
+préféré conserver  côte à côte  les différentes versions de  la classe
+`ProductOpener::NutriscoreData`,  plutôt que  de les  « empiler » dans
+l'historique géré par Git.
+
+La version de référence est la version 0, contenant :
+
+* le module `ProductOpener/Nutriscore0.pm`
+
+* le script `example0.pl`
+
+La première version contient :
+
+* la classe `ProductOpener/NutriscoreData1.pm`
+
+* le module `ProductOpener/Nutriscore1.pm`
+
+* le script  `example1.pl`, servant de  test pour l'intégration  de la
+classe PO/ND1.pm avec le module PO/N1.pm
+
+* les  scripts `t1/*.t`,  servant de  tests unitaires  pour la  classe
+PO/ND1.pm et étant indépendants du module PO/N1.pm
+
+et idem pour les versions suivantes.
+
 Version 1, objet basique
 ========================
 
