@@ -808,8 +808,8 @@ sub compute_nutriscore_score_2023 ($nutriscore_data_ref) {
 
         $nutriscore_data_ref->count_proteins(0);
         if ($nutriscore_data_ref->is_beverage) {
-                $nutriscore_data_ref->count_proteins = 1;
-                $nutriscore_data_ref->count_proteins_reason = "beverage";
+                $nutriscore_data_ref->count_proteins(1);
+                $nutriscore_data_ref->count_proteins_reason("beverage");
         }
         elsif ($nutriscore_data_ref->is_cheese) {
                 $nutriscore_data_ref->count_proteins(1);
