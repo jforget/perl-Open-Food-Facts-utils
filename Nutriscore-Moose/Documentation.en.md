@@ -165,12 +165,16 @@ the proper result.
 
 Which improvements, when compared with plain hashmaps?
 
-* checking the values for strings, integers (including the special case
-of integers used as booleans) and reals.
+* checking  the values  for strings,  integers (including  the special
+case of  integers used  as booleans) and  reals (check  effective when
+creating an instance).
 
 What needs to be done to reach an ideal situation?
 
 * using accessors to get a property and to modify it,
+
+* checking the values for strings, integers, booleans and reals (check
+to be done when updating an instance).
 
 * encapsulation:  forbid  accesses  to properties  using  the  hashmap
 syntax, now only accessors are allowed,
@@ -208,10 +212,11 @@ not checked in this test script.
 Which improvements, when compared with plain hashmaps?
 
 * checking  the values  for strings,  integers (including  the special
-case of integers used as booleans) and reals.
+case of integers used as booleans)  and reals. This check is done both
+when creating an instance and when updating it through accessors.
 
 * using accessors  to read a  property with  a hard-coded name  and to
-replace its value,
+replace its value (after checking it),
 
 What needs to be done to reach an ideal situation?
 

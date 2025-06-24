@@ -171,11 +171,15 @@ on en attendait 17. La classe `NutriscoreData1` comporte donc le champ
 Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
 
 * le contrôle  de valeur des  chaînes, des  entiers (y compris  le cas
-particulier des entiers servant de booléens) et des réels.
+particulier des  entiers servant de  booléens) et des  réels (contrôle
+effectué lors de la création d'une instance).
 
 Que reste-t-il à faire pour avoir une situation idéale ?
 
 * utiliser des accesseurs pour lire une propriété et la modifier,
+
+* contrôler la  valeur des chaînes,  des entiers, des booléens  et des
+réels (contrôle à effectuer lors de la modification d'une instance).
 
 * encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
 propriétés, seuls les accesseurs sont autorisés,
@@ -216,10 +220,12 @@ que j'ai modifiés mais qui n'ont pas été testés.
 Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
 
 * le contrôle  de valeur des  chaînes, des  entiers (y compris  le cas
-particulier des entiers servant de booléens) et des réels.
+particulier des entiers servant de booléens) et des réels. Ce contrôle
+est effectué  lorsque l'on crée  une instance, mais  aussi lorsqu'elle
+est modifiée par le biais d'un accesseur.
 
 * utiliser des accesseurs pour lire une propriété dont le nom est fixe
-et pour remplacer sa valeur,
+et pour remplacer sa valeur (et la contrôler),
 
 Que reste-t-il à faire pour avoir une situation idéale ?
 

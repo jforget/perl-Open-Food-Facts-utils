@@ -14,12 +14,21 @@ use utf8;
 use strict;
 use warnings;
 use lib qw{ . ../../openfoodfacts-server/lib/ };
-use ProductOpener::Nutriscore1 qw/:all/;
-use YAML::XS;
+use ProductOpener::Nutriscore2 qw/:all/;
+use Test::More;
 
-say "deliberate error on missing properties 'energy' and 'fiber'";
-eval {
-  my $nutriscore_data_ref = ProductOpener::NutriscoreData1->new(
+BEGIN {
+  eval "use Test::Exception;";
+  if ($@) {
+    plan skip_all => "Test::Exception needed";
+    exit;
+  }
+}
+
+plan(tests => 6);
+
+dies_ok {
+  my $nutriscore_data_ref = ProductOpener::NutriscoreData2->new(
     proteins            => 6.7,
     saturated_fat       => 0.7,
     sodium              => 0.61 / 2.5 * 1000,               # in mg, sodium = salt divided by 2.5
@@ -27,12 +36,10 @@ eval {
     saturated_fat_ratio => 0.7 / 3 * 100,
     fruits_vegetables_nuts_colza_walnut_olive_oils => 20,   # in %
   );
-};
-say $@ if $@;
+} "deliberate error on missing properties 'energy' and 'fiber'";
 
-say "deliberate value error on 'energy' property";
-eval {
-  my $nutriscore_data_ref = ProductOpener::NutriscoreData1->new(
+dies_ok {
+  my $nutriscore_data_ref = ProductOpener::NutriscoreData2->new(
     energy              =>  518.1,     # in kJ, should be integer
     fiber               => 2.2,
     proteins            => 6.7,
@@ -42,12 +49,10 @@ eval {
     saturated_fat_ratio => 0.7 / 3 * 100,
     fruits_vegetables_nuts_colza_walnut_olive_oils => 20,   # in %
   );
-};
-say $@ if $@;
+} "deliberate value error on 'energy' property";
 
-say "deliberate value error on 'is_beverage' property";
-eval {
-  my $nutriscore_data_ref = ProductOpener::NutriscoreData1->new(
+dies_ok {
+  my $nutriscore_data_ref = ProductOpener::NutriscoreData2->new(
     energy              =>  518,     # in kJ
     fiber               => 2.2,
     proteins            => 6.7,
@@ -58,12 +63,10 @@ eval {
     saturated_fat_ratio => 0.7 / 3 * 100,
     fruits_vegetables_nuts_colza_walnut_olive_oils => 20,   # in %
   );
-};
-say $@ if $@;
+} "deliberate value error on 'is_beverage' property";
 
-say "no error in this version on property 'grade'";
-eval {
-  my $nutriscore_data_ref = ProductOpener::NutriscoreData1->new(
+lives_ok {
+  my $nutriscore_data_ref = ProductOpener::NutriscoreData2->new(
     energy              =>  518,     # in kJ
     fiber               => 2.2,
     proteins            => 6.7,
@@ -74,19 +77,40 @@ eval {
     saturated_fat_ratio => 0.7 / 3 * 100,
     fruits_vegetables_nuts_colza_walnut_olive_oils => 20,   # in %
   );
-};
-say $@ if $@;
+} "no error in this version on property 'grade'";
 
+
+my $nutriscore_data_ref = ProductOpener::NutriscoreData2->new(
+  # Nutrients
+  energy =>  518,     # in kJ
+  sugars => 3,
+  saturated_fat => 0.7,
+  saturated_fat_ratio => 0.7 / 3 * 100,
+  sodium => 0.61 / 2.5 * 1000,                            # in mg, sodium = salt divided by 2.5
+  fruits_vegetables_nuts_colza_walnut_olive_oils => 20,   # in %
+  fiber => 2.2,
+  proteins => 6.7,
+
+  # The Nutri-Score computation is different for beverages, waters, cheeses and fats
+  is_beverage => 1,
+  is_water => 0,
+  is_cheese => 0,
+  is_fat => 1, # for 2021 version
+  is_fat_oil_nuts_seed => 1, # for 2023 version
+);
+
+dies_ok { $nutriscore_data_ref->sugars_points(3.1)  } "Property 'sugars_points' should be integer";
+dies_ok { $nutriscore_data_ref->is_cheese(3) } "Property 'is_cheese' should be boolean";
 
 =encoding utf8
 
 =head1 NAME
 
-example-error1.pl -- Unit test for NutriscoreData class
+02-error.t -- Unit tests for error checks in NutriscoreData class
 
 =head1 USAGE
 
-  perl example-error1.pl
+  prove t2/*.t
 
 =back
 
