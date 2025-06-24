@@ -266,7 +266,50 @@ the class  accepts property `saturated_fat_ratio_points`  and property
 `saturated_fat_ratio_value`),
 
 * define  the inner  structure  of property  `components`, instead  of
-accepting any hashref.
+accepting any hashref,
+
+* decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
+lines 861 to 871); I doubt that  this would be allowed in standard OOP
+and that it would require jumping through several hoops.
+
+Version 3, indirect method names
+================================
+
+No  changes in  classe  `NutriscoreData3` (except  for two  properties
+forgotten until now). In module  `Nutriscore3`, the accessor syntax is
+extended to the  cases where the method name is  variable (stored in a
+Perl  variable  or  computed  with  a formula).  On  the  other  hand,
+complicated update (such as "`+=`"  or "`push`") still use the hashmap
+syntax.
+
+Which improvements, when compared with plain hashmaps?
+
+* checking  the values  for strings,  integers (including  the special
+case of integers used as booleans)  and reals. This check is done both
+when creating an instance and when updating it through accessors.
+
+* using accessors to  read a property and to replace  its value (after
+checking it),
+
+* reject any key which is not declared in the class,
+
+What needs to be done to reach an ideal situation?
+
+* using accessors to modifiy a property in an incremental way (such as
+`+=` or `push`)
+
+* encapsulation:  forbid  accesses  to properties  using  the  hashmap
+syntax, now only accessors are allowed,
+
+* stricter checks on  property `grade`, which should  be "`a`", "`b`",
+"`c`", "`d`" or "`e`" and nothing else,
+
+* define  the inner  structure  of property  `components`, instead  of
+accepting any hashref,
+
+* decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
+lines 861 to 871); I doubt that  this would be allowed in standard OOP
+and that it would require jumping through several hoops.
 
 License
 =======
