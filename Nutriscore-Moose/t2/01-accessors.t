@@ -14,7 +14,7 @@ use utf8;
 use strict;
 use warnings;
 use lib qw{ . ../../openfoodfacts-server/lib/ };
-use ProductOpener::Nutriscore2 qw/:all/;
+use ProductOpener::NutriscoreData2;
 use Test::More;
 
 plan(tests => 5);
