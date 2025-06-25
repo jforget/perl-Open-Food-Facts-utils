@@ -311,6 +311,48 @@ accepting any hashref,
 lines 861 to 871); I doubt that  this would be allowed in standard OOP
 and that it would require jumping through several hoops.
 
+Remark:  the missing  properties are  `saturated_fat_ratio_points` and
+`saturated_fat_ratio_value`,  following   the  addition   of  property
+`saturated_fat_ratio`  in  version 1  to  get  the proper  results  in
+`example1.pl`.
+
+Version 4, checking values for `grade`
+======================================
+
+Just add an `enum`, using the advice from the
+[`Moose` documentation](https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Types.pod#TYPE-CREATION-HELPERS)
+and, in a lesser way, from
+[Stack Overflow](https://stackoverflow.com/questions/473666/does-perl-have-an-enumeration-type).
+
+Which improvements, when compared with plain hashmaps?
+
+* checking  the values  for strings,  integers (including  the special
+case of integers used as booleans)  and reals. This check is done both
+when creating an instance and when updating it through accessors.
+
+* using accessors to  read a property and to replace  its value (after
+checking it),
+
+* reject any key which is not declared in the class,
+
+* stricter checks on  property `grade`, which should  be "`a`", "`b`",
+"`c`", "`d`" or "`e`" and nothing else,
+
+What needs to be done to reach an ideal situation?
+
+* using accessors to modifiy a property in an incremental way (such as
+`+=` or `push`)
+
+* encapsulation:  forbid  accesses  to properties  using  the  hashmap
+syntax, now only accessors are allowed,
+
+* define  the inner  structure  of property  `components`, instead  of
+accepting any hashref,
+
+* decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
+lines 861 to 871); I doubt that  this would be allowed in standard OOP
+and that it would require jumping through several hoops.
+
 License
 =======
 

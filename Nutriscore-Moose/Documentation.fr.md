@@ -327,6 +327,52 @@ Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
 possible en  programmation objet, ou  bien alors au prix  de plusieurs
 complications.
 
+Remarque : les deux propriétés oubliées sont
+`saturated_fat_ratio_points` et `saturated_fat_ratio_value`,
+correspondant à la propriété `saturated_fat_ratio` que j'ai du ajouter
+dans la version 1 pour obtenir les bons résultats dans `example1.pl`.
+
+Version 4, contrôle de valeur de `grade`
+========================================
+
+Juste la définition d'un `enum`, en m'inspirant de
+[la documentation de `Moose`](https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Types.pod#TYPE-CREATION-HELPERS)
+et, dans une moindre mesure, de
+[Stack Overflow](https://stackoverflow.com/questions/473666/does-perl-have-an-enumeration-type).
+
+Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
+
+* le contrôle  de valeur des  chaînes, des  entiers (y compris  le cas
+particulier des entiers servant de booléens) et des réels. Ce contrôle
+est effectué  lorsque l'on crée  une instance, mais  aussi lorsqu'elle
+est modifiée par le biais d'un accesseur.
+
+* utiliser un accesseur  pour lire une propriété et  pour remplacer sa
+valeur (après l'avoir contrôlée),
+
+* interdire toute propriété qui n'est pas déclarée dans la classe.
+
+* contrôle plus fin sur la  propriété `grade`, qui devrait prendre les
+valeurs « `a` »,  « `b` », « `c` », « `d` » et  « `e` », à l'exclusion
+de toute autre valeur,
+
+Que reste-t-il à faire pour avoir une situation idéale ?
+
+* utiliser  des  accesseurs  pour  modifier  une  propriété  de  façon
+incrémentale (p. ex. `+=` ou `push`),
+
+* encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
+propriétés, seuls les accesseurs sont autorisés,
+
+* définir  la   structure  de  la  propriété   `components`,  au  lieu
+d'admettre n'importe quel _hashref_,
+
+* statuer   sur   la   suppression   de   certaines   propriétés,   cf
+Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
+possible en  programmation objet, ou  bien alors au prix  de plusieurs
+complications.
+
+
 Licence
 =======
 
