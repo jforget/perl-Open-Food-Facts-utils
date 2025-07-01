@@ -151,21 +151,21 @@ history mechanism.
 
 Reference version is version 0, which contains:
 
-* module `ProductOpener/Nutriscore0.pm`
+* module `lib/ProductOpener/Nutriscore0.pm`
 
 * test script `example0.pl`
 
 The first exploratory version contains;
 
-* class `ProductOpener/NutriscoreData1.pm`
+* class `lib/ProductOpener/NutriscoreData1.pm`
 
-* module `ProductOpener/Nutriscore1.pm`
+* module `lib/ProductOpener/Nutriscore1.pm`
 
 * script `example1.pl`, which  is a test script  for integrating class
-PO/ND1.pm with module PO/N1.pm
+lib/PO/ND1.pm with module lib/PO/N1.pm
 
-* scripts `t1/*.t`, which are unit tests for class PO/ND1.pm and which
-ignore completely module PO/N1.pm
+* scripts `t1/*.t`, which  are unit tests for  class lib/PO/ND1.pm and
+which ignore completely module lib/PO/N1.pm
 
 and similar for the following versions.
 

@@ -155,21 +155,21 @@ l'historique géré par Git.
 
 La version de référence est la version 0, contenant :
 
-* le module `ProductOpener/Nutriscore0.pm`
+* le module `lib/ProductOpener/Nutriscore0.pm`
 
 * le script `example0.pl`
 
 La première version contient :
 
-* la classe `ProductOpener/NutriscoreData1.pm`
+* la classe `lib/ProductOpener/NutriscoreData1.pm`
 
-* le module `ProductOpener/Nutriscore1.pm`
+* le module `lib/ProductOpener/Nutriscore1.pm`
 
 * le script  `example1.pl`, servant de  test pour l'intégration  de la
-classe PO/ND1.pm avec le module PO/N1.pm
+classe lib/PO/ND1.pm avec le module lib/PO/N1.pm
 
 * les  scripts `t1/*.t`,  servant de  tests unitaires  pour la  classe
-PO/ND1.pm et étant indépendants du module PO/N1.pm
+lib/PO/ND1.pm et étant indépendants du module lib/PO/N1.pm
 
 et idem pour les versions suivantes.
 

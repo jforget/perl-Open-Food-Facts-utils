@@ -13,7 +13,7 @@ use v5.38;
 use utf8;
 use strict;
 use warnings;
-use lib qw{ . ../../openfoodfacts-server/lib/ };
+use lib qw{ lib ../../openfoodfacts-server/lib/ };
 use ProductOpener::Nutriscore4 qw/:all/;
 use YAML::XS;
 
