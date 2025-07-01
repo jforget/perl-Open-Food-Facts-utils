@@ -252,7 +252,7 @@ What needs to be done to reach an ideal situation?
 * using  accessors to  read a  property with  a variable  name and  to
 replace its value,
 
-* using accessors to modifiy a property in an incremental way (such as
+* using accessors to modify a property  in an incremental way (such as
 `+=`)
 
 * encapsulation:  forbid  accesses  to properties  using  the  hashmap
@@ -295,7 +295,7 @@ checking it),
 
 What needs to be done to reach an ideal situation?
 
-* using accessors to modifiy a property in an incremental way (such as
+* using accessors to modify a property  in an incremental way (such as
 `+=` or `push`)
 
 * encapsulation:  forbid  accesses  to properties  using  the  hashmap
@@ -345,7 +345,7 @@ syntax),
 
 What needs to be done to reach an ideal situation?
 
-* using accessors to modifiy a property in an incremental way (such as
+* using accessors to modify a property  in an incremental way (such as
 `+=` or `push`)
 
 * encapsulation:  forbid  accesses  to properties  using  the  hashmap
@@ -395,14 +395,67 @@ syntax),
 
 What needs to be done to reach an ideal situation?
 
-* using accessors to  modifiy a array-like property  in an incremental
+* encapsulation:  forbid  accesses  to properties  using  the  hashmap
+syntax, now only accessors are allowed,
+
+* define  the inner  structure  of property  `components`, instead  of
+accepting any hashref,
+
+* using accessors  to modify a  array-like property in  an incremental
 way (such as `push`)
+
+* decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
+lines 861 to 871); I doubt that  this would be allowed in standard OOP
+and that it would require jumping through several hoops.
+
+Version 6, stylish incremental updates
+======================================
+
+In version 6,  updating a property can be done  in two different ways:
+replacing the old value with the  new one, using the method homonymous
+to the property, or incrementing the  old value, using a method with a
+`_incr` suffix.
+
+```
+$nutriscore_data_ref->negative_points_incr($points);
+```
+
+For a decrement operation "`-=`", you just need to insert a minus sign:
+
+```
+$nutriscore_data_ref->negative_points_incr( - $points );
+```
+
+Other incremental updates  are not coded in the example  class, but it
+is  easy to  copy-paste the  additive methods  into multiplîcative  or
+similar methods
+
+Which improvements, when compared with plain hashmaps?
+
+* checking  the values  for strings,  integers (including  the special
+case of integers used as booleans)  and reals. This check is done both
+when creating an instance and when updating it through accessors.
+
+* using  accessors to  read a  property, to  replace its  value (after
+checking it) and sometimes to increment it,
+
+* reject  any property  which  is  not declared  in  the class  (check
+enabled  when using  an accessor,  not  enabled if  using the  hashmap
+syntax),
+
+* stricter checks on  property `grade`, which should  be "`a`", "`b`",
+"`c`", "`d`" or "`e`" and nothing else,
+
+What needs to be done to reach an ideal situation?
 
 * encapsulation:  forbid  accesses  to properties  using  the  hashmap
 syntax, now only accessors are allowed,
 
 * define  the inner  structure  of property  `components`, instead  of
 accepting any hashref,
+
+* using accessors  to modify a  array-like property in  an incremental
+way (such as `push`)
 
 * decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
 lines 861 to 871); I doubt that  this would be allowed in standard OOP

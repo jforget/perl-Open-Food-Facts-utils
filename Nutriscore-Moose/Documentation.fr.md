@@ -435,6 +435,64 @@ Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
 possible en  programmation objet, ou  bien alors au prix  de plusieurs
 complications.
 
+Version 6, mise à jour incrémentale (avec style)
+================================================
+
+Dans la  version 6,  la mise à  jour d'une propriété  se fait  de deux
+façons différentes. Pour une mise à jour en « annule et remplace », on
+utilise une  méthode homonyme. Pour  une mise à jour  incrémentale, on
+utilise une méthode dont le nom se termine par le suffixe « `_incr` »,
+par exemple :
+
+```
+$nutriscore_data_ref->negative_points_incr($points);
+```
+
+Pour une décrémentation « `-=` », il suffit d'insérer un signe moins :
+
+```
+$nutriscore_data_ref->negative_points_incr( - $points );
+```
+
+Les  autres   mises  à   jour  composites   (multiplication  « `*=` »,
+concaténation « .= », etc) ne sont pas prévues dans la classe exemple,
+mais il est facile de s'inspirer de l'existant pour les programmer.
+
+Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
+
+* le contrôle  de valeur des  chaînes, des  entiers (y compris  le cas
+particulier des entiers servant de booléens) et des réels. Ce contrôle
+est effectué  lorsque l'on crée  une instance, mais  aussi lorsqu'elle
+est modifiée par le biais d'un accesseur.
+
+* utiliser un  accesseur pour  lire une  propriété, pour  remplacer sa
+valeur   (après  l'avoir   contrôlée)  et   dans  certains   cas  pour
+l'incrémenter,
+
+* interdire  toute propriété  qui n'est  pas déclarée  dans la  classe
+(contrôle activé lorsque la propriété est mentionnée par le biais d'un
+accesseur,  contrôle ineffectif  lorsque l'on  utilise la  syntaxe des
+_hashmaps_),
+
+* contrôle plus fin sur la  propriété `grade`, qui devrait prendre les
+valeurs « `a` »,  « `b` », « `c` », « `d` » et  « `e` », à l'exclusion
+de toute autre valeur,
+
+Que reste-t-il à faire pour avoir une situation idéale ?
+
+* encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
+propriétés, seuls les accesseurs sont autorisés,
+
+* définir  la   structure  de  la  propriété   `components`,  au  lieu
+d'admettre n'importe quel _hashref_,
+
+* utiliser des accesseurs pour modifier une propriété de type liste de
+façon incrémentale (p. ex. `push`),
+
+* statuer   sur   la   suppression   de   certaines   propriétés,   cf
+Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
+possible en  programmation objet, ou  bien alors au prix  de plusieurs
+complications.
 
 Licence
 =======
