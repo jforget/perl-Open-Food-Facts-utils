@@ -316,13 +316,16 @@ Remark:  the missing  properties are  `saturated_fat_ratio_points` and
 `saturated_fat_ratio`  in  version 1  to  get  the proper  results  in
 `example1.pl`.
 
-Version 4, checking values for `grade`
-======================================
+Version 4, checking values for property `grade`
+===============================================
 
 Just add an `enum`, using the advice from the
 [`Moose` documentation](https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Types.pod#TYPE-CREATION-HELPERS)
 and, in a lesser way, from
-[Stack Overflow](https://stackoverflow.com/questions/473666/does-perl-have-an-enumeration-type).
+[Stack Overflow](https://stackoverflow.com/questions/473666/does-perl-have-an-enumeration-type)
+and
+[best pratices](https://metacpan.org/dist/Moose/view/lib/Moose/Manual/BestPractices.pod#Namespace-your-types)
+about type names.
 
 Which improvements, when compared with plain hashmaps?
 

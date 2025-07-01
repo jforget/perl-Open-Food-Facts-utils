@@ -332,13 +332,16 @@ Remarque : les deux propriétés oubliées sont
 correspondant à la propriété `saturated_fat_ratio` que j'ai du ajouter
 dans la version 1 pour obtenir les bons résultats dans `example1.pl`.
 
-Version 4, contrôle de valeur de `grade`
-========================================
+Version 4, contrôle de valeur de la propriété `grade`
+=====================================================
 
 Juste la définition d'un `enum`, en m'inspirant de
 [la documentation de `Moose`](https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Types.pod#TYPE-CREATION-HELPERS)
 et, dans une moindre mesure, de
-[Stack Overflow](https://stackoverflow.com/questions/473666/does-perl-have-an-enumeration-type).
+[Stack Overflow](https://stackoverflow.com/questions/473666/does-perl-have-an-enumeration-type)
+et des
+[bonnes pratiques](https://metacpan.org/dist/Moose/view/lib/Moose/Manual/BestPractices.pod#Namespace-your-types)
+pour les noms de type.
 
 Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
 

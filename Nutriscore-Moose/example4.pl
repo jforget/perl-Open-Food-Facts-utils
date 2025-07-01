@@ -17,7 +17,7 @@ use lib qw{ . ../../openfoodfacts-server/lib/ };
 use ProductOpener::Nutriscore4 qw/:all/;
 use YAML::XS;
 
-my $nutriscore_data_ref = ProductOpener::NutriscoreData3->new(
+my $nutriscore_data_ref = ProductOpener::NutriscoreData4->new(
   # Nutrients
   energy =>  518,     # in kJ
   sugars => 3,

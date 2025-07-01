@@ -12,7 +12,7 @@ package  ProductOpener::NutriscoreData4;
 use Moose;
 
 use Moose::Util::TypeConstraints ;
-enum 'grade', [ qw/ a b c d e / ];
+enum 'ProductOpener::NutriscoreData::grade', [ qw/ a b c d e / ];
 
 has is_beverage          => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 );
 has is_cheese            => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 );
@@ -53,7 +53,7 @@ has count_proteins        => ( is => 'rw' , isa => 'Num' , required => 0 ); # in
 has count_proteins_reason => ( is => 'rw' , isa => 'Str' , required => 0 ); # in 2023 version, not in 2021
 has negative_points       => ( is => 'rw' , isa => 'Int' , required => 0 );
 has positive_points       => ( is => 'rw' , isa => 'Int' , required => 0 );
-has grade                 => ( is => 'rw' , isa => 'grade', required => 0 );
+has grade                 => ( is => 'rw' , isa => 'ProductOpener::NutriscoreData::grade', required => 0 );
 has score                 => ( is => 'rw' , isa => 'Int'  , required => 0 );
 
 8_000_000;
