@@ -353,7 +353,10 @@ est modifiée par le biais d'un accesseur.
 * utiliser un accesseur  pour lire une propriété et  pour remplacer sa
 valeur (après l'avoir contrôlée),
 
-* interdire toute propriété qui n'est pas déclarée dans la classe.
+* interdire  toute propriété  qui n'est  pas déclarée  dans la  classe
+(contrôle activé lorsque la propriété est mentionnée par le biais d'un
+accesseur,  contrôle ineffectif  lorsque l'on  utilise la  syntaxe des
+_hashmaps_),
 
 * contrôle plus fin sur la  propriété `grade`, qui devrait prendre les
 valeurs « `a` »,  « `b` », « `c` », « `d` » et  « `e` », à l'exclusion
@@ -363,6 +366,63 @@ Que reste-t-il à faire pour avoir une situation idéale ?
 
 * utiliser  des  accesseurs  pour  modifier  une  propriété  de  façon
 incrémentale (p. ex. `+=` ou `push`),
+
+* encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
+propriétés, seuls les accesseurs sont autorisés,
+
+* définir  la   structure  de  la  propriété   `components`,  au  lieu
+d'admettre n'importe quel _hashref_,
+
+* statuer   sur   la   suppression   de   certaines   propriétés,   cf
+Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
+possible en  programmation objet, ou  bien alors au prix  de plusieurs
+complications.
+
+Version 5, mise à jour incrémentale
+===================================
+
+Les versions 5 à ? proposent  quelques solutions pour les mises à jour
+incrémentales  comme  « `+=` »  et  « `-=` »  (mais  pas  encore  pour
+« `push` »).
+
+La version 5 consiste à détricoter les « `+=` » pour obtenir des mises
+à jour  basiques et à  encapsuler ces mises  à jour basiques  avec des
+accesseurs. On a successivement :
+
+```
+$nutriscore_data_ref->{negative_points} +=                                          $points;
+$nutriscore_data_ref->{negative_points} = $nutriscore_data_ref->{negative_points} + $points;
+$nutriscore_data_ref->negative_points(    $nutriscore_data_ref->negative_points   + $points);
+```
+
+Ce n'est  pas élégant, c'est  plus _WET_ que _DRY_  (_write everywhere
+twice_ / écrire partout deux fois plutôt que _don't repeat yourself_ /
+évitez les répétitions), mais cela fonctionne.
+
+Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
+
+* le contrôle  de valeur des  chaînes, des  entiers (y compris  le cas
+particulier des entiers servant de booléens) et des réels. Ce contrôle
+est effectué  lorsque l'on crée  une instance, mais  aussi lorsqu'elle
+est modifiée par le biais d'un accesseur.
+
+* utiliser un  accesseur pour  lire une  propriété, pour  remplacer sa
+valeur   (après  l'avoir   contrôlée)  et   dans  certains   cas  pour
+l'incrémenter,
+
+* interdire  toute propriété  qui n'est  pas déclarée  dans la  classe
+(contrôle activé lorsque la propriété est mentionnée par le biais d'un
+accesseur,  contrôle ineffectif  lorsque l'on  utilise la  syntaxe des
+_hashmaps_),
+
+* contrôle plus fin sur la  propriété `grade`, qui devrait prendre les
+valeurs « `a` »,  « `b` », « `c` », « `d` » et  « `e` », à l'exclusion
+de toute autre valeur,
+
+Que reste-t-il à faire pour avoir une situation idéale ?
+
+* utiliser des accesseurs pour modifier une propriété de type liste de
+façon incrémentale (p. ex. `push`),
 
 * encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
 propriétés, seuls les accesseurs sont autorisés,

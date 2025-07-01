@@ -336,7 +336,9 @@ when creating an instance and when updating it through accessors.
 * using accessors to  read a property and to replace  its value (after
 checking it),
 
-* reject any key which is not declared in the class,
+* reject  any property  which  is  not declared  in  the class  (check
+enabled  when using  an accessor,  not  enabled if  using the  hashmap
+syntax),
 
 * stricter checks on  property `grade`, which should  be "`a`", "`b`",
 "`c`", "`d`" or "`e`" and nothing else,
@@ -345,6 +347,56 @@ What needs to be done to reach an ideal situation?
 
 * using accessors to modifiy a property in an incremental way (such as
 `+=` or `push`)
+
+* encapsulation:  forbid  accesses  to properties  using  the  hashmap
+syntax, now only accessors are allowed,
+
+* define  the inner  structure  of property  `components`, instead  of
+accepting any hashref,
+
+* decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
+lines 861 to 871); I doubt that  this would be allowed in standard OOP
+and that it would require jumping through several hoops.
+
+Version 5, incremental update
+=============================
+
+Versions 5 to ? give some  suggestions for incremental updates such as
+"`+=`" and "`-=`" (but not yet "`push`").
+
+Version  5  consists  in  unraveling incremental  updates  into  basic
+updates and  then encapsulating these  basic updates. For  example, we
+have in succession:
+
+```
+$nutriscore_data_ref->{negative_points} +=                                          $points;
+$nutriscore_data_ref->{negative_points} = $nutriscore_data_ref->{negative_points} + $points;
+$nutriscore_data_ref->negative_points(    $nutriscore_data_ref->negative_points   + $points);
+```
+
+It is not pretty, it applies a WET style instead of a DRY style (Write
+Everything Twice / Don't Repeat Yourself), but it works.
+
+Which improvements, when compared with plain hashmaps?
+
+* checking  the values  for strings,  integers (including  the special
+case of integers used as booleans)  and reals. This check is done both
+when creating an instance and when updating it through accessors.
+
+* using  accessors to  read a  property, to  replace its  value (after
+checking it) and sometimes to increment it,
+
+* reject  any property  which  is  not declared  in  the class  (check
+enabled  when using  an accessor,  not  enabled if  using the  hashmap
+syntax),
+
+* stricter checks on  property `grade`, which should  be "`a`", "`b`",
+"`c`", "`d`" or "`e`" and nothing else,
+
+What needs to be done to reach an ideal situation?
+
+* using accessors to  modifiy a array-like property  in an incremental
+way (such as `push`)
 
 * encapsulation:  forbid  accesses  to properties  using  the  hashmap
 syntax, now only accessors are allowed,
