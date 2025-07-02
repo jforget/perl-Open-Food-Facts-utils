@@ -386,7 +386,7 @@ incrémentales  comme  « `+=` »  et  « `-=` »  (mais  pas  encore  pour
 « `push` »).
 
 La version 5 consiste à détricoter les « `+=` » pour obtenir des mises
-à jour  basiques et à  encapsuler ces mises  à jour basiques  avec des
+à jour basiques  puis à encapsuler ces mises à  jour basiques avec des
 accesseurs. On a successivement :
 
 ```
@@ -397,7 +397,7 @@ $nutriscore_data_ref->negative_points(    $nutriscore_data_ref->negative_points 
 
 Ce n'est  pas élégant, c'est  plus _WET_ que _DRY_  (_write everywhere
 twice_ / écrire partout deux fois plutôt que _don't repeat yourself_ /
-évitez les répétitions), mais cela fonctionne.
+éviter les répétitions), mais cela fonctionne.
 
 Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
 
@@ -440,7 +440,7 @@ Version 6, mise à jour incrémentale (avec style)
 
 Dans la  version 6,  la mise à  jour d'une propriété  se fait  de deux
 façons différentes. Pour une mise à jour en « annule et remplace », on
-utilise une  méthode homonyme. Pour  une mise à jour  incrémentale, on
+utilise une  méthode homonyme (standard Moose). Pour  une mise à jour  incrémentale, on
 utilise une méthode dont le nom se termine par le suffixe « `_incr` »,
 par exemple :
 
@@ -463,7 +463,8 @@ Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
 * le contrôle  de valeur des  chaînes, des  entiers (y compris  le cas
 particulier des entiers servant de booléens) et des réels. Ce contrôle
 est effectué  lorsque l'on crée  une instance, mais  aussi lorsqu'elle
-est modifiée par le biais d'un accesseur.
+est  modifiée  par  le  biais  d'un  accesseur  en  mode  « annule  et
+remplace ».
 
 * utiliser un  accesseur pour  lire une  propriété, pour  remplacer sa
 valeur   (après  l'avoir   contrôlée)  et   dans  certains   cas  pour
@@ -479,6 +480,9 @@ valeurs « `a` »,  « `b` », « `c` », « `d` » et  « `e` », à 
 de toute autre valeur,
 
 Que reste-t-il à faire pour avoir une situation idéale ?
+
+* le  contrôle   des  valeurs  des  chaînes,   entiers  et  flottants,
+lorsqu'une propriété est incrémentée,
 
 * encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
 propriétés, seuls les accesseurs sont autorisés,

@@ -413,8 +413,8 @@ Version 6, stylish incremental updates
 
 In version 6,  updating a property can be done  in two different ways:
 replacing the old value with the  new one, using the method homonymous
-to the property, or incrementing the  old value, using a method with a
-`_incr` suffix.
+to the property (as with the  Moose standard), or incrementing the old
+value, using a method with a `_incr` suffix.
 
 ```
 $nutriscore_data_ref->negative_points_incr($points);
@@ -434,7 +434,8 @@ Which improvements, when compared with plain hashmaps?
 
 * checking  the values  for strings,  integers (including  the special
 case of integers used as booleans)  and reals. This check is done both
-when creating an instance and when updating it through accessors.
+when creating  an instance  and when updating  it through  an accessor
+replacing the old value by a new one.
 
 * using  accessors to  read a  property, to  replace its  value (after
 checking it) and sometimes to increment it,
@@ -447,6 +448,9 @@ syntax),
 "`c`", "`d`" or "`e`" and nothing else,
 
 What needs to be done to reach an ideal situation?
+
+* checking the values for strings, integers and reals, when a property
+is updated by an incrementation accessor,
 
 * encapsulation:  forbid  accesses  to properties  using  the  hashmap
 syntax, now only accessors are allowed,

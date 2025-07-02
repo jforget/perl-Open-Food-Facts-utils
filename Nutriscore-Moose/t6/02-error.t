@@ -25,7 +25,7 @@ BEGIN {
   }
 }
 
-plan(tests => 9);
+plan(tests => 10);
 
 dies_ok {
   my $nutriscore_data_ref = ProductOpener::NutriscoreData6->new(
@@ -105,6 +105,7 @@ dies_ok { $nutriscore_data_ref->grade('z')         } "Property 'grade' should be
 dies_ok { $nutriscore_data_ref->wrong_method(0)    } "Property 'wrong_method' not declared";
 my $method = "wrong_method";
 dies_ok { $nutriscore_data_ref->$method(0)         } "Property 'wrong_method' not declared";
+lives_ok{ $nutriscore_data_ref->energy_incr(0.5)   } "In this version, we can bypass the type check when incrementing a property, it is wrong";
 
 =encoding utf8
 
