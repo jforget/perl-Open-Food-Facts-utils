@@ -169,6 +169,37 @@ which ignore completely module lib/PO/N1.pm
 
 and similar for the following versions.
 
+Prerequisites
+------------
+
+To run the scripts in this directory,  you need a clone for this Githb
+repo, as well as a clone of the
+[openfoodfacts-server](https://github.com/jforget/openfoodfacts-server)
+repository (mine or
+[Open Food Facts' repo](https://github.com/openfoodfacts/openfoodfacts-server),
+in the same directory as the clone of perl-Open-Food-Facts-utils.
+
+You need to install these Perl modules:
+
+* [Moose](https://metacpan.org/pod/Moose) (bien sûr),
+
+* [Log::Any](https://metacpan.org/pod/Log::Any)
+
+* [YAML::XS](https://metacpan.org/dist/YAML-LibYAML/view/lib/YAML/XS.pod)
+
+* [Test::Exception](https://metacpan.org/pod/Test::Exception)
+
+```
+git clone https://github.com/jforget/openfoodfacts-server.git
+git clone https://github.com/jforget/perl-Open-Food-Facts-utils.git
+cpan
+install Moose
+install Log::Any
+install YAML::XS
+install Test::Exception
+exit
+```
+
 Version 1, barebones class
 ==========================
 

@@ -173,6 +173,37 @@ lib/PO/ND1.pm et étant indépendants du module lib/PO/N1.pm
 
 et idem pour les versions suivantes.
 
+Pré-requis
+----------
+
+Pour faire fonctionner les scripts  de ce répertoire, vous devez avoir
+un clone du présent dépôt Github, ainsi qu'un clone du dépôt
+[openfoodfacts-server](https://github.com/jforget/openfoodfacts-server)
+(le mien ou
+[celui d'OFF](https://github.com/openfoodfacts/openfoodfacts-server),
+dans le même répertoire que le clone de perl-Open-Food-Facts-utils.
+
+Vous devez également installer :
+
+* [Moose](https://metacpan.org/pod/Moose) (bien sûr),
+
+* [Log::Any](https://metacpan.org/pod/Log::Any)
+
+* [YAML::XS](https://metacpan.org/dist/YAML-LibYAML/view/lib/YAML/XS.pod)
+
+* [Test::Exception](https://metacpan.org/pod/Test::Exception)
+
+```
+git clone https://github.com/jforget/openfoodfacts-server.git
+git clone https://github.com/jforget/perl-Open-Food-Facts-utils.git
+cpan
+install Moose
+install Log::Any
+install YAML::XS
+install Test::Exception
+exit
+```
+
 Version 1, objet basique
 ========================
 
