@@ -498,6 +498,56 @@ Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
 possible en  programmation objet, ou  bien alors au prix  de plusieurs
 complications.
 
+Version 7, incrémentation
+=========================
+
+Dans cette version, les méthodes  d'incrémentation ne sont pas codées,
+elles  sont  générées. Le  fait  que  ces méthodes  proviennent  d'une
+génération de code fait que l'on peut introduire des répétitions comme
+dans la version 5, sans toutefois être gêné par ces répétitions. De la
+sorte, le contrôle de type est effectué lors de l'incrémentation.
+
+Une autre  nouveauté est que  la valeur incrémentale  est facultative,
+avec une valeur par défaut à 1.
+
+Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
+
+* le contrôle  de valeur des  chaînes, des  entiers (y compris  le cas
+particulier des entiers servant de booléens) et des réels. Ce contrôle
+est effectué  lorsque l'on crée  une instance, mais  aussi lorsqu'elle
+est  modifiée  par  le  biais  d'un  accesseur  en  mode  « annule  et
+remplace » ou en mode incrémentation.
+
+* utiliser un  accesseur pour  lire une  propriété, pour  remplacer sa
+valeur   (après  l'avoir   contrôlée)  et   dans  certains   cas  pour
+l'incrémenter,
+
+* interdire  toute propriété  qui n'est  pas déclarée  dans la  classe
+(contrôle activé lorsque la propriété est mentionnée par le biais d'un
+accesseur,  contrôle ineffectif  lorsque l'on  utilise la  syntaxe des
+_hashmaps_),
+
+* contrôle plus fin sur la  propriété `grade`, qui devrait prendre les
+valeurs « `a` »,  « `b` », « `c` », « `d` » et  « `e` », à l'exclusion
+de toute autre valeur,
+
+Que reste-t-il à faire pour avoir une situation idéale ?
+
+* encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
+propriétés, seuls les accesseurs sont autorisés,
+
+* définir  la   structure  de  la  propriété   `components`,  au  lieu
+d'admettre n'importe quel _hashref_,
+
+* utiliser des accesseurs pour modifier une propriété de type liste de
+façon incrémentale (p. ex. `push`),
+
+* statuer   sur   la   suppression   de   certaines   propriétés,   cf
+Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
+possible en  programmation objet, ou  bien alors au prix  de plusieurs
+complications.
+
+
 Licence
 =======
 

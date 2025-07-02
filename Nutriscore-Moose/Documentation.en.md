@@ -465,6 +465,50 @@ way (such as `push`)
 lines 861 to 871); I doubt that  this would be allowed in standard OOP
 and that it would require jumping through several hoops.
 
+Version 7, incrementation
+=========================
+
+In  this version,  the  incrementation methods  are  not written,  but
+generated.  Since  they   come  from  a  code   generation,  the  code
+duplication  that was  bad  in version  5  is no  longer  bad here.  A
+positive  result  is  that  now,  type checking  is  done  during  the
+incrementation.
+
+Another  new feature  is  that  the incrementing  value  is no  longer
+mandatory and its default value is 1.
+
+Which improvements, when compared with plain hashmaps?
+
+* checking  the values  for strings,  integers (including  the special
+case of integers used as booleans)  and reals. This check is done both
+when creating  an instance  and when updating  it through  an accessor
+(replacement or incrementation).
+
+* using  accessors to  read a  property, to  replace its  value (after
+checking it) and sometimes to increment it,
+
+* reject  any property  which  is  not declared  in  the class  (check
+enabled  when using  an accessor,  not  enabled if  using the  hashmap
+syntax),
+
+* stricter checks on  property `grade`, which should  be "`a`", "`b`",
+"`c`", "`d`" or "`e`" and nothing else,
+
+What needs to be done to reach an ideal situation?
+
+* encapsulation:  forbid  accesses  to properties  using  the  hashmap
+syntax, now only accessors are allowed,
+
+* define  the inner  structure  of property  `components`, instead  of
+accepting any hashref,
+
+* using accessors  to modify a  array-like property in  an incremental
+way (such as `push`)
+
+* decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
+lines 861 to 871); I doubt that  this would be allowed in standard OOP
+and that it would require jumping through several hoops.
+
 License
 =======
 
