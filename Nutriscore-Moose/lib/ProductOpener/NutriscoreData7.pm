@@ -53,6 +53,8 @@ has count_proteins        => ( is => 'rw' , isa => 'Num' , required => 0 ); # in
 has count_proteins_reason => ( is => 'rw' , isa => 'Str' , required => 0 ); # in 2023 version, not in 2021
 has negative_points       => ( is => 'rw' , isa => 'Int' , required => 0 );
 has positive_points       => ( is => 'rw' , isa => 'Int' , required => 0 );
+has negative_points_max   => ( is => 'rw' , isa => 'Int' , required => 0 );
+has positive_points_max   => ( is => 'rw' , isa => 'Int' , required => 0 );
 has grade                 => ( is => 'rw' , isa => 'ProductOpener::NutriscoreData::grade', required => 0 );
 has score                 => ( is => 'rw' , isa => 'Int'  , required => 0 );
 

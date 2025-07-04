@@ -561,6 +561,34 @@ sorte, le contrôle de type est effectué lors de l'incrémentation.
 Une autre  nouveauté est que  la valeur incrémentale  est facultative,
 avec une valeur par défaut à 1.
 
+Pendant que je testais cette version,  je me suis aperçu qu'il fallait
+déclarer deux nouvelles propriétés,  à savoir `negative_points_max` et
+`positive_points_max`, qui ne sont commentées ni dans
+[`Nutriscore.pm` linges 494 à 524](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L494).
+ni dans
+[`product-nutriscore.yaml`](https://openfoodfacts.github.io/openfoodfacts-server/api/ref-v2/#cmp--schemas-product-nutriscore).
+Si la couverture de code avait été plus complète, cela aurait provoqué
+une  erreur de  programme  au moment  de  l'utilisation d'une  méthode
+d'incrémentation pour ces deux propriétés.
+
+Je suis surpris que la déclaration de méthodes incrémentales n'existe
+pas dans Moose.
+[Metacpan](https://metacpan.org/search?q=moose+increment)
+ne me donne aucun résultat qui pourrait convenir et
+[Qwant](https://www.qwant.com/?q=perl+moose+incr%C3%A9mentation&t=web&llm=2)
+indique dans sa réponse flash
+
+> Moose facilite la gestion des  classes Perl en permettant de définir
+> des attributs avec des méthodes d'accès et des traits personnalisés,
+> mais   il   ne   fournit    pas   directement   une   fonctionnalité
+> d'incrémentation ;  celle-ci doit  être implémentée via  une méthode
+> spécifique ou  en utilisant un  attribut avec un builder  pour gérer
+> l'incrémentation automatique.
+
+Peut-on  faire confiance  à l'intelligence  artificielle qui  alimente
+cette réponse flash ? Peu importe, le résultat est que je dois générer
+ces méthodes d'incrémentation dans la classe.
+
 Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
 
 * le contrôle  de valeur des  chaînes, des  entiers (y compris  le cas

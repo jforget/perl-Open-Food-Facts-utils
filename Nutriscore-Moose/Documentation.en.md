@@ -522,6 +522,32 @@ incrementation.
 Another  new feature  is  that  the incrementing  value  is no  longer
 mandatory and its default value is 1.
 
+While doing this  test, I noticed that I needed  to declare properties
+`negative_points_max` and  `positive_points_max`, which  are commented
+neither in
+[`Nutriscore.pm` lines 494 to 524](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L494).
+nor in
+[`product-nutriscore.yaml`](https://openfoodfacts.github.io/openfoodfacts-server/api/ref-v2/#cmp--schemas-product-nutriscore).
+If the code coverage had been  more extensive, it would have triggered
+a program error when using the corresponding increment method.
+
+I am surprised that Moose contains no facilities to generate increment
+methods.
+[Metacpan](https://metacpan.org/search?q=moose+increment)
+gives me no useful results and the (French-speaking) search engine
+[Qwant](https://www.qwant.com/?q=perl+moose+incr%C3%A9mentation&t=web&llm=2)
+answers with a flash answer which translates to
+
+> Moose provides some  facilities to manage Perl  classes, by defining
+> attributes with accessor methods and bespoke traits, but it does not
+> provide  directly an  incrementation feature;  this feature  must be
+> implemented through a  specific method or using an  attribute with a
+> builder which can manage automatic incrementation.
+
+Can we trust the artificial intelligence that wrote this flash answer?
+It does not matter. In the end, I generated the incrementation methods
+in the class.
+
 Which improvements, when compared with plain hashmaps?
 
 * checking  the values  for strings,  integers (including  the special
