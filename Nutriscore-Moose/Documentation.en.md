@@ -228,11 +228,14 @@ the   results  for   `example1.pl`  are   different  from   those  for
 `NutriscoreData1` class includes this  property, the computation gives
 the proper result.
 
-And much  later, I  relaised that the  `$nutriscore_data_ref` variable
+Much  later, I  realised that the  `$nutriscore_data_ref` variable
 was actually described in the comments of `ProductOpener::Nutriscore`,
 especially in lines
 [149 to 175](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L149)
 and [494 to 524](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L494).
+In  this actual  description, there  is  no multi-level  data such  as
+`components` like I thought when I was paying attention only to
+[`product-nutriscore.yaml`](https://openfoodfacts.github.io/openfoodfacts-server/api/ref-v2/#cmp--schemas-product-nutriscore),
 
 Which improvements, when compared with plain hashmaps?
 
@@ -257,8 +260,8 @@ syntax, now only accessors are allowed,
 the class  accepts property `saturated_fat_ratio_points`  and property
 `saturated_fat_ratio_value`),
 
-* define  the inner  structure  of property  `components`, instead  of
-accepting any hashref.
+* imagine how a multi-level structured data such as `components` would
+be implemented, instead of accepting any hashref.
 
 We  can  notice that  module  `Nutriscore1.pm`  is nearly  similar  to
 `Nutriscore0.pm`.
@@ -307,8 +310,8 @@ syntax, now only accessors are allowed,
 the class  accepts property `saturated_fat_ratio_points`  and property
 `saturated_fat_ratio_value`),
 
-* define  the inner  structure  of property  `components`, instead  of
-accepting any hashref,
+* imagine how a multi-level structured data such as `components` would
+be implemented, instead of accepting any hashref,
 
 * decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
 lines 861 to 871); I doubt that  this would be allowed in standard OOP
@@ -338,7 +341,7 @@ checking it),
 What needs to be done to reach an ideal situation?
 
 * using accessors to modify a property  in an incremental way (such as
-`+=` or `push`)
+`+=` or `push`),
 
 * encapsulation:  forbid  accesses  to properties  using  the  hashmap
 syntax, now only accessors are allowed,
@@ -346,8 +349,8 @@ syntax, now only accessors are allowed,
 * stricter checks on  property `grade`, which should  be "`a`", "`b`",
 "`c`", "`d`" or "`e`" and nothing else,
 
-* define  the inner  structure  of property  `components`, instead  of
-accepting any hashref,
+* imagine how a multi-level structured data such as `components` would
+be implemented, instead of accepting any hashref,
 
 * decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
 lines 861 to 871); I doubt that  this would be allowed in standard OOP
@@ -388,13 +391,13 @@ syntax),
 What needs to be done to reach an ideal situation?
 
 * using accessors to modify a property  in an incremental way (such as
-`+=` or `push`)
+`+=` or `push`),
 
 * encapsulation:  forbid  accesses  to properties  using  the  hashmap
 syntax, now only accessors are allowed,
 
-* define  the inner  structure  of property  `components`, instead  of
-accepting any hashref,
+* imagine how a multi-level structured data such as `components` would
+be implemented, instead of accepting any hashref,
 
 * decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
 lines 861 to 871); I doubt that  this would be allowed in standard OOP
@@ -440,11 +443,11 @@ What needs to be done to reach an ideal situation?
 * encapsulation:  forbid  accesses  to properties  using  the  hashmap
 syntax, now only accessors are allowed,
 
-* define  the inner  structure  of property  `components`, instead  of
-accepting any hashref,
+* imagine how a multi-level structured data such as `components` would
+be implemented, instead of accepting any hashref,
 
 * using accessors  to modify a  array-like property in  an incremental
-way (such as `push`)
+way (such as `push`),
 
 * decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
 lines 861 to 871); I doubt that  this would be allowed in standard OOP
@@ -497,11 +500,11 @@ is updated by an incrementation accessor,
 * encapsulation:  forbid  accesses  to properties  using  the  hashmap
 syntax, now only accessors are allowed,
 
-* define  the inner  structure  of property  `components`, instead  of
-accepting any hashref,
+* imagine how a multi-level structured data such as `components` would
+be implemented, instead of accepting any hashref,
 
 * using accessors  to modify a  array-like property in  an incremental
-way (such as `push`)
+way (such as `push`),
 
 * decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
 lines 861 to 871); I doubt that  this would be allowed in standard OOP
@@ -541,11 +544,11 @@ What needs to be done to reach an ideal situation?
 * encapsulation:  forbid  accesses  to properties  using  the  hashmap
 syntax, now only accessors are allowed,
 
-* define  the inner  structure  of property  `components`, instead  of
-accepting any hashref,
+* imagine how a multi-level structured data such as `components` would
+be implemented, instead of accepting any hashref,
 
 * using accessors  to modify a  array-like property in  an incremental
-way (such as `push`)
+way (such as `push`),
 
 * decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
 lines 861 to 871); I doubt that  this would be allowed in standard OOP

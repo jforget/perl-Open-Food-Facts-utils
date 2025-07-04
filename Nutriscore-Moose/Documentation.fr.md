@@ -238,6 +238,10 @@ Et  longtemps  après,  j'ai  vu  que la  description  de  la  variable
 `ProductOpener::Nutriscore` en lignes
 [149 à 175](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L149)
 et [494 à 524](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L494).
+Dans cette véritable description, il  n'y a pas de données structurées
+multi-niveaux comme  `components` comme  je le  croyais lorsque  je me
+basais uniquement sur
+[`product-nutriscore.yaml`](https://openfoodfacts.github.io/openfoodfacts-server/api/ref-v2/#cmp--schemas-product-nutriscore),
 
 Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
 
@@ -264,8 +268,9 @@ de toute autre valeur,
 `saturated_fat_ratio_value`  qui  sont  ajoutées  lors  du  calcul  du
 nutriscore),
 
-* définir  la   structure  de  la  propriété   `components`,  au  lieu
-d'admettre n'importe quel _hashref_,
+* imaginer  ce  que  pourrait  être   la  structure  de  la  propriété
+multi-niveau   `components`,  au   lieu   d'admettre  n'importe   quel
+_hashref_,
 
 Remarquons que  le module `Nutriscore1.pm` est  quasiment identique au
 module `Nutriscore0.pm`.
@@ -318,8 +323,9 @@ de toute autre valeur,
 `saturated_fat_ratio_value`  qui  sont  ajoutées  lors  du  calcul  du
 nutriscore),
 
-* définir  la   structure  de  la  propriété   `components`,  au  lieu
-d'admettre n'importe quel _hashref_,
+* imaginer  ce  que  pourrait  être   la  structure  de  la  propriété
+multi-niveau   `components`,  au   lieu   d'admettre  n'importe   quel
+_hashref_,
 
 * statuer   sur   la   suppression   de   certaines   propriétés,   cf
 Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
@@ -360,8 +366,9 @@ propriétés, seuls les accesseurs sont autorisés,
 valeurs « `a` »,  « `b` », « `c` », « `d` » et  « `e` », à l'exclusion
 de toute autre valeur,
 
-* définir  la   structure  de  la  propriété   `components`,  au  lieu
-d'admettre n'importe quel _hashref_,
+* imaginer  ce  que  pourrait  être   la  structure  de  la  propriété
+multi-niveau   `components`,  au   lieu   d'admettre  n'importe   quel
+_hashref_,
 
 * statuer   sur   la   suppression   de   certaines   propriétés,   cf
 Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
@@ -411,8 +418,9 @@ incrémentale (p. ex. `+=` ou `push`),
 * encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
 propriétés, seuls les accesseurs sont autorisés,
 
-* définir  la   structure  de  la  propriété   `components`,  au  lieu
-d'admettre n'importe quel _hashref_,
+* imaginer  ce  que  pourrait  être   la  structure  de  la  propriété
+multi-niveau   `components`,  au   lieu   d'admettre  n'importe   quel
+_hashref_,
 
 * statuer   sur   la   suppression   de   certaines   propriétés,   cf
 Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
@@ -468,8 +476,9 @@ façon incrémentale (p. ex. `push`),
 * encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
 propriétés, seuls les accesseurs sont autorisés,
 
-* définir  la   structure  de  la  propriété   `components`,  au  lieu
-d'admettre n'importe quel _hashref_,
+* imaginer  ce  que  pourrait  être   la  structure  de  la  propriété
+multi-niveau   `components`,  au   lieu   d'admettre  n'importe   quel
+_hashref_,
 
 * statuer   sur   la   suppression   de   certaines   propriétés,   cf
 Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
@@ -528,8 +537,9 @@ lorsqu'une propriété est incrémentée,
 * encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
 propriétés, seuls les accesseurs sont autorisés,
 
-* définir  la   structure  de  la  propriété   `components`,  au  lieu
-d'admettre n'importe quel _hashref_,
+* imaginer  ce  que  pourrait  être   la  structure  de  la  propriété
+multi-niveau   `components`,  au   lieu   d'admettre  n'importe   quel
+_hashref_,
 
 * utiliser des accesseurs pour modifier une propriété de type liste de
 façon incrémentale (p. ex. `push`),
@@ -577,8 +587,9 @@ Que reste-t-il à faire pour avoir une situation idéale ?
 * encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
 propriétés, seuls les accesseurs sont autorisés,
 
-* définir  la   structure  de  la  propriété   `components`,  au  lieu
-d'admettre n'importe quel _hashref_,
+* imaginer  ce  que  pourrait  être   la  structure  de  la  propriété
+multi-niveau   `components`,  au   lieu   d'admettre  n'importe   quel
+_hashref_,
 
 * utiliser des accesseurs pour modifier une propriété de type liste de
 façon incrémentale (p. ex. `push`),
