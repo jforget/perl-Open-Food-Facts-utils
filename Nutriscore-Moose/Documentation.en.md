@@ -177,22 +177,22 @@ and similar for the following versions.
 Prerequisites
 ------------
 
-To run the scripts in this directory,  you need a clone for this Githb
+To run the scripts in this directory, you need a clone for this Github
 repo, as well as a clone of the
 [openfoodfacts-server](https://github.com/jforget/openfoodfacts-server)
 repository (mine or
-[Open Food Facts' repo](https://github.com/openfoodfacts/openfoodfacts-server),
+[Open Food Facts' repo](https://github.com/openfoodfacts/openfoodfacts-server)),
 in the same directory as the clone of perl-Open-Food-Facts-utils.
 
 You need to install these Perl modules:
 
-* [Moose](https://metacpan.org/pod/Moose) (bien sûr),
+* [Moose](https://metacpan.org/pod/Moose) (of course),
 
-* [Log::Any](https://metacpan.org/pod/Log::Any)
+* [Log::Any](https://metacpan.org/pod/Log::Any),
 
-* [YAML::XS](https://metacpan.org/dist/YAML-LibYAML/view/lib/YAML/XS.pod)
+* [YAML::XS](https://metacpan.org/dist/YAML-LibYAML/view/lib/YAML/XS.pod),
 
-* [Test::Exception](https://metacpan.org/pod/Test::Exception)
+* [Test::Exception](https://metacpan.org/pod/Test::Exception).
 
 ```
 git clone https://github.com/jforget/openfoodfacts-server.git
@@ -324,7 +324,7 @@ No  changes in  classe  `NutriscoreData3` (except  for two  properties
 forgotten until now). In module  `Nutriscore3`, the accessor syntax is
 extended to the  cases where the method name is  variable (stored in a
 Perl  variable  or  computed  with  a formula).  On  the  other  hand,
-complicated update (such as "`+=`"  or "`push`") still use the hashmap
+complicated updates (such as "`+=`" or "`push`") still use the hashmap
 syntax.
 
 Which improvements, when compared with plain hashmaps?
@@ -406,7 +406,7 @@ and that it would require jumping through several hoops.
 Version 5, incremental update
 =============================
 
-Versions 5 to ? give some  suggestions for incremental updates such as
+Versions 5 to 7 give some  suggestions for incremental updates such as
 "`+=`" and "`-=`" (but not yet "`push`").
 
 Version  5  consists  in  unraveling incremental  updates  into  basic
@@ -525,7 +525,7 @@ mandatory and its default value is 1.
 While doing this  test, I noticed that I needed  to declare properties
 `negative_points_max` and  `positive_points_max`, which  are commented
 neither in
-[`Nutriscore.pm` lines 494 to 524](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L494).
+[`Nutriscore.pm` lines 494 to 524](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L494)
 nor in
 [`product-nutriscore.yaml`](https://openfoodfacts.github.io/openfoodfacts-server/api/ref-v2/#cmp--schemas-product-nutriscore).
 If the code coverage had been  more extensive, it would have triggered
@@ -556,7 +556,7 @@ when creating  an instance  and when updating  it through  an accessor
 (replacement or incrementation).
 
 * using  accessors to  read a  property, to  replace its  value (after
-checking it) and sometimes to increment it,
+checking it) and sometimes to increment it (with type check),
 
 * reject  any property  which  is  not declared  in  the class  (check
 enabled  when using  an accessor,  not  enabled if  using the  hashmap

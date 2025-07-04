@@ -184,18 +184,18 @@ Pour faire fonctionner les scripts  de ce répertoire, vous devez avoir
 un clone du présent dépôt Github, ainsi qu'un clone du dépôt
 [openfoodfacts-server](https://github.com/jforget/openfoodfacts-server)
 (le mien ou
-[celui d'OFF](https://github.com/openfoodfacts/openfoodfacts-server),
+[celui d'OFF](https://github.com/openfoodfacts/openfoodfacts-server)),
 dans le même répertoire que le clone de perl-Open-Food-Facts-utils.
 
 Vous devez également installer :
 
 * [Moose](https://metacpan.org/pod/Moose) (bien sûr),
 
-* [Log::Any](https://metacpan.org/pod/Log::Any)
+* [Log::Any](https://metacpan.org/pod/Log::Any),
 
-* [YAML::XS](https://metacpan.org/dist/YAML-LibYAML/view/lib/YAML/XS.pod)
+* [YAML::XS](https://metacpan.org/dist/YAML-LibYAML/view/lib/YAML/XS.pod),
 
-* [Test::Exception](https://metacpan.org/pod/Test::Exception)
+* [Test::Exception](https://metacpan.org/pod/Test::Exception).
 
 ```
 git clone https://github.com/jforget/openfoodfacts-server.git
@@ -287,7 +287,7 @@ pour la  mise à jour  de cette  propriété par l'opérateur  « `=` ». En
 revanche, pour l'instant, les  opérateurs du genre « `+=` » continuent
 à utiliser la syntaxe des _hashmaps_.  Cela ne fonctionne pas non plus
 lorsque  le nom  de la  propriété est  calculé, par  exemple, avec  la
-variable `$nutrient` concaténée avec la chaîne `_value`.
+variable `$nutrient` concaténée avec la chaîne `'_value'`.
 
 Problème :  le  script  de  test `example2.pl`  est  très  loin  d'une
 couverture de code complète pour `NutritionData2.pm`. Il y a des accès
@@ -430,7 +430,7 @@ complications.
 Version 5, mise à jour incrémentale
 ===================================
 
-Les versions 5 à ? proposent  quelques solutions pour les mises à jour
+Les versions 5 à 7 proposent  quelques solutions pour les mises à jour
 incrémentales  comme  « `+=` »  et  « `-=` »  (mais  pas  encore  pour
 « `push` »).
 
