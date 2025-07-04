@@ -18,7 +18,11 @@ avec [`Moo`](https://metacpan.org/pod/Moo)
 et [Corinna](https://curtispoe.org/articles/corinna-in-the-perl-core.html)
 ou d'autres solutions  Perl de programmation orientée  objet. Le choix
 technique est déjà  fait, c'est Moose, l'expérience porte  sur la mise
-en œuvre de Moose.
+en œuvre de Moose.  D'autre part, même s'il y a  une réflexion au sein
+d'Open Food Facts pour commencer à utiliser
+[PostgreSQL](https://www.postgresql.fr/),
+l'utilisation  de  Moose  est   un  sujet  différent,  concernant  des
+variables éphémères et non le stockage de données permanentes.
 
 Installation de Moose
 =====================
@@ -228,6 +232,12 @@ Après   coup,    j'ai   constaté    qu'en   faisant    l'impasse   sur
 ceux de la  référence `example0.pl`, il y avait 14  points négatifs là
 on en attendait 17. La classe `NutriscoreData1` comporte donc le champ
 `saturated_fat_ratio` et le calcul se fait bien.
+
+Et  longtemps  après,  j'ai  vu  que la  description  de  la  variable
+`$nutriscore_data_ref`   était   basée   sur   les   commentaires   de
+`ProductOpener::Nutriscore` en lignes
+[149 à 175](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L149)
+et [494 à 524](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L494).
 
 Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
 

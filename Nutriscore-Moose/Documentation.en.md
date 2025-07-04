@@ -17,7 +17,12 @@ with [`Moo`](https://metacpan.org/pod/Moo)
 and [Corinna](https://curtispoe.org/articles/corinna-in-the-perl-core.html)
 and other object-oriented Perl solutions.  The choice has already been
 made, and it is Moose. The experiment  is about how to use Moose in an
-actual OFF function.
+actual OFF  function. There is also  in Open Food Facts  some thoughts
+about the use of
+[PostgreSQL](https://www.postgresql.org/),
+but this is a  topic different from the use of  Moose. For the moment,
+Moose is about storing transient  program variables, not about storing
+permanent data.
 
 Installing Moose
 ================
@@ -222,6 +227,12 @@ the   results  for   `example1.pl`  are   different  from   those  for
 `exampl0.pl`:   14   negative   points   instead   of   17.   If   the
 `NutriscoreData1` class includes this  property, the computation gives
 the proper result.
+
+And much  later, I  relaised that the  `$nutriscore_data_ref` variable
+was actually described in the comments of `ProductOpener::Nutriscore`,
+especially in lines
+[149 to 175](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L149)
+and [494 to 524](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L494).
 
 Which improvements, when compared with plain hashmaps?
 
