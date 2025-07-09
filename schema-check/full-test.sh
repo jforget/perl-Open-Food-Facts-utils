@@ -12,6 +12,12 @@ export dir_res=results
 export base=$1
 echo $1
 
+if [ ! "$base" ]
+then
+    echo "Missing basename for result files"
+    exit
+fi
+
 export def_sch='-s schemas/schemas/product.yaml -s schemas/schemas/product_hidden.yaml'
 
 perl schema-check.pl $def_sch examples/off* examples/test-errors         > $dir_res/$base-basic

@@ -13,6 +13,18 @@ export ref=$1
 export base=$2
 echo $ref $base
 
+if [ ! "$ref" ]
+then
+    echo "Missing basename for reference files"
+    exit
+fi
+
+if [ ! "$base" ]
+then
+    echo "Missing basename for result files"
+    exit
+fi
+
 cd results
 
 for i in 324 basic dyn-short egg list-short meta multi other parallel parallel-1 parallel-2 oneof
