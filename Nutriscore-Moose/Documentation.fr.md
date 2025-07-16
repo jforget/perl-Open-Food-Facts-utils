@@ -105,6 +105,10 @@ POD de `Nutriscrore.pm` :
         print "Points for sugars: " . $nutriscore_data_ref->{sugars_points}. "\n";
 ```
 
+Soit  dit   en  passant,   la  documentation  POD   devrait  remplacer
+`is_fat_oil_nuts_seed` par  `is_fat_oil_nuts_seeds` avec  un "s"  à la
+fin.
+
 Script de test `nutriscore.t` ?
 -------------------------------
 
@@ -146,6 +150,22 @@ Et je devais alors installer
 C'est là que j'ai arrêté. Pourquoi les tests *unitaires* du nutriscore
 ont-ils besoin de  faire du traitement d'image ? Je  me contenterai du
 script inspiré de l'exemple POD.
+
+À  la fin,  après  avoir écrit  la  version 7,  j'ai  écrit un  script
+`04-integration.t` qui compare les  résultats de `Nutriscore7.pm` avec
+ceux  de `Nutriscore0.pm`  pour  des valeurs  d'entrée identiques.  Ce
+script de test utilise, lui, très peu de modules :
+
+* `Test::More` parce que c'est un script de tests,
+
+* `ProductOpener::Nutriscore0` pour calculer les données de référence,
+
+* `ProductOpener::Nutriscore7` pour calculer les données à tester,
+
+* `ProductOpener::NutriscoreData7` parce que c'est le module en cours de test.
+
+J'ai incorporé rétroactivement ce script  de tests dans les versions 1
+à 6.
 
 Versions successives
 --------------------

@@ -32,8 +32,8 @@ my $nutriscore_data_ref = ProductOpener::NutriscoreData7->new(
   is_beverage => 1,
   is_water => 0,
   is_cheese => 0,
-  is_fat => 1, # for 2021 version
-  is_fat_oil_nuts_seed => 1, # for 2023 version
+  is_fat                => 1, # for 2021 version
+  is_fat_oil_nuts_seeds => 1, # for 2023 version
 );
 
 my ($nutriscore_score, $nutriscore_grade) = compute_nutriscore_score_and_grade(
@@ -48,11 +48,11 @@ print YAML::XS::Dump($nutriscore_data_ref);
 
 =head1 NAME
 
-example4.pl -- Unit test for Nutriscore computation
+example7.pl -- Unit test for Nutriscore computation
 
 =head1 USAGE
 
-  perl example4.pl
+  perl example7.pl
 
 =back
 

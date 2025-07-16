@@ -103,6 +103,9 @@ On 24th May, I used a test script based on the POD documentation of `Nutriscore.
         print "Points for sugars: " . $nutriscore_data_ref->{sugars_points}. "\n";
 ```
 
+By the  way, in  the POD documentation,  `is_fat_oil_nuts_seed` should
+really be `is_fat_oil_nuts_seeds` with a final "s".
+
 Test script `nutriscore.t`?
 ---------------------------
 
@@ -144,6 +147,21 @@ And now I had to install
 I canceled this  step. Why do the *unit* tests  for Nutriscore need to
 do some graphical file processing? So  I will use only the script from
 the POD example.
+
+In  the  end  (after  writing  version  7),  I  wrote  a  test  script
+`04-integration.t` which would compare the results of `Nutriscore7.pm`
+with the results  of `Nutriscore0.pm` for the same  input values. This
+test script uses very few modules:
+
+* `Test::More` because this a test script,
+
+* `ProductOpener::Nutriscore0` to generate reference data,
+
+* `ProductOpener::Nutriscore7` to generate test data,
+
+* `ProductOpener::NutriscoreData7` because this is the module being tested.
+
+This test script has been retroactively included in versions 1 to 6.
 
 Successive Versions
 -------------------

@@ -95,8 +95,8 @@ my $nutriscore_data_ref = ProductOpener::NutriscoreData7->new(
   is_beverage => 1,
   is_water    => 0,
   is_cheese   => 0,
-  is_fat      => 1, # for 2021 version
-  is_fat_oil_nuts_seed => 1, # for 2023 version
+  is_fat                => 1, # for 2021 version
+  is_fat_oil_nuts_seeds => 1, # for 2023 version
 );
 
 dies_ok { $nutriscore_data_ref->sugars_points(3.1) } "Property 'sugars_points' should be integer";
