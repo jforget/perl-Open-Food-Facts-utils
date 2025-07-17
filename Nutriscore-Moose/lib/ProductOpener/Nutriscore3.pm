@@ -43,11 +43,11 @@ of a food product.
                 proteins => 6.7,
 
                 # The Nutri-Score computation is different for beverages, waters, cheeses and fats
-                is_beverage => 1,
-                is_water => 0,
-                is_cheese => 0,
-                is_fat => 1, # for 2021 version
-                is_fat_oil_nuts_seed => 1, # for 2023 version
+                is_beverage           => 1,
+                is_water              => 0,
+                is_cheese             => 0,
+                is_fat                => 1, # for 2021 version
+                is_fat_oil_nuts_seeds => 1, # for 2023 version
         }
 
         my ($nutriscore_score, $nutriscore_grade) = compute_nutriscore_score_and_grade(
