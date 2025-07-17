@@ -92,11 +92,11 @@ my $nutriscore_data_ref = ProductOpener::NutriscoreData1->new(
   proteins => 6.7,
 
   # The Nutri-Score computation is different for beverages, waters, cheeses and fats
-  is_beverage => 1,
-  is_water => 0,
-  is_cheese => 0,
-  is_fat => 1, # for 2021 version
-  is_fat_oil_nuts_seed => 1, # for 2023 version
+  is_beverage           => 1,
+  is_water              => 0,
+  is_cheese             => 0,
+  is_fat                => 1, # for 2021 version
+  is_fat_oil_nuts_seeds => 1, # for 2023 version
 );
 
 lives_ok { $nutriscore_data_ref->{sugars_points} = 3.1 } "In this version, no checks when updating property 'sugars_points'";

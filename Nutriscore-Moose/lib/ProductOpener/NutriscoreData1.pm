@@ -13,12 +13,12 @@ use Moose;
 
 use Moose::Util::TypeConstraints ;
 
-has is_beverage          => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 );
-has is_cheese            => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 );
-has is_water             => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 );
-has is_fat               => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 ); # 2021 version, not in 2023
-has is_fat_oil_nuts_seed => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 ); # 2023 version, not in 2021
-has is_red_meat_product  => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 ); # 2023 version, not in 2021
+has is_beverage           => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 );
+has is_cheese             => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 );
+has is_water              => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 );
+has is_fat                => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 ); # 2021 version, not in 2023
+has is_fat_oil_nuts_seeds => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 ); # 2023 version, not in 2021
+has is_red_meat_product   => ( is => 'rw' , isa => 'Bool', required => 1, default => 0 ); # 2023 version, not in 2021
 # Attributes for the 2021 version, begin
 has energy               => ( is => 'rw' , isa => 'Int' , required => 1 );
 has energy_points        => ( is => 'rw' , isa => 'Int' , required => 0 );
@@ -35,7 +35,9 @@ has proteins_value       => ( is => 'rw' , isa => 'Num' , required => 0 );
 has saturated_fat        => ( is => 'rw' , isa => 'Num' , required => 1 );
 has saturated_fat_points => ( is => 'rw' , isa => 'Int' , required => 0 );
 has saturated_fat_value  => ( is => 'rw' , isa => 'Num' , required => 0 );
-has saturated_fat_ratio  => ( is => 'rw' , isa => 'Num' , required => 1 ); #  not in docs/api/ref/schema
+has saturated_fat_ratio         => ( is => 'rw' , isa => 'Num', required => 1, default => 0 ); #  not in docs/api/ref/schema
+has saturated_fat_ratio_points  => ( is => 'rw' , isa => 'Int', required => 0 ); #  not in docs/api/ref/schema
+has saturated_fat_ratio_value   => ( is => 'rw' , isa => 'Num', required => 0 ); #  not in docs/api/ref/schema
 has sodium               => ( is => 'rw' , isa => 'Num' , required => 1 );
 has sodium_points        => ( is => 'rw' , isa => 'Int' , required => 0 );
 has sodium_value         => ( is => 'rw' , isa => 'Num' , required => 0 );
