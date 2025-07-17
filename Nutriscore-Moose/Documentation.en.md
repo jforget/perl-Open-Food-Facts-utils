@@ -598,6 +598,25 @@ way (such as `push`),
 lines 861 to 871); I doubt that  this would be allowed in standard OOP
 and that it would require jumping through several hoops.
 
+Version 8, 2023 algorithm
+=========================
+
+Version 8 is  just an attempt to improve code  coverage, especially by
+using the 2023 version of nutriscore.
+
+This required a bunch of modifications, a big one if measured as lines
+of code, yet a small one on the concept level.
+
+* Adding several attributes  dealing with nutrients that  are not used
+in version 2021 or that have a different name.
+
+* Adding an `xxx_points_max` attribute for each nutrient.
+
+* Adding a default value to each required attribute.
+
+I  do  not give  the  comparisons  with  hashmaps  and with  an  ideal
+situation, they are the same as in version 7.
+
 License
 =======
 

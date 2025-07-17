@@ -647,6 +647,25 @@ Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
 possible en  programmation objet, ou  bien alors au prix  de plusieurs
 complications.
 
+Version 8, algorithme de 2023
+=============================
+
+La version  8 est juste une  tentative pour obtenir une  couverture de
+code  un  peu meilleure,  en  testant  notamment  la version  2023  de
+l'algorithme du nutriscore.
+
+Cela  a  néanmoins  entraîné  des changements  importants  en  taille,
+quoique mineurs pour l'aspect conceptuel.
+
+* Ajout de plusieurs  attributs associés à des nutriments  qui ne sont
+pas pris en compte dans la version 2021 ou qui sont appelés autrement.
+
+* Ajout des attributs `xxx_points_max` pour tous les nutriments.
+
+* Ajout d'une valeur par défaut pour tous les attributs obligatoires.
+
+Je ne reprends la comparaison avec les _hashmaps_ et avec la situation
+idéale, c'est identique à la version 7.
 
 Licence
 =======
