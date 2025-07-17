@@ -20,32 +20,30 @@ use ProductOpener::NutriscoreData7;
 use Test::More;
 
 my @test_data = test_data();
-my @versions  = (2021);
 
-plan(tests => 4 * @versions * @test_data);
+plan(tests => 4 * @test_data);
 
-for my $version (@versions) {
-  for my $nutriscore_data_ref0 (@test_data) {
-    my $nutriscore_data_ref7 = ProductOpener::NutriscoreData7->new( %$nutriscore_data_ref0 );
+my $version  = 2021;
+for my $nutriscore_data_ref0 (@test_data) {
+  my $nutriscore_data_ref7 = ProductOpener::NutriscoreData7->new( %$nutriscore_data_ref0 );
 
-    my ($score0, $grade0) = ProductOpener::Nutriscore0::compute_nutriscore_score_and_grade( $nutriscore_data_ref0, $version );
-    my ($score7, $grade7) = ProductOpener::Nutriscore7::compute_nutriscore_score_and_grade( $nutriscore_data_ref7, $version );
-    is($score7, $score0, "$version: score is $score7, should be $score0");
-    is($grade7, $grade0, "$version: grade is $grade7, should be $grade0");
-    my @missing   = ();
-    my @different = ();
-    for my $key (sort keys %$nutriscore_data_ref0) {
-      unless ($nutriscore_data_ref7->can($key)) {
-        push @missing, $key;
-      }
-      elsif ($nutriscore_data_ref7->$key != $nutriscore_data_ref0->{$key}) {
-        # numeric test, hoping that no values are alphabetic
-        push @different, $key;
-      }
+  my ($score0, $grade0) = ProductOpener::Nutriscore0::compute_nutriscore_score_and_grade( $nutriscore_data_ref0, $version );
+  my ($score7, $grade7) = ProductOpener::Nutriscore7::compute_nutriscore_score_and_grade( $nutriscore_data_ref7, $version );
+  is($score7, $score0, "$version: score is $score7, should be $score0");
+  is($grade7, $grade0, "$version: grade is $grade7, should be $grade0");
+  my @missing   = ();
+  my @different = ();
+  for my $key (sort keys %$nutriscore_data_ref0) {
+    unless ($nutriscore_data_ref7->can($key)) {
+      push @missing, $key;
     }
-    is(0 + @missing  , 0, "$version: missing keys @missing");
-    is(0 + @different, 0, "$version: keys with different values @different");
+    elsif ($nutriscore_data_ref7->$key != $nutriscore_data_ref0->{$key}) {
+      # numeric test, hoping that no values are alphabetic
+      push @different, $key;
+    }
   }
+  is(0 + @missing  , 0, "$version: missing keys @missing");
+  is(0 + @different, 0, "$version: keys with different values @different");
 }
 
 sub test_data {
