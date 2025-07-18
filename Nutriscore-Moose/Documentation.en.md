@@ -617,6 +617,16 @@ in version 2021 or that have a different name.
 I  do  not give  the  comparisons  with  hashmaps  and with  an  ideal
 situation, they are the same as in version 7.
 
+Code coverage has improved when compared to version 7, but it is still
+very low. You can check with:
+
+```
+cover --delete
+PERL5OPT=-MDevel::Cover prove t8/*
+cover
+firefox cover_db/coverage.html &
+```
+
 License
 =======
 

@@ -58,6 +58,15 @@ has positive_points_max   => ( is => 'rw' , isa => 'Int' , required => 0 );
 has grade                 => ( is => 'rw' , isa => 'ProductOpener::NutriscoreData::grade', required => 0 );
 has score                 => ( is => 'rw' , isa => 'Int'  , required => 0 );
 
+# really useful:  negative_points
+#                 positive_points
+#                 negative_points_max
+#                 positive_points_max
+# just for t<n>/03-incr.t, even if it is silly: energy
+# (also in t<n>/02-error.t)                     fiber
+#                                               proteins
+#                                               sugars
+#                                               is_cheese
 for my $prop (qw / negative_points
                    positive_points
                    negative_points_max

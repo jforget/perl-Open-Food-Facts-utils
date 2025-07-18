@@ -667,6 +667,16 @@ pas pris en compte dans la version 2021 ou qui sont appelés autrement.
 Je ne reprends la comparaison avec les _hashmaps_ et avec la situation
 idéale, c'est identique à la version 7.
 
+La couverture  de code est meilleure  qu'avec la version 7,  mais elle
+est encore très faible. Vous pouvez le vérifier avec
+
+```
+cover --delete
+PERL5OPT=-MDevel::Cover prove t8/*
+cover
+firefox cover_db/coverage.html &
+```
+
 Licence
 =======
 

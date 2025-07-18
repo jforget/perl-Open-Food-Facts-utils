@@ -77,6 +77,7 @@ sub positive_points_max_incr {
 }
 
 # not really interesting, but we need them for unit tests t<n>/03-incr.t
+# (also in t<n>/02-error.t)
 
 sub energy_incr    { my ($self, $delta) = @_; $self->{energy}    += $delta; }
 sub fiber_incr     { my ($self, $delta) = @_; $self->{fiber}     += $delta; }

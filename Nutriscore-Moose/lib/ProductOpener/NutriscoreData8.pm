@@ -70,8 +70,8 @@ has salt                                 => ( is => 'rw' , isa => 'Num', require
 has salt_points                          => ( is => 'rw' , isa => 'Int', required => 0 );
 has salt_points_max                      => ( is => 'rw' , isa => 'Int', required => 0 );
 has salt_value                           => ( is => 'rw' , isa => 'Num', required => 0 );
-has positive_nutrients                   => ( is => 'rw' ,                   required => 0 ); # for the moment, ignore the type of this property used only in the 2023 version
-has components                           => ( is => 'rw' , isa => 'Hashref', required => 0 ); # for the moment, basic type checking
+has positive_nutrients                   => ( is => 'rw' , isa => 'ArrayRef', required => 0 ); # for the moment, ignore the type of this property used only in the 2023 version
+has components                           => ( is => 'rw' , isa => 'Hashref' , required => 0 ); # for the moment, basic type checking
 # Attributes for the 2023 version, end
 has count_proteins        => ( is => 'rw' , isa => 'Num' , required => 0 ); # in 2023 version, not in 2021
 has count_proteins_reason => ( is => 'rw' , isa => 'Str' , required => 0 ); # in 2023 version, not in 2021
@@ -82,6 +82,15 @@ has positive_points_max   => ( is => 'rw' , isa => 'Int' , required => 0, defaul
 has grade                 => ( is => 'rw' , isa => 'ProductOpener::NutriscoreData::grade', required => 0 );
 has score                 => ( is => 'rw' , isa => 'Int'  , required => 0 );
 
+# really useful:  negative_points
+#                 positive_points
+#                 negative_points_max
+#                 positive_points_max
+# just for t<n>/03-incr.t, even if it is silly: energy
+# (also in t<n>/02-error.t)                     fiber
+#                                               proteins
+#                                               sugars
+#                                               is_cheese
 for my $prop (qw / negative_points
                    positive_points
                    negative_points_max
