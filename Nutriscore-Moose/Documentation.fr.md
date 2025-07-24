@@ -639,13 +639,17 @@ propriétés, seuls les accesseurs sont autorisés,
 multi-niveau   `components`,  au   lieu   d'admettre  n'importe   quel
 _hashref_,
 
+* idem  avec la  propriété `positive_nutrients`  qui, pour  l'instant,
+admet n'importe quel _arrayref_,
+
 * utiliser des accesseurs pour modifier une propriété de type liste de
 façon incrémentale (p. ex. `push`),
 
 * statuer   sur   la   suppression   de   certaines   propriétés,   cf
 Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
 possible en  programmation objet, ou  bien alors au prix  de plusieurs
-complications.
+complications.  Ou alors,  pourrait-on alimenter  ces propriétés  avec
+`undef` ?
 
 Version 8, algorithme de 2023
 =============================
@@ -668,7 +672,7 @@ Je ne reprends la comparaison avec les _hashmaps_ et avec la situation
 idéale, c'est identique à la version 7.
 
 La couverture  de code est meilleure  qu'avec la version 7,  mais elle
-est encore très faible. Vous pouvez le vérifier avec
+est encore incomplète. Vous pouvez le vérifier avec
 
 ```
 cover --delete

@@ -591,12 +591,17 @@ syntax, now only accessors are allowed,
 * imagine how a multi-level structured data such as `components` would
 be implemented, instead of accepting any hashref,
 
+* same thing with property  `positive_nutrients`, which for the moment
+accepts any arrayref,
+
 * using accessors  to modify a  array-like property in  an incremental
 way (such as `push`),
 
 * decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
 lines 861 to 871); I doubt that  this would be allowed in standard OOP
-and that it would require jumping through several hoops.
+and  that  it would  require  jumping  through  several hoops.  Is  it
+possible to  fill these  properties with  `undef` instead  of deleting
+them?
 
 Version 8, 2023 algorithm
 =========================
@@ -618,7 +623,7 @@ I  do  not give  the  comparisons  with  hashmaps  and with  an  ideal
 situation, they are the same as in version 7.
 
 Code coverage has improved when compared to version 7, but it is still
-very low. You can check with:
+partial. You can check with:
 
 ```
 cover --delete
