@@ -681,6 +681,64 @@ cover
 firefox cover_db/coverage.html &
 ```
 
+Version 9, tableau `positive_nutrients`
+=======================================
+
+Cette  version a  pour but  d'eliminer  la syntaxe  _hashmap_ pour  la
+propriété  de  type liste  `positive_nutrients`.  Il  ne reste  qu'une
+instruction  avec la  syntaxe  _hashmap_, un  `unshift`  de la  chaîne
+`"proteins"`. Également, faire  un contrôle de type  pour les éléments
+de la liste.
+
+Mes sources d'inspiration pour cette adaptation sont :
+
+* [Stack overflow](https://stackoverflow.com/questions/3487559/accessing-a-moose-array),
+
+* [le manuel de Moose](https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Delegation.pod#NATIVE-DELEGATION).
+
+Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
+
+* le contrôle de valeur des propriétés scalaires : chaînes, entiers (y
+compris le cas particulier des  entiers servant de booléens) et réels.
+Ce contrôle  est effectué lorsque  l'on crée une instance,  mais aussi
+lorsqu'elle est modifiée par le  biais d'un accesseur en mode « annule
+et remplace » ou en mode incrémentation.
+
+* utiliser  un  accesseur  pour  lire  une  propriété  scalaire,  pour
+remplacer sa  valeur (après  l'avoir contrôlée)  et dans  certains cas
+pour l'incrémenter,
+
+* le contrôle des propriétés listes, en appliquant un contrôle de type
+sur chaque élément de la liste,
+
+* utiliser un accesseur  pour lire la liste et pour  la mettre à jour,
+aussi  bien en  « annule et  remplace » qu'en  mode incrémental  comme
+`unshift`,
+
+* interdire  toute propriété  qui n'est  pas déclarée  dans la  classe
+(contrôle activé lorsque la propriété est mentionnée par le biais d'un
+accesseur,  contrôle ineffectif  lorsque l'on  utilise la  syntaxe des
+_hashmaps_),
+
+* contrôle plus fin sur la  propriété `grade`, qui devrait prendre les
+valeurs « `a` »,  « `b` », « `c` », « `d` » et  « `e` », à l'exclusion
+de toute autre valeur,
+
+Que reste-t-il à faire pour avoir une situation idéale ?
+
+* encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
+propriétés, seuls les accesseurs sont autorisés,
+
+* imaginer  ce  que  pourrait  être   la  structure  de  la  propriété
+multi-niveau   `components`,  au   lieu   d'admettre  n'importe   quel
+_hashref_,
+
+* statuer   sur   la   suppression   de   certaines   propriétés,   cf
+Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
+possible en  programmation objet, ou  bien alors au prix  de plusieurs
+complications.  Ou alors,  pourrait-on alimenter  ces propriétés  avec
+`undef` ?
+
 Licence
 =======
 

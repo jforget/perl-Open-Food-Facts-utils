@@ -632,6 +632,57 @@ cover
 firefox cover_db/coverage.html &
 ```
 
+Version 9, array `positive_nutrients`
+=====================================
+
+This  version aims  at  eliminating the  hashmap  syntax for  property
+`positive_nutrients`.  There is  a single  remaining one,  a `unshift`
+with string value  `"proteins"`. Also, we want type  checking for each
+element of the array.
+
+I have used the following pages:
+
+* [Stack overflow](https://stackoverflow.com/questions/3487559/accessing-a-moose-array),
+
+* [the Moose manual](https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Delegation.pod#NATIVE-DELEGATION).
+
+Which improvements, when compared with plain hashmaps?
+
+* checking  the  values  for   scalar  properties:  strings,  integers
+(including the special  case of integers used as  booleans) and reals.
+This check is done both when creating an instance and when updating it
+through an accessor (replacement or incrementation).
+
+* using  accessors to  read a  scalar property,  to replace  its value
+(after checking it) and sometimes to increment it (with type check),
+
+* checking list properties,  by applying a type check  to each element
+of the list,
+
+* using accessors  to read a  list property,  to replace its  value by
+overwriting it or by incrementally updating it (e.g. `unshift`),
+
+* reject  any property  which  is  not declared  in  the class  (check
+enabled  when using  an accessor,  not  enabled if  using the  hashmap
+syntax),
+
+* stricter checks on  property `grade`, which should  be "`a`", "`b`",
+"`c`", "`d`" or "`e`" and nothing else,
+
+What needs to be done to reach an ideal situation?
+
+* encapsulation:  forbid  accesses  to properties  using  the  hashmap
+syntax, now only accessors are allowed,
+
+* imagine how a multi-level structured data such as `components` would
+be implemented, instead of accepting any hashref,
+
+* decide  on the  deletion of  some properties  (ses `Nutriscore0.pm`,
+lines 861 to 871); I doubt that  this would be allowed in standard OOP
+and  that  it would  require  jumping  through  several hoops.  Is  it
+possible to  fill these  properties with  `undef` instead  of deleting
+them?
+
 License
 =======
 
