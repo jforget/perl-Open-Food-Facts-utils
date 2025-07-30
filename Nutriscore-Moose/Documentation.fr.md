@@ -681,6 +681,38 @@ cover
 firefox cover_db/coverage.html &
 ```
 
+Je  ne cherche  pas à  avoir une  couverture de  code à  100%. Un  tel
+objectif ouvrirait la porte aux dysfonctionnements mis en évidence par la
+[loi](https://freakonometrics.hypotheses.org/61681).
+de [Goodhart](https://xkcd.com/2899/).
+De plus, comme je l'ai présenté lors des
+[Journées Perl 2015](https://journeesperl.fr/fpw2015/talk/6309),
+une couverture à 100% n'est pas  une garantie pour l'absence totale de
+bugs. En revanche, comme je l'ai présenté lors des
+[Journées Perl 2013](http://www.youtube.com/watch?v=eXRPWdoLBzA),
+faire un  effort même incomplet  pour améliorer la couverture  de code
+permet parfois  de mettre en évidence  des bugs que l'on  n'aurait pas
+trouvés autrement. Voir les lignes 779, 784 et 787 de
+[Nutriscore7.pm](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/8d2629f533e6bae0e1dda412da7bd4e6569e1377/Nutriscore-Moose/lib/ProductOpener/Nutriscore7.pm#L779)
+et
+[Nutriscore8.pm](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/8d2629f533e6bae0e1dda412da7bd4e6569e1377/Nutriscore-Moose/lib/ProductOpener/Nutriscore8.pm#L779)
+
+Quant au
+[sujet 12172](https://github.com/openfoodfacts/openfoodfacts-server/issues/12172),
+au début j'ai ajouté l'appel de
+`get_value_with_one_less_negative_point` et de
+`get_value_with_one_more_positive_point` dans les scripts de test,
+ce qui aurait implicitement assuré la couverture de
+`get_value_with_one_less_negative_point_2023` et de
+`get_value_with_one_more_positive_point_2023`.
+Or ces fonctions plantaient. Je les ai remplacées dans les
+scripts de test par les fonctions `xxx_2023` et j'ai soumis le
+[sujet 12172](https://github.com/openfoodfacts/openfoodfacts-server/issues/12172).
+L'équipe d'Open Food Facts a purement et simplement décidé de
+[supprimer](https://github.com/openfoodfacts/openfoodfacts-server/pull/12176/commits/ec66bff057c4692ca61eb56775374be387865838)
+les fonctions `get_value_with_one_less_negative_point` et
+`get_value_with_one_more_positive_point`.
+
 Version 9, tableau `positive_nutrients`
 =======================================
 

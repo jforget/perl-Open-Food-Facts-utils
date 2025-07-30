@@ -632,6 +632,38 @@ cover
 firefox cover_db/coverage.html &
 ```
 
+I  do not  strive  to obtain  a  100% code  coverage.  Doing so  would
+generate quirks associated with
+[Goodhart's](https://fourweekmba.com/goodharts-law/)
+[law](https://xkcd.com/2899/).
+Moreover, as I explained (in French) during the
+[French Perl Workshop in 2015](https://journeesperl.fr/fpw2015/talk/6309),
+a 100% code coverage is no  warranty for the complete absence of bugs.
+On the other hand, as I explained (in French) during the
+[French Perl Workshop in 2013](http://www.youtube.com/watch?v=eXRPWdoLBzA),
+improving  code coverage,  even if  we  do not  reach 100%,  sometimes
+exposes bugs that would have kept  un-noticed else. See lines 779, 784
+and 787 of
+[Nutriscore7.pm](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/8d2629f533e6bae0e1dda412da7bd4e6569e1377/Nutriscore-Moose/lib/ProductOpener/Nutriscore7.pm#L779)
+and
+[Nutriscore8.pm](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/8d2629f533e6bae0e1dda412da7bd4e6569e1377/Nutriscore-Moose/lib/ProductOpener/Nutriscore8.pm#L779)
+
+As for
+[issue 12172](https://github.com/openfoodfacts/openfoodfacts-server/issues/12172),
+at first I had included fuctions
+`get_value_with_one_less_negative_point` and
+`get_value_with_one_more_positive_point` in the test scripts, which
+would implicitly add `get_value_with_one_less_negative_point_2023` and
+`get_value_with_one_more_positive_point_2023` to the covered code.
+Unfortunately, these functions were buggy and they would crash the
+test script. So I replaced them in the test script by a direct call to
+functions `xxx_2023` and I submitted
+[issue 12172](https://github.com/openfoodfacts/openfoodfacts-server/issues/12172).
+The Open Food Facts team then decided to
+[remove](https://github.com/openfoodfacts/openfoodfacts-server/pull/12176/commits/ec66bff057c4692ca61eb56775374be387865838)
+functions `get_value_with_one_less_negative_point` and
+`get_value_with_one_more_positive_point`.
+
 Version 9, array `positive_nutrients`
 =====================================
 
