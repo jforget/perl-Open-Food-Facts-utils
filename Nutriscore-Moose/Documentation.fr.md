@@ -192,10 +192,21 @@ La première version contient :
 * le script  `example1.pl`, servant de  test pour l'intégration  de la
 classe lib/PO/ND1.pm avec le module lib/PO/N1.pm
 
-* les  scripts `t1/*.t`,  servant de  tests unitaires  pour la  classe
-lib/PO/ND1.pm et étant indépendants du module lib/PO/N1.pm
+* les  scripts de test `t1/*.t`,
 
-et idem pour les versions suivantes.
+et idem pour les versions suivantes. La version 10 est identifiée
+par des `"a"` (vous vous en doutiez) et contient donc :
+
+* la classe `lib/ProductOpener/NutriscoreDataa.pm`
+
+* le module `lib/ProductOpener/Nutriscorea.pm`
+
+* le script  `examplea.pl`, servant de  test pour l'intégration  de la
+classe lib/PO/NDa.pm avec le module lib/PO/Na.pm
+
+* les  scripts de test `ta/*.t`.
+
+Et la version 16 est identifiée par `"g"` (quelle surprise !).
 
 Pré-requis
 ----------
@@ -666,7 +677,8 @@ pas pris en compte dans la version 2021 ou qui sont appelés autrement.
 
 * Ajout des attributs `xxx_points_max` pour tous les nutriments.
 
-* Ajout d'une valeur par défaut pour tous les attributs obligatoires.
+* Ajout d'une valeur  par défaut pour tous  les attributs obligatoires
+(_spoiler_ : on reviendra en arrière dans la version 10).
 
 Je ne reprends la comparaison avec les _hashmaps_ et avec la situation
 idéale, c'est identique à la version 7.
@@ -727,6 +739,60 @@ Mes sources d'inspiration pour cette adaptation sont :
 * [Stack overflow](https://stackoverflow.com/questions/3487559/accessing-a-moose-array),
 
 * [le manuel de Moose](https://metacpan.org/dist/Moose/view/lib/Moose/Manual/Delegation.pod#NATIVE-DELEGATION).
+
+Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
+
+* le contrôle de valeur des propriétés scalaires : chaînes, entiers (y
+compris le cas particulier des  entiers servant de booléens) et réels.
+Ce contrôle  est effectué lorsque  l'on crée une instance,  mais aussi
+lorsqu'elle est modifiée par le  biais d'un accesseur en mode « annule
+et remplace » ou en mode incrémentation.
+
+* utiliser  un  accesseur  pour  lire  une  propriété  scalaire,  pour
+remplacer sa  valeur (après  l'avoir contrôlée)  et dans  certains cas
+pour l'incrémenter,
+
+* le contrôle des propriétés listes, en appliquant un contrôle de type
+sur chaque élément de la liste,
+
+* utiliser un accesseur  pour lire la liste et pour  la mettre à jour,
+aussi  bien en  « annule et  remplace » qu'en  mode incrémental  comme
+`unshift`,
+
+* interdire  toute propriété  qui n'est  pas déclarée  dans la  classe
+(contrôle activé lorsque la propriété est mentionnée par le biais d'un
+accesseur,  contrôle ineffectif  lorsque l'on  utilise la  syntaxe des
+_hashmaps_),
+
+* contrôle plus fin sur la  propriété `grade`, qui devrait prendre les
+valeurs « `a` »,  « `b` », « `c` », « `d` » et  « `e` », à l'exclusion
+de toute autre valeur,
+
+Que reste-t-il à faire pour avoir une situation idéale ?
+
+* encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
+propriétés, seuls les accesseurs sont autorisés,
+
+* imaginer  ce  que  pourrait  être   la  structure  de  la  propriété
+multi-niveau   `components`,  au   lieu   d'admettre  n'importe   quel
+_hashref_,
+
+* statuer   sur   la   suppression   de   certaines   propriétés,   cf
+Nutriscore0.pm  lignes  861 à  871 ;  cela  m'étonnerait que  ce  soit
+possible en  programmation objet, ou  bien alors au prix  de plusieurs
+complications.  Ou alors,  pourrait-on alimenter  ces propriétés  avec
+`undef` ? Cela  dit, cette possibilité  risque de poser  des problèmes
+étant donné que certaines propriétés sont déclarées obligatoires.
+
+Version 10, plus de valeurs par défaut
+======================================
+
+L'ajout de valeurs par défaut dans  la version 8 était nécessaire pour
+éviter  des messages  d'avertissement  lors de  l'appel d'une  méthode
+`xxx_incr`  pour  un  nutirment   absent  de  l'instance  `PO::ND`  ou
+indéfini. En ajustant le code  de ces méthodes `xxx_incr`, les valeurs
+par  défaut  sont désormais  inutiles  et  les nutriments  absents  du
+produit ont une valeur `undef` au lieu de `0`.
 
 Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
 
