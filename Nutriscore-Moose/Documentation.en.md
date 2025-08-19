@@ -775,6 +775,88 @@ and  that  it would  require  jumping  through  several hoops.  Is  it
 possible to  fill these  properties with  `undef` instead  of deleting
 them?
 
+Version 11, deleting properties from instances
+==============================================
+
+The  question about  the possibility  of deleting  a property  from an
+object instance has two interpretations.
+
+The first  one is "Is  it moral  to delete a  property?". I am  not in
+position  to  answer  this  question. I  learnt  OOP  (object-oriented
+programming) on the run. I had no academic lessons on this topic.
+
+The second interpretation of this question is "Is it legal to delete a
+property?".  In this  case, "legal"  means "allowed  by Perl,  without
+resorting to  dirty tricks involving,  for example, `eval`".  For this
+case, I can give an authoritative answer and this answer is yes. Up to
+version 10, it has worked in
+[`Nutriscore.pm` line 861 to 871](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L871)
+with  the `delete`  statement and  the hashmap  syntax. Starting  with
+version  11,  it  is  encapsulated within  `xxx_delete`  methods  from
+`NutriscoreData.pm`, which  use internally the `delete`  statement and
+the hashmap syntax.
+
+Of  course, this  answer applies  only  to systems  where objects  are
+enhanced hashtables: Perl + `bless`, Perl + `Moose`, JSON. It does not
+apply to systems in which objects are enhanced `struct`'s such as C++.
+As for  systems in  which objects  are black  boxes or  basic elements
+(Raku, Perl +  Corinna, ...), you have  to read the fine  manual and I
+guess this answer  will be that you cannot delete  a property instance
+and  if you  really want  to, you  should instead  fill this  property
+instance with `undef` or similar.
+
+As for the answer to the first question, it should be unrelated to the
+system you use. Yet, I have the  feeling that it could be plagued with
+the  programming language  equivalent of  the Sapir-Whorf  hypothesis,
+which usually  deals with natural  languages. If a  programmer learned
+OOP  with C++  or with  any  language using  enhanced `struct`'s,  his
+answer could be:
+
+> Are you crazy ot what? Deleting a property is impossible. Therefore,
+> wondering if it is moral or not is totally ludicrous.
+
+Even if I have read a  C++ programming manual before learning Perl, my
+opinion on this  question is that the removal of  a property should be
+allowed, in the rare cases when it is justified. Yet, I have not found
+any examples other  than `Nutriscore.pm` in which  removing a property
+is justified.  And as I said  above, I am not  an authoritative source
+for OOP theory.
+
+Which improvements, when compared with plain hashmaps?
+
+* checking  the  values  for   scalar  properties:  strings,  integers
+(including the special  case of integers used as  booleans) and reals.
+This check is done both when creating an instance and when updating it
+through an accessor (replacement or incrementation).
+
+* using  accessors to  read a  scalar property,  to replace  its value
+(after checking it) and sometimes to increment it (with type check) or
+to delete it,
+
+* checking list properties,  by applying a type check  to each element
+of the list,
+
+* using accessors  to read a  list property,  to replace its  value by
+overwriting it or by incrementally updating it (e.g. `unshift`),
+
+* reject  any property  which  is  not declared  in  the class  (check
+enabled  when using  an accessor,  not  enabled if  using the  hashmap
+syntax),
+
+* stricter checks on  property `grade`, which should  be "`a`", "`b`",
+"`c`", "`d`" or "`e`" and nothing else,
+
+What needs to be done to reach an ideal situation?
+
+* encapsulation:  forbid  accesses  to properties  using  the  hashmap
+syntax, now only accessors are allowed,
+
+* imagine how a multi-level structured data such as `components` would
+be implemented, instead of accepting any hashref,
+
+* convince  other people  that the  deletion of  some properties  (see
+`Nutriscore0.pm`, lines 861 to 871) is not absurd.
+
 License
 =======
 

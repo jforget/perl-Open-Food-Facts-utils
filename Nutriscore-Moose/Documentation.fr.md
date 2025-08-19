@@ -837,6 +837,98 @@ possible en  programmation objet, ou  bien alors au prix  de plusieurs
 complications.  Ou alors,  pourrait-on alimenter  ces propriétés  avec
 `undef` ?
 
+Version 11, suppression des propriété d'une instance
+====================================================
+
+La question  de savoir si l'on  peut supprimer une propriété  dans une
+instance d'objet a deux interprétations.
+
+La  première  interprétation  est  « A-t-on  moralement  le  droit  de
+supprimer une propriété ? ». Je ne suis pas bien placé pour répondre à
+cette question. J'ai appris la  POO (programmation orientée objet) sur
+le tas. Je n'ai pas eu de cours sur les principes de la POO.
+
+La deuxième interprétation est : « A-t-on légalement la possibilité de
+supprimer une  propriété ? ». Ici,  « légal » signifie  « en utilisant
+des instructions Perl  basiques, sans recourir à  des astuces reposant
+par exemple  sur des `eval`. »  Pour cette interprétation, je  suis en
+mesure de donner une réponse et  cette réponse est affirmative. Cela a
+fonctionné depuis  toujours avec l'instruction `delete`  et la syntaxe
+_hashmap_ dans
+[`Nutriscore.pm` lignes 861 à 871](https://github.com/jforget/perl-Open-Food-Facts-utils/blob/master/Nutriscore-Moose/lib/ProductOpener/Nutriscore0.pm#L861)
+Maintenant, encapsulation oblige, cela fonctionne grâce à des méthodes
+`xxx_delete`,  elles-mêmes programmées  dans `NutriscoreData.pm`  avec
+l'instruction `delete` et la syntaxe _hashmap_.
+
+Évidemment, cette réponse est valable  pour les systèmes où les objets
+sont  des  tables de  hachage  améliorées :  Perl  + `bless`,  Perl  +
+`Moose`, JSON. Elle ne s'applique pas  aux systèmes où les objets sont
+des `struct`  améliorés, comme C++.  Quant aux systèmes où  les objets
+sont  des  boîtes noires  ou  des  éléments  primaires (Raku,  Perl  +
+Corinna, ...), il faut se reporter  à la documentation, avec de fortes
+chances pour que  l'on vous dise que  ce n'est pas possible  et que si
+vous en avez vraiment envie, vous  avez plutôt intérêt à alimenter les
+propriétés avec `undef` ou l'équivalent.
+
+La réponse à la première question devrait être indépendante du système
+utilisé. Cela  dit, j'ai le  pressentiment que cette  réponse pourrait
+mettre  en   évidence  un   équivalent  informatique   de  l'hypothèse
+Sapir-Whorf qui  concerne les langages  naturels. Si un  programmeur a
+appris la POO avec C++ ou avec un autre langage utilisant des `struct`
+améliorés, sa réponse pourrait être du genre :
+
+> Non mais ça va pas ! C'est  quoi ce délire ? Supprimer une propriété
+> est impossible, il est absurde de se demander s'il est acceptable ou
+> inacceptable de le faire.
+
+Même si j'ai lu un manuel de programmation C++ avant d'apprendre Perl,
+mon opinion  sur le  sujet est  que la  suppression d'une  instance de
+propriété devrait être autorisée, dans les rares cas où cela s'impose.
+Cela  dit,  outre  `Nutriscore.pm`,  je  n'ai  pas  trouvé  d'exemples
+requérant la suppression d'une propriété.  Et comme je l'ai écrit plus
+haut, je ne suis pas un spécialiste de l'aspect théorique de la POO.
+
+Qu'a-t-on gagné par rapport aux _hashmaps_ traditionnels ?
+
+* le contrôle de valeur des propriétés scalaires : chaînes, entiers (y
+compris le cas particulier des  entiers servant de booléens) et réels.
+Ce contrôle  est effectué lorsque  l'on crée une instance,  mais aussi
+lorsqu'elle est modifiée par le  biais d'un accesseur en mode « annule
+et remplace » ou en mode incrémentation.
+
+* utiliser  un  accesseur  pour  lire  une  propriété  scalaire,  pour
+remplacer sa  valeur (après  l'avoir contrôlée)  et dans  certains cas
+pour l'incrémenter (avec contrôle de type) ou pour la supprimer,
+
+* le contrôle des propriétés listes, en appliquant un contrôle de type
+sur chaque élément de la liste,
+
+* utiliser un accesseur  pour lire la liste et pour  la mettre à jour,
+aussi  bien en  « annule et  remplace » qu'en  mode incrémental  comme
+`unshift`,
+
+* interdire  toute propriété  qui n'est  pas déclarée  dans la  classe
+(contrôle activé lorsque la propriété est mentionnée par le biais d'un
+accesseur,  contrôle ineffectif  lorsque l'on  utilise la  syntaxe des
+_hashmaps_),
+
+* contrôle plus fin sur la  propriété `grade`, qui devrait prendre les
+valeurs « `a` »,  « `b` », « `c` », « `d` » et  « `e` », à l'exclusion
+de toute autre valeur,
+
+Que reste-t-il à faire pour avoir une situation idéale ?
+
+* encapsulation : interdire  les accès  de syntaxe _hashmap_  pour les
+propriétés, seuls les accesseurs sont autorisés,
+
+* imaginer  ce  que  pourrait  être   la  structure  de  la  propriété
+multi-niveau   `components`,  au   lieu   d'admettre  n'importe   quel
+_hashref_,
+
+* convaincre nos  pairs que la  suppression de certaines  instances de
+propriété,  cf  Nutriscore0.pm  lignes  861   à  871,  n'est  pas  une
+absurdité.
+
 Licence
 =======
 
