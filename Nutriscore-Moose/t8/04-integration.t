@@ -24,44 +24,44 @@ my @test_2023 = test_data_2023();
 
 plan(tests => 4 * @test_2021 + 5 * @test_2023);
 
-for my $nutriscore_data_ref0 (@test_2021) {
-  check($nutriscore_data_ref0, 2021);
+for my $nutriscore_data_ref_old (@test_2021) {
+  check($nutriscore_data_ref_old, 2021);
 }
 
-for my $nutriscore_data_ref0 (@test_2023) {
-  check($nutriscore_data_ref0, 2023);
+for my $nutriscore_data_ref_old (@test_2023) {
+  check($nutriscore_data_ref_old, 2023);
 }
 
-sub check($nutriscore_data_ref0, $version) {
-  my $nutriscore_data_ref8 = ProductOpener::NutriscoreData8->new( %$nutriscore_data_ref0 );
+sub check($nutriscore_data_ref_old, $version) {
+  my $nutriscore_data_ref_new = ProductOpener::NutriscoreData8->new( %$nutriscore_data_ref_old );
 
-  my ($score0, $grade0) = ProductOpener::Nutriscore0::compute_nutriscore_score_and_grade( $nutriscore_data_ref0, $version );
-  my ($score8, $grade8) = ProductOpener::Nutriscore8::compute_nutriscore_score_and_grade( $nutriscore_data_ref8, $version );
-  is($score8, $score0, "$version: score is $score8, should be $score0");
-  is($grade8, $grade0, "$version: grade is $grade8, should be $grade0");
+  my ($score_old, $grade_old) = ProductOpener::Nutriscore0::compute_nutriscore_score_and_grade( $nutriscore_data_ref_old, $version );
+  my ($score_new, $grade_new) = ProductOpener::Nutriscore8::compute_nutriscore_score_and_grade( $nutriscore_data_ref_new, $version );
+  is($score_new, $score_old, "$version: score is $score_new, should be $score_old");
+  is($grade_new, $grade_old, "$version: grade is $grade_new, should be $grade_old");
 
   my @missing   = ();
   my @different = ();
-  for my $key (sort keys %$nutriscore_data_ref0) {
+  for my $key (sort keys %$nutriscore_data_ref_old) {
     if ($key eq 'components' or $key eq 'positive_nutrients') {
       next;
     }
-    unless ($nutriscore_data_ref8->can($key)) {
+    unless ($nutriscore_data_ref_new->can($key)) {
       push @missing, $key;
     }
-    elsif ($nutriscore_data_ref8->$key ne $nutriscore_data_ref0->{$key}) {
+    elsif ($nutriscore_data_ref_new->$key ne $nutriscore_data_ref_old->{$key}) {
       # numeric test, hoping that no values are alphabetic
-      push @different, sprintf("%s (%s <> %s)", $key, $nutriscore_data_ref8->$key, $nutriscore_data_ref0->{$key});
+      push @different, sprintf("%s (%s <> %s)", $key, $nutriscore_data_ref_new->$key, $nutriscore_data_ref_old->{$key});
     }
   }
   is(0 + @missing  , 0, "$version: missing keys @missing");
   is(0 + @different, 0, "$version: keys with different values @different");
   if ($version == 2023) {
     my %exist;
-    for my $nutrient (@{$nutriscore_data_ref0->{positive_nutrients}}) {
+    for my $nutrient (@{$nutriscore_data_ref_old->{positive_nutrients}}) {
       $exist{$nutrient} ++;
     }
-    for my $nutrient (@{$nutriscore_data_ref8->positive_nutrients}) {
+    for my $nutrient (@{$nutriscore_data_ref_new->positive_nutrients}) {
       $exist{$nutrient} += 2;
     }
     my @missing = grep { $exist{$_} == 1 } keys %exist;

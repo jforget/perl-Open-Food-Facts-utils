@@ -26,18 +26,18 @@ my @nutrient_2023 = qw/ energy sugars saturated_fat energy_from_saturated_fat sa
 
 plan(tests => 2 * @nutrient_2021 * @test_2021 + 2 * @nutrient_2023 * @test_2023);
 
-for my $nutriscore_data_ref0 (@test_2021) {
+for my $nutriscore_data_ref_old (@test_2021) {
   for my $nutrient (@nutrient_2021) {
-    $nutriscore_data_ref0->{$nutrient . "_value"} //= $nutriscore_data_ref0->{$nutrient} // 0;
+    $nutriscore_data_ref_old->{$nutrient . "_value"} //= $nutriscore_data_ref_old->{$nutrient} // 0;
   }
-  my $nutriscore_data_ref9 = ProductOpener::NutriscoreData9->new( %$nutriscore_data_ref0 );
+  my $nutriscore_data_ref_new = ProductOpener::NutriscoreData9->new( %$nutriscore_data_ref_old );
   for my $nutrient (@nutrient_2021) {
-    if (defined $nutriscore_data_ref0->{$nutrient}) {
-      my $ref  = ProductOpener::Nutriscore0::get_value_with_one_less_negative_point_2021 ($nutriscore_data_ref0, $nutrient);
-      my $test = ProductOpener::Nutriscore9::get_value_with_one_less_negative_point_2021 ($nutriscore_data_ref9, $nutrient);
+    if (defined $nutriscore_data_ref_old->{$nutrient}) {
+      my $ref  = ProductOpener::Nutriscore0::get_value_with_one_less_negative_point_2021 ($nutriscore_data_ref_old, $nutrient);
+      my $test = ProductOpener::Nutriscore9::get_value_with_one_less_negative_point_2021 ($nutriscore_data_ref_new, $nutrient);
       is($test, $ref, "2021 negative point on $nutrient");
-      $ref  = ProductOpener::Nutriscore0::get_value_with_one_more_positive_point_2021 ($nutriscore_data_ref0, $nutrient);
-      $test = ProductOpener::Nutriscore9::get_value_with_one_more_positive_point_2021 ($nutriscore_data_ref9, $nutrient);
+      $ref  = ProductOpener::Nutriscore0::get_value_with_one_more_positive_point_2021 ($nutriscore_data_ref_old, $nutrient);
+      $test = ProductOpener::Nutriscore9::get_value_with_one_more_positive_point_2021 ($nutriscore_data_ref_new, $nutrient);
       is($test, $ref, "2021 positive point on $nutrient");
     }
     else {
@@ -47,15 +47,15 @@ for my $nutriscore_data_ref0 (@test_2021) {
   }
 }
 
-for my $nutriscore_data_ref0 (@test_2023) {
-  my $nutriscore_data_ref9 = ProductOpener::NutriscoreData9->new( %$nutriscore_data_ref0 );
+for my $nutriscore_data_ref_old (@test_2023) {
+  my $nutriscore_data_ref_new = ProductOpener::NutriscoreData9->new( %$nutriscore_data_ref_old );
   for my $nutrient (@nutrient_2023) {
-    if (defined $nutriscore_data_ref0->{$nutrient}) {
-      my $ref  = ProductOpener::Nutriscore0::get_value_with_one_less_negative_point_2023 ($nutriscore_data_ref0, $nutrient, $nutriscore_data_ref0->{$nutrient});
-      my $test = ProductOpener::Nutriscore9::get_value_with_one_less_negative_point_2023 ($nutriscore_data_ref9, $nutrient, $nutriscore_data_ref9->$nutrient);
+    if (defined $nutriscore_data_ref_old->{$nutrient}) {
+      my $ref  = ProductOpener::Nutriscore0::get_value_with_one_less_negative_point_2023 ($nutriscore_data_ref_old, $nutrient, $nutriscore_data_ref_old->{$nutrient});
+      my $test = ProductOpener::Nutriscore9::get_value_with_one_less_negative_point_2023 ($nutriscore_data_ref_new, $nutrient, $nutriscore_data_ref_new->$nutrient);
       is($test, $ref, "2023 negative point on $nutrient");
-      $ref  = ProductOpener::Nutriscore0::get_value_with_one_more_positive_point_2023 ($nutriscore_data_ref0, $nutrient, $nutriscore_data_ref0->{$nutrient});
-      $test = ProductOpener::Nutriscore9::get_value_with_one_more_positive_point_2023 ($nutriscore_data_ref9, $nutrient, $nutriscore_data_ref9->$nutrient);
+      $ref  = ProductOpener::Nutriscore0::get_value_with_one_more_positive_point_2023 ($nutriscore_data_ref_old, $nutrient, $nutriscore_data_ref_old->{$nutrient});
+      $test = ProductOpener::Nutriscore9::get_value_with_one_more_positive_point_2023 ($nutriscore_data_ref_new, $nutrient, $nutriscore_data_ref_new->$nutrient);
       is($test, $ref, "2023 positive point on $nutrient");
     }
     else {
@@ -169,7 +169,7 @@ sub test_data_2023 {
 
 =head1 NAME
 
-04-integration.t -- Testing the integration of NutriscoreData with Nutriscore
+04-more-or-less.t -- Testing the integration of NutriscoreData with Nutriscore functions get_value_with_one_less_negative_point_2023 and ..._one_more_positive_...
 
 =head1 USAGE
 
